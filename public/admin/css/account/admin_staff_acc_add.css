@@ -1,0 +1,28 @@
+#contentBlock {
+    display: flex;
+    justify-content: center;
+}
+#formcard {
+    width: 80%;
+    padding-bottom: 12px;
+}
+#addForm th, #addForm td {
+    vertical-align: middle;
+}
+#addForm input {
+    width: 100%;
+    padding: 6px 6px 6px 12px;
+}
+#btncon {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    flex-flow: row-reverse;
+    justify-content: space-around;
+    align-content: center;
+    align-items: center;
+}
+#btncon button {
+    width: 20%;
+    margin: 0;
+}

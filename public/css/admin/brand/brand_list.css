@@ -1,0 +1,76 @@
+#content {
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+}
+table {
+    width: 60%;
+    height: auto;
+    /* margin-top: 50px; */
+    background-color: black; 
+}
+th {
+    height: 150px;
+    background-color: white;
+    font-size: 35px;
+    text-align: center;
+}
+td {
+    height: 100px;
+    text-align: center;
+    background-color: white;
+    font-size: 35px;
+    padding: 0px 5px 0px 5px;
+}
+table, th, td {
+    border: 2px solid black;
+}
+/* th, td {
+    padding: 0px 5px 0px 5px;
+} */
+#brands_action, .editbtn {
+    width: 100%;
+    height: 150px;
+    display: flex;
+    flex-flow: column;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    align-content: center;
+    align-items: center;
+}
+.editbtn {
+    height: 100px;
+}
+#brands_action a, .editbtn a {
+    text-decoration: none;
+    width: 150px;
+    height: 50px;
+    /* margin: 5px; */
+    padding: 0;
+}
+.txt_btn {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-content: center;
+    align-items: center;
+}
+#brands_action div, .editbtn div {
+    width: 150px;
+    height: 50px;
+    background-color: black;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    border: none;
+    /* border-radius: 45px; */
+    cursor: pointer;
+}
+#brands_action div:hover, .editbtn div:hover {
+    background-color: #d0021b;
+}
+#brands_action div:active, .editbtn div:active {
+    background-color: white;
+    color: #d0021b;
+    border: 2px solid #d0021b;
+}

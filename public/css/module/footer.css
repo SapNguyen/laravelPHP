@@ -1,0 +1,13 @@
+footer{
+    margin-top: 100px;
+    width: 100%;
+    background-image: url("https://theme.hstatic.net/200000265619/1000946504/14/bg_fot.jpg?v=372");
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: auto; 
+    padding: 50px 20%;
+  }
+  footer div div p, footer div div h6{
+    color: white;
+    margin-top: 10px;
+  } 

@@ -1,0 +1,217 @@
+html, body {
+    min-width: 750px;
+}
+
+#content {
+    display: flex;
+    flex-flow: column;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-content: center;
+    align-items: center;
+}
+
+#staffTable {
+    width: 95%;
+    height: 686px;
+    position: relative;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    border: 2px solid lightgrey;
+}
+
+table {
+    width: 100%;
+    font-size: 20px;
+    table-layout: fixed;
+}
+
+th, td {
+    padding: 5px 10px 5px 10px;
+    border-bottom: 1px solid black;
+    border-left: 1px solid black;
+    vertical-align: middle;
+    
+    white-space: nowrap;
+    overflow: hidden !important;
+    text-overflow: ellipsis;
+}
+
+th {
+    height: 42px;
+    cursor: pointer;
+}
+
+td {
+    height: 92px;
+}
+
+.actionbtn {
+    width: 95px;
+    height: 35px;
+    border: 1px solid black;
+    margin: 5px;
+}
+
+.lastcol {
+    border-right: 1px solid black;
+    padding: 0;
+}
+
+.btncol {
+    width: 100%;
+    display: flex;
+    flex-flow: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: center;
+    align-items: flex-start;
+
+}
+
+#firstrow {
+    position: sticky;
+    background-color: white;
+    top: 0;
+    z-index: 1;
+}
+
+.firstrow {
+    border-top: 1px solid black;
+}
+
+.lastrow {
+    border: none;
+    border-top: 1px solid black;
+}
+
+form {
+    width: 100%;
+    font-size: 20px;
+    padding: 0 2.5%;
+}
+
+#filterblock {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+}
+
+#filterblock span {
+    margin: 5px 7px;
+}
+
+#filbtn, #addbtn {
+    width: 70px;
+    height: 35px;
+    background-color: black;
+    color: white;
+    border: 1px solid black;
+}
+
+#addbtn {
+    width: 100px;
+}
+
+#filbtn:hover, #addbtn:hover {
+    background-color: #d0021b;
+    border: 1px solid #d0021b;
+}
+
+#filbtn:active, #addbtn:active {
+    background-color: white;
+    color: #d0021b;
+}
+
+#Sac1, #Sac0 {
+    width: 20px;
+    height: 20px;
+}
+
+#staSpan {
+    display: flex;
+    align-items: center;
+}
+
+#addStaff {
+    width: 95%;
+    height: 299px;
+    display: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: flex-start;
+    align-items: center;
+}
+
+#addStaff table {
+    width: 35%;
+}
+
+#addStaff th, #addStaff td {
+    border: none;
+    padding: 10px 0;
+    width: fit-content;
+    height: fit-content;
+}
+
+#addStaff td input {
+    width: 100%;
+    padding-left: 10px;
+}
+
+#addcanbtn, #addsavbtn {
+    width: 70px;
+    height: 35px;
+    float: right;
+    margin-left: 10px;
+    background-color: black;
+    color: white;
+    border: 1px solid black;
+}
+
+#addcanbtn:hover, #addsavbtn:hover {
+    background-color: #d0021b;
+    border: 1px solid #d0021b;
+}
+
+#addcanbtn:active, #addsavbtn:active {
+    background-color: white;
+    color: #d0021b;
+}
+
+.actionbtn{
+    font-weight: bold;
+}
+
+.actbtn {
+    background-color: lightgreen;
+    border: 1px solid lightgreen;
+}
+
+.actbtn:active {
+    background-color: white;
+    color: lightgreen;
+}
+
+.deabtn {
+    background-color: lightblue;
+    border: 1px solid lightblue;
+}
+
+.deabtn:active {
+    background-color: white;
+    color: lightblue;
+}
+
+.delbtn {
+    background-color: lightcoral;
+    border: 1px solid lightcoral;
+}
+
+.delbtn:active {
+    background-color: white;
+    color: lightcoral;
+}

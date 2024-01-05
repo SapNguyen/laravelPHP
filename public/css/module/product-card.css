@@ -1,0 +1,46 @@
+.card{
+    margin-top: 10px;
+    position: relative;
+}
+.card:hover{
+    border: 1px solid #d60f25;
+    transform: translate(0,-3px);
+}
+
+.card:hover .card-footer::after{
+    border-color: #d60f25;
+}
+.card:hover .card-footer::before{
+    border-color: #d60f25;
+}
+.promotion-tag{
+    position: absolute;
+    background-color: #d60f25;
+    color: white;
+    right: 0;
+    width: 50px;
+}
+.promotion-tag::before{
+    content: "";
+    width: 0;
+	height: 0;
+    position: absolute;
+    left: 0;
+    bottom: -11px;
+    font-size: 1px;
+	border-top: 10px solid transparent;
+	border-left: 30px solid #d60f25;
+	border-bottom: 10px solid transparent;
+}
+.promotion-tag::after{
+    content: "";
+    width: 0;
+	height: 0;
+    position: absolute;
+    right: 0;
+    bottom: -11px;
+    font-size: 1px;
+	border-top: 10px solid transparent;
+	border-right: 30px solid #d60f25;
+	border-bottom: 10px solid transparent;
+}

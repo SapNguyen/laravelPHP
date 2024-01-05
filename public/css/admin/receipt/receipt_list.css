@@ -1,0 +1,98 @@
+html, body {
+    min-width: 700px;
+}
+
+#content {
+    display: flex;
+    flex-flow: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;   
+    position: relative;
+}
+
+h1 {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#left{
+    width: 95%;
+    /* border: 1px solid black; */
+    border-radius: 10px;
+    margin-bottom: 5%;
+}
+
+#left th, #left td {
+    padding: 10px 0 5px 15px;
+    text-align: justify;
+    font-size: 20px;
+}
+
+td {
+    border-top: 1px solid black;
+}
+
+td button {
+    float: right;
+    width: 70px;
+    height: 35px;
+    background-color: black;
+    color: white;
+    border: 1px solid black;
+}
+
+td button:hover {
+    background-color: #d0021b;
+    color: white;
+    border: 1px solid #d0021b;
+}
+
+td button:active {
+    background-color: white;
+    color: #d0021b;
+    border: 1px solid #d0021b;
+}
+
+.closeBtn {
+    display: none;
+    background-color: #d0021b;
+    color: white;
+    border: 1px solid #d0021b;
+}
+
+#left .detailRow {
+    width: 100%;
+    display: none;
+}
+
+#left .detailCol {
+    width: 100%;
+    padding: 10px 0;
+    border-top: none;
+}
+
+#left .detailTable {
+    width: 100%;
+    border: 1px solid black;
+}
+
+#left .detailTable th, #left .detailTable td {
+    padding: 5px;
+    text-align: center;
+}
+
+#left .detailTable .msDetail {
+    text-align: left;
+    padding-left: 20px;
+}
+
+.midCol {
+    border-left: 1px solid black;
+}
+
+.thRow {
+    border-top: 1px solid black;
+}

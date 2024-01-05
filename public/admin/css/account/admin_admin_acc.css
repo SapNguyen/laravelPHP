@@ -1,0 +1,51 @@
+#adminInfo {
+    font-size: 20px;
+}
+#adminInfo input {
+    width: 100%;
+    border: none;
+    outline: none;
+}
+#adminInfo button, #adminInfo #resetbtn {
+    width: 20%;
+    margin: 0;
+}
+#btncon {
+    width: 100%;
+    display: flex;
+    flex-flow: row-reverse;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-content: center;
+    align-items: center;
+}
+.editbtn {
+    display: none;
+}
+#resetbtn {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    font-weight: 400;
+    text-align: center;
+    vertical-align: middle;
+    user-select: none;
+    border: 1px solid transparent;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 0.25rem;
+    text-transform: none;
+    overflow: visible;
+    font-family: inherit;
+    border-collapse: collapse;
+    border-spacing: 2px;
+    word-wrap: break-word;
+}
+#resetbtn:hover {
+    background-color: #e0a800;
+    border-color: #d39e00;
+}
+#userInput, #passInput {
+    background-color: white;
+    color: black;
+}

@@ -1,0 +1,213 @@
+.active-nav{
+  background-color: #d0021b !important;
+}
+.nav-bar ul li{
+  cursor: pointer;
+}
+li{
+    list-style-type: none;
+  }
+  p{
+    margin: 0px;
+  }
+  a{
+    text-decoration: none;
+    color: black;
+  }
+  .logo{
+    height: 80px;
+  }
+  .container{
+    padding: 20px 0px;
+    height: auto;
+    text-align: center;
+  }
+  .inline-block{
+    display: inline-block;  
+    padding: 0px 20px;
+  }
+  .search-bar{
+    border-radius: 20px;
+    border: 1px solid #e5e6ec; 
+    outline: none;
+    padding: 0px 70px 0px 20px;
+    height: 45px;
+    width: 100%;
+  }
+  .input-search{
+    width: 350px;
+    position: relative;
+  }
+  .search-icon{
+    position: absolute;
+    right: 20px;
+    top: 10px;
+  }
+  .icon-hotline{
+    background-color: black;
+    border-radius: 50px;
+    height: 45px;
+    width: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  #cart:hover{
+    opacity: 0.8;
+  }
+  .shopping-dropdown{
+    position: absolute;
+    background-color: white;
+    display: none;
+    z-index: 1000;
+    cursor: default;
+    min-width: 320px;
+    text-align: center;
+    right: 0px;
+    padding: 10px;
+    margin-top: 2px;
+  }
+  .account-dropdown{
+    position: absolute;
+    display: none;
+    background-color: white;
+    width: 180px;
+    text-align: center;
+    right: 0px;
+    z-index: 1000;
+  }
+  #shopping-cart, #account{
+    position: relative;
+  }
+  #shopping-cart:hover .shopping-dropdown{
+    display: block;
+  }
+  #account:hover .account-dropdown{
+    display: block;
+  }
+  .btn-dark{
+    font-size: 14px;
+    border-radius: 20px;
+    padding: 10px 30px;
+  }
+  .btn-dark:hover{
+    background-color: white !important;
+    border: 1px solid red !important;
+    color: red !important;
+  }
+  .btn-secondary{
+    border-radius: 0px;
+    padding: 10px 30px;
+    font-size: 14px;
+  }
+  .btn-secondary:hover{
+    background-color: red !important;
+  }
+  .btn-account{
+    width: 150px;
+    margin: 0px 0px 5px 0px;
+  }
+  #shopping-cart, #account, #hotline{
+    display: inline-block;
+  }
+  #account, #shopping-cart{
+    padding-left: 20px;
+  }
+  .hotline-bar{
+    display: flex;
+    align-items: center;
+    border: 2px solid black;
+    border-radius: 50px;
+    line-height: 18px;
+    height: 45px;
+    padding: 0px 15px 0px 50px;
+    position: relative;
+    max-width: 290px;
+    cursor: pointer;
+  }
+  .hotline-bar:hover{
+    opacity: 0.7;
+  }
+  .account-name{
+    width: auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 10px 0;
+
+  }
+  #icon-hotline{
+    position: absolute;
+    left: -1px;
+    top: -2px;
+  }
+  .nav-bar{
+    background: black;
+  }
+  .nav-link{
+    background: black;
+    color: white;
+    padding: 11px 40px;
+    font-size: 15px;
+    margin-right: 5px;
+  }
+  .nav-link:hover{
+    color: white !important;
+    background: #d0021b !important;
+  }
+  .link-brand{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+  .brand-expand{
+    color: white;
+     position: absolute;
+     right: 15px;
+  }
+  .expand-left{
+    color: black;
+    position: absolute;
+    top: 5px;
+    right: -10px;
+  }
+  .nav-item:hover .brand-dropdown{
+    display: block;
+  }
+  .brand-dropdown{
+    display: none;
+    color: black;
+    background: white;
+    width: 200px;
+    padding: 6px 10px;
+    position: absolute;
+    z-index: 1000;
+  }
+  .brand-type{
+    position: relative;
+    border-bottom: solid 1px #e5e6ec;
+    padding: 11px 0px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: 400;
+  }
+  .brand-type a:hover, .brand-type a:hover span{
+    color: red !important;
+  }
+  ul li a{
+    display: block;
+  }
+  .type-dropend{
+    display: none;
+    position: absolute;
+    top: -6px;
+    right: -210px;
+    background: white;
+    width: 200px;
+    padding: 6px 10px;
+    z-index: 1000;
+  }
+  .brand-type:hover .type-dropend{
+    display: block;
+  }

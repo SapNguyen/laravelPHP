@@ -1,0 +1,32 @@
+#staffList {
+    font-size: 20px;
+}
+#staffList input {
+    background-color: white;
+    color: black;
+    width: 100%;
+    height: 100%;
+    padding: 6px;
+}
+#staffList select {
+    background-color: white;
+    color: black;
+    width: 100%;
+    padding: 6px;
+}
+#showBlock {
+    height: 700px;
+}
+#staffTable th, #staffTable td {
+    vertical-align: middle;
+    padding: 12px;
+}
+#staffTable td button {
+    margin: 8px 0;
+}
+.savebtn, .resetbtn, .cancelbtn {
+    display: none;
+}
+.card-tools {
+    width: 25%;
+}

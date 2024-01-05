@@ -1,0 +1,91 @@
+#content {
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+  }
+#msg {
+    margin: 2% 0;
+}
+form {
+    width: 80%;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+}
+h1 {
+    margin: 3% 0;
+}
+table {
+    width: 80%;
+    height: auto;
+    /* margin: 5% 0px 5% 0px; */
+    margin: 0px 0px 5% 0px;
+    background-color: black; 
+}
+th {
+    height: 100px;
+    background-color: white;
+    font-size: 35px;
+    text-align: center;
+}
+td {
+    height: 100px;
+    text-align: center;
+    background-color: white;
+    font-size: 35px;
+}
+table, th, td {
+    border: 2px solid black;
+}
+th, td {
+    padding: 0px 5px 0px 5px;
+}
+.selectP {
+    width: 25px;
+    height: 25px;
+    border: 2px solid black;
+}
+#form_btn {
+    width: 50%;
+    display: flex;
+    justify-content: space-around;
+    align-content: space-around;
+    align-items: center;
+    margin-bottom: 5%;
+}
+#form_btn input {
+    width: 150px;
+    height: 50px;
+    font-size: 25px;
+    font-weight: bold;
+    background-color: black;
+    color: white;
+    cursor: pointer;
+}
+#form_btn input:hover {
+    background-color: #d0021b;
+    border: 2px solid #d0021b;
+}
+#form_btn input:active {
+    border: 2px solid #d0021b;
+    background-color: white;
+    color: #d0021b;
+}
+#canBtn {
+    width: 150px;
+    height: 50px;
+    font-size: 25px;
+    font-weight: bold;
+    background-color: black;
+    color: white;
+    cursor: pointer;
+}
+#canBtn:hover {
+    background-color: #d0021b;
+    border: 2px solid #d0021b;
+}
+#canBtn:active {
+    border: 2px solid #d0021b;
+    background-color: white;
+    color: #d0021b;
+}

@@ -1,0 +1,145 @@
+html, body {
+    min-width: 1155px;
+}
+
+#content, form {
+    display: flex;
+    flex-flow: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+}
+
+form {
+    width: 100%;
+}
+
+h1 {
+    text-align: center;
+}
+
+#filter {
+    width: 75%;
+    font-size: 18px;
+    display: flex;
+    flex-flow: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+}
+
+#filter span {
+    margin: 5px;
+}
+
+#filter input {
+    padding: 0 5px;
+}
+
+.inText {
+    width: 150px;
+}
+
+#checkArea {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-content: center;
+    align-items: center;
+}
+
+.check {
+    width: 20px;
+    height: 20px;
+}
+
+#submit {
+    width: 100px;
+    background-color: black;
+    color: white;
+    border: 1px solid black;
+}
+
+#submit:hover {
+    background-color: #d0021b;
+    color: white;
+    border: 1px solid #d0021b;
+}
+
+#submit:active {
+    background-color: white;
+    color: #d0021b;
+}
+
+table {
+    width: 95%;
+    table-layout: fixed;
+}
+
+th, td {
+    font-size: 20px;
+    padding: 8px 10px 5px 10px;
+}
+
+td {
+    border-top: 1px solid black;
+    word-wrap: break-word;
+    vertical-align: middle;
+}
+
+.midcol {
+    border-left: 1px solid black;
+}
+
+.lastcol {
+    border-right: 1px solid black;
+}
+
+.btncol {
+    /* height: 86px; */
+    padding: 0 10px;
+    padding-bottom: 5px;
+}
+
+.statbtn {
+    width: 80px;
+    height: 35px;
+    margin-top: 5px;
+    font-weight: bold;
+    /* box-shadow: 1px 2px 3px grey; */
+}
+
+/* .banbtn {
+    background-color: lightblue;
+    border: 2px solid lightblue;
+}
+
+.banbtn:active {
+    background-color: white;
+    color: lightblue;
+} */
+
+.banbtn {
+    background-color: lightcoral;
+    border: 2px solid lightcoral;
+}
+
+.banbtn:active {
+    background-color: white;
+    color: lightcoral;
+}
+
+.recbtn {
+    background-color: lightgreen;
+    border: 2px solid lightgreen;
+}
+
+.recbtn:active {
+    background-color: white;
+    color: lightgreen;
+}
+
+.lastrow {
+    border-top: 1px solid black;
+}

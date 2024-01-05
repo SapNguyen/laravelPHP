@@ -1,0 +1,88 @@
+#content {
+display: flex;
+flex-flow: column;
+justify-content: center;
+align-items: center;
+align-content: center;
+padding-top: 5%;
+}
+form {
+    width: 100%;
+    /* padding: 0px 10%; */
+    height: auto;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+}
+table {
+    width: 70%;
+    height: auto;
+    margin: 5% 0px 4% 0px;
+    /* border: 2px solid black; */
+}
+tr {
+    height: 50px;
+}
+th {
+    padding: 10px;
+    font-size: 35px;
+    text-align: left;
+}
+#nameBar input {
+    width: 70%;
+    height: 50px;
+    border: 2px solid black;
+    padding: 3px 10px;
+    font-size: 25px;
+}
+#statusBar {
+padding-left: 82px;
+}
+#statusBar input {
+    width: 25px;
+    height: 25px;
+}
+#form_btn {
+    width: 40%;
+    margin-bottom: 5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    align-content: space-around;
+}
+#form_btn input {
+    width: 150px;
+    height: 50px;
+    font-size: 25px;
+    font-weight: bold;
+    background-color: black;
+    color: white;
+    cursor: pointer;
+}
+#form_btn input:hover {
+    background-color: #d0021b;
+    border: 2px solid #d0021b;
+}
+#form_btn input:active {
+    border: 2px solid #d0021b;
+    background-color: white;
+    color: #d0021b;
+}
+#canBtn {
+    width: 150px;
+    height: 50px;
+    font-size: 25px;
+    font-weight: bold;
+    background-color: black;
+    color: white;
+    cursor: pointer;
+}
+#canBtn:hover {
+    background-color: #d0021b;
+    border: 2px solid #d0021b;
+}
+#canBtn:active {
+    border: 2px solid #d0021b;
+    background-color: white;
+    color: #d0021b;
+}

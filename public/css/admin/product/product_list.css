@@ -1,0 +1,203 @@
+#content {
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: center;
+    align-content: center;
+    padding-bottom: 3%;
+}
+form {
+    width: 100%;
+    display: flex;
+    flex-flow: column;
+    flex-wrap: wrap;
+    align-content: center;
+    align-items: center;
+}
+h1 {
+    margin: 1% 0 0 0;
+    text-align: center;
+}
+#SADBox {
+    width: 90%;
+    height: 75px;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    align-content: center;
+    align-items: center;
+    margin-top: 25px;
+    /* padding: 0 10%; */
+}
+#SADBox a, #SADBox a button, #searchBtn, #pDel {
+    width: 100px;
+    height: 35px;
+    /* margin: 0 1%; */
+}
+#SADBox a button, #searchBtn, #pDel {
+    font-size: 20px;
+    font-weight: bold;
+    background-color: black;
+    color: white;
+    border: 1px solid black;
+}
+#searchBox {
+    width: 70%;
+    height: 35px;
+    margin: 0 1%;
+    display: flex;
+    justify-content: flex-start;
+}
+#searchBtn {
+    margin: 0;
+}
+#inputName {
+    width: 85%;
+    height: 35px;
+    padding-left: 10px;
+    font-size: 20px;
+}
+#SADBox a button:hover, #searchBtn:hover, #pDel:hover {
+    background-color: #d0021b;
+    border: 1px solid #d0021b;
+}
+#SADBox a button:active, #searchBtn:active, #pDel:active {
+    background-color: white;
+    color: #d0021b;
+    border: 1px solid #d0021b;
+}
+#searchBox a {
+    display: block;
+    width: 100px;
+    height: 35px;
+    margin: 0;
+}
+
+.delCheck {
+    width: 25px;
+    height: 25px;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
+#pDel, #delCancel {
+    display: none;
+}
+
+#Pcontainer {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: space-around;
+    align-items: center;
+    padding: 25px 0;
+    min-width: 100%;
+}
+.Pitem {
+    width: fit-content;
+    height: 432px;
+    position: relative;
+    border: 2px solid black;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 0.5%;
+    display: flex;
+    flex-flow: column;
+    align-content: center;
+    align-items: baseline;
+}
+#imgCon {
+    width: 270px;
+    height: 270px;
+    border-bottom: 1px solid black;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-content: center;
+    align-items: center;
+}
+#imgCon img {
+    max-width: 270px;
+    max-height: 270px;
+}
+.Pinfo {
+    width: 100%;
+    position: absolute;
+    top: 270px;
+    display: flex;
+    flex-flow: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: space-around;
+    align-items: center;
+}
+.Pinfo a, .Pinfo p {
+    width: 100%;
+    text-align: center;
+}
+.Pinfo a {
+    text-decoration: none;
+    color: black;
+    font-size: 20px;
+}
+.Pinfo a:hover {
+    color: #d0021b;
+}
+.Pinfo a:active {
+    color: #d0021b;
+}
+.pinfo {
+    width: 85%;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    align-content: center;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.pinfo a, .pinfo a button {
+    width: 150px;
+    height: 30px;
+}
+.pinfo a {
+    position: relative;
+}
+.pinfo a button {
+    font-size: 16px;
+    background-color: black;
+    color: white;
+    text-align: center;
+    border: 1px solid black;
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.pinfo a button:hover {
+    background-color: #d0021b;
+    border: 1px solid #d0021b;
+}
+.pinfo a button:active {
+    background-color: white;
+    color: #d0021b;
+}
+.statusBox {
+    width: 65px;
+    height: 30px;
+    font-size: 16px;
+    color: white;
+    /* padding: 1px; */
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: center;
+    align-content: center;
+}
