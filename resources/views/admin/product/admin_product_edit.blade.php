@@ -6,7 +6,7 @@ $path = 'img/product/temp';
 if(File::exists($path)){
     File::cleanDirectory($path);
 }
-$filepath = 'img/product/'.$product[0]->product_id;
+$filepath = 'img/product/'.$product[0]['product_id'];
 if(File::exists($filepath)){
 	$file = File::allFiles($filepath);
 	for($i = 0; $i < count($file); $i++){
@@ -94,7 +94,7 @@ if(File::exists($filepath)){
             <div class="col-12">
                 <div class="card card-info">
                     <div class="card-header">
-                        <h3 class="card-title">Product no.{{ $product[0]->product_id }}</h3>
+                        <h3 class="card-title">Product no.{{ $product[0]['product_id'] }}</h3>
                     </div>
                     <div class="card-body">
                         <div id="example2_wrapper" class="dataTables_wrapper dt-bootstrap4">
@@ -103,7 +103,7 @@ if(File::exists($filepath)){
                                 <div class="col-sm-12">
                                   <form method="post" id="addForm">
                                     @csrf
-									                  <input type="hidden" value="{{ $product[0]->product_id }}" id="pID">
+									                  <input type="hidden" value="{{ $product[0]['product_id'] }}" id="pID">
                                   	<table class="table table-bordered ">
                                       <colgroup>
                                           <col style="width: 20%;"/>
@@ -113,7 +113,7 @@ if(File::exists($filepath)){
                                           <tr>
                                               <th>Name</th>
                                               <td>
-                                          <input type="text" id="pName" value="{{ $product[0]->product_name }}">
+                                          <input type="text" id="pName" value="{{ $product[0]['product_name'] }}">
                                         </td>
                                       </tr>
                                       <tr>
@@ -121,10 +121,10 @@ if(File::exists($filepath)){
                                         <td>
                                           <select id="pBrand">
                                           @foreach($brand as $b)
-                                            @if($b->brand_id == $product[0]->brand_id)
-                                            <option value="{{ $b->brand_id }}" selected>{{ $b->brand_name }}</option>
+                                            @if($b['brand_id'] == $product[0]['brand_id'])
+                                            <option value="{{ $b['brand_id'] }}" selected>{{ $b['brand_name'] }}</option>
                                             @else
-                                            <option value="{{ $b->brand_id }}">{{ $b->brand_name }}</option>
+                                            <option value="{{ $b['brand_id'] }}">{{ $b['brand_name'] }}</option>
                                             @endif
                                           @endforeach
                                           </select>
@@ -133,19 +133,19 @@ if(File::exists($filepath)){
                                       <tr>
                                         <th>Material</th>
                                         <td>
-                                          <input type="text" id="pMaterial" value="{{ $product[0]->product_material }}">
+                                          <input type="text" id="pMaterial" value="{{ $product[0]['product_material'] }}">
                                         </td>
                                       </tr>
                                       <tr>
                                         <th>Price</th>
                                         <td>
-                                          <input type="number" min="1000" max="999999999" step="1000" id="pPrice" value="{{ $product[0]->product_price }}">
+                                          <input type="number" min="1000" max="999999999" step="1000" id="pPrice" value="{{ $product[0]['product_price'] }}">
                                         </td>
                                       </tr>
                                       <tr>
                                         <th>Description</th>
                                         <td style="padding: 0;">
-                                          <textarea id="pDes">{{ $product[0]->product_des }}</textarea>
+                                          <textarea id="pDes">{{ $product[0]['product_des'] }}</textarea>
                                         </td>
                                       </tr>
                                     </tbody>
@@ -160,7 +160,7 @@ if(File::exists($filepath)){
                                           <th>
                                             <div>
                                               <input type="file" class="imgInput" multiple>
-                                              <input type="hidden" class="imgText" value="{{ $ps1->product_image }}">
+                                              <input type="hidden" class="imgText" value="{{ $ps1['product_image'] }}">
                                               <span>Images (max 6 images)</span>
                                               <button type="button" class="btn btn-block btn-warning addImg">Select</button>
                                             </div>
@@ -182,25 +182,25 @@ if(File::exists($filepath)){
                                         </tr>
 
                                         <tr>
-                                          <td class="imgcol" rowspan="{{ $ps1->row + 1 }}">
+                                          <td class="imgcol" rowspan="{{ $ps1['row'] + 1 }}">
                                             <div class="imgshow">
-                                              @foreach(explode(',', $ps1->product_image) as $img)
+                                              @foreach(explode(',', $ps1['product_image']) as $img)
                                                 <img src="/img/product/temp/{{ $img }}">												
                                               @endforeach
                                             </div>
                                           </td>
-                                          <td class="colorcol" rowspan="{{ $ps1->row + 1 }}">
-                                            <textarea class="pColor">{{ $ps1->color }}</textarea>
+                                          <td class="colorcol" rowspan="{{ $ps1['row'] + 1 }}">
+                                            <textarea class="pColor">{{ $ps1['color'] }}</textarea>
                                           </td>
                                         </tr>
                                         @foreach($psc2 as $ps2)
-                                        @if($ps2->product_id == $ps1->product_id && $ps2->color == $ps1->color)
+                                        @if($ps2['product_id'] == $ps1['product_id'] && $ps2['color'] == $ps1['color'])
                                         <tr>
                                           <td>
-                                            <input type="number" min="0" step="0.25" class="pSize" value="{{ $ps2->size }}">
+                                            <input type="number" min="0" step="0.25" class="pSize" value="{{ $ps2['size'] }}">
                                           </td>
                                           <td>
-                                            <input type="number" min="0" class="pQuan" value="{{ $ps2->quantity }}">
+                                            <input type="number" min="0" class="pQuan" value="{{ $ps2['quantity'] }}">
                                           </td>
                                           <td class="removecol">
                                             <button type="button" class="btn btn-block btn-danger removeSize">X</button>
@@ -321,7 +321,7 @@ submitbtn.addEventListener('click', (e) => {
 		url: '/updateProduct',
 		data: formData,
 		success: function(response){
-			alert(response.message);
+			alert('Sửa thành công');
 			window.location.href = '/admin/products';
 		},
 		error: function(response){

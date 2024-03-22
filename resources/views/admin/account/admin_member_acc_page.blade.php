@@ -98,10 +98,10 @@
                   @else
                   @foreach($member as $m)
                   <tr data-widget="expandable-table" aria-expanded="false">
-                    <td>{{ $m->username }}</td>
-                    <td>{{ $m->password }}</td>
+                    <td>{{ $m['username'] }}</td>
+                    <td>{{ $m['password'] }}</td>
                     <td>
-                      @if($m->mem_active == 1)
+                      @if($m['mem_active'] == 1)
                       <span style="color: green;">Active</span>
                       @else
                       <span style="color: red;">Banned</span>
@@ -110,17 +110,17 @@
                   </tr>
                   <tr class="expandable-body d-none">
                     <td colspan="3">
-                      <p>Name:&nbsp;&nbsp;&nbsp;{{ $m->name }}</p>
-                      <p>Contact:&nbsp;&nbsp;&nbsp;{{ $m->phone }}</p>
-                      <p>Address:&nbsp;&nbsp;&nbsp;{{ $m->address }}</p>
+                      <p>Name:&nbsp;&nbsp;&nbsp;{{ $m['name'] }}</p>
+                      <p>Contact:&nbsp;&nbsp;&nbsp;{{ $m['phone'] }}</p>
+                      <p>Address:&nbsp;&nbsp;&nbsp;{{ $m['address'] }}</p>
                       <p>Number of receipts:&nbsp;&nbsp;&nbsp;
                         <?php $i = 0; ?>
                         @if(count($nor) == 0)
                           {{ $i }}
                         @else
                           @foreach($nor as $n)
-                            @if($n->mem_id == $m->mem_id)
-                              {{ $n->nor }}
+                            @if($n['mem_id'] == $m['mem_id'])
+                              {{ $n['nor'] }}
                               <?php $i += 1; ?>
                               @break
                             @endif
@@ -131,10 +131,10 @@
                         @endif
                       </p>
                       <div>
-                        @if($m->mem_active == 1)
-                        <button class="btn btn-block btn-danger debtn" data-mid="{{ $m->mem_id }}">Ban</button>
+                        @if($m['mem_active'] == 1)
+                        <button class="btn btn-block btn-danger debtn" data-mid="{{ $m['mem_id'] }}">Ban</button>
                         @else
-                        <button class="btn btn-block btn-success acbtn" data-mid="{{ $m->mem_id }}">Unban</button>
+                        <button class="btn btn-block btn-success acbtn" data-mid="{{ $m['mem_id'] }}">Unban</button>
                         @endif
                       </div>
                     </td>

@@ -111,7 +111,7 @@ if(File::exists($path)){
                                             <td>
 												<select id="pBrand">
 												@foreach($brand as $b)
-													<option value="{{ $b->brand_id }}">{{ $b->brand_name }}</option>
+													<option value="{{ $b['brand_id'] }}">{{ $b['brand_name'] }}</option>
 												@endforeach
 												</select>
 											</td>
@@ -145,6 +145,10 @@ if(File::exists($path)){
 											<tr>
 												<th>
 													<div>
+														{{-- <input type="file" class="imgInput" multiple>
+														<input type="hidden" class="imgText">
+														<span>Images (max 6 images)</span>
+														<button type="button" class="btn btn-block btn-warning addImg">Select</button> --}}
 														<input type="file" class="imgInput" multiple>
 														<input type="hidden" class="imgText">
 														<span>Images (max 6 images)</span>
@@ -154,7 +158,7 @@ if(File::exists($path)){
 												<th>
 													<div>
 														<span>Color</span>
-														<!-- <button type="button" class="btn btn-block btn-danger removeColor">Remove</button> -->
+														<button type="button" class="btn btn-block btn-danger removeColor">Remove</button>
 													</div>
 												</th>
 												<th>
@@ -167,14 +171,27 @@ if(File::exists($path)){
 												<th></th>
 											</tr>
 
-											<tr>
+											{{-- <tr>
 												<td class="imgcol" rowspan="2">
-													<div class="imgshow"></div>
+													<div class="imgshow">
+														<img src="/img/No_image.png" alt="">
+													</div>
 												</td>
 												<td class="colorcol" rowspan="2">
 													<textarea class="pColor"></textarea>
 												</td>
-											</tr>
+											</tr> --}}
+
+											<tr>
+												<td class="imgcol" rowspan="2">
+												  <div class="imgshow">
+													  {{-- <img src="/img/product/temp/"> --}}
+												  </div>
+												</td>
+												<td class="colorcol" rowspan="2">
+												  <textarea class="pColor"></textarea>
+												</td>
+											  </tr>
 
 											<tr>
 												<td>
@@ -299,7 +316,7 @@ submitbtn.addEventListener('click', (e) => {
 		url: '/addProduct',
 		data: formData,
 		success: function(response){
-			alert(response.message);
+			alert('Thêm sản phẩm thành công');
 			window.location.href = '/admin/products';
 		},
 		error: function(response){

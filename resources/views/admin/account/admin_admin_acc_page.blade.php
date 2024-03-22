@@ -82,7 +82,7 @@
         <div class="card-body">
           <form method="post" action="{{ route('a.a.update') }}">
             @csrf
-            <input type="hidden" value="{{ $admin[0]->mem_id }}" name="aId">
+            <input type="hidden" value="{{ $admin[0]['mem_id'] }}" name="aId">
             <table class="table table-bordered " id="adminInfo">
               <colgroup>
                 <col style="width: 20%;"/>
@@ -92,14 +92,14 @@
                 <tr>
                   <th>Username</td>
                   <td>
-                    <input type="text" name="aName" value="{{ $admin[0]->username }}" id="userInput" disabled
+                    <input type="text" name="aName" value="{{ $admin[0]['username'] }}" id="userInput" disabled
                     required oninvalid="this.setCustomValidity('')" oninput="this.setCustomValidity('')">
                   </td>
                 </tr>
                 <tr>
                   <th>Password</th>
                   <td>
-                    <input type="password" name="aPass" value="{{ $admin[0]->password }}" id="passInput" disabled>
+                    <input type="password" name="aPass" value="{{ $admin[0]['password'] }}" id="passInput" disabled>
                   </td>
                 </tr>
                 <tr>

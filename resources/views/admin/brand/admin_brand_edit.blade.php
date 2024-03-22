@@ -105,18 +105,18 @@
             <div class="row">
                 <div class="card card-info" style="width: 100%;">
                     <div class="card-header">
-                        <h3 class="card-title">Change brand no.{{ $brand[0]->brand_id }} 's infomation</h3>
+                        <h3 class="card-title">Change brand no.{{ $brand[0]['brand_id'] }} 's infomation</h3>
                     </div>
-                    <form method="post" action="{{ route('a.b.edit') }}" onsubmit="return checkForm()">
+                    <form method="post" action="{{ route('a.b.edit') }}" onsubmit="return checkForm()" enctype="multipart/form-data">
                         @csrf
-                        <input type="hidden" name="bid" value="{{ $brand[0]->brand_id }}">
+                        <input type="hidden" name="bid" value="{{ $brand[0]['brand_id'] }}" >
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="exampleInputEmail1">Brand's Name<b style="color: red;"> *</b></label>
-                                <input type="text" name="bName" value="{{ $brand[0]->brand_name }}" class="form-control" id="exampleInputEmail1" placeholder="Enter brand's name"
+                                <input type="text" name="bName" value="{{ $brand[0]['brand_name'] }}" class="form-control" id="exampleInputEmail1" placeholder="Enter brand's name"
                                 required oninvalid="this.setCustomValidity('Please fill in brand\'s name!')" oninput="this.setCustomValidity('')">
                             </div>
-                            <div class="form-group">
+                            {{-- <div class="form-group">
                                 <label for="exampleInputFile">Brand's Logo</label>
                                 <div class="input-group">
                                 <div class="custom-file">
@@ -132,44 +132,84 @@
                                 @else
                                 <img src="/img/brand/{{ $brand[0]->brand_id }}/{{ $brand[0]->brand_logo }}" style="max-height: 200px; border: 1px solid black; margin-top: 5px;" id="logoImg">
                                 @endif
-                            </div>
+                            </div> --}}
                             <div class="form-group">
-                                <label for="exampleInputFile">Home Page Image</label>
-                                <div class="input-group">
-                                    <div class="custom-file">
-                                        <input type="file" name="bHPimg" class="custom-file-input" id="bHPimg" accept="image/*">
-                                        <label class="custom-file-label" for="exampleInputFile">Choose file</label>
-                                    </div>
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">Upload</span>
-                                    </div>
-                                </div>
-                                @if($brand[0]->brand_img == "No_image_2.png")
-                                <img src="/img/No_image_2.png" style="max-height: 200px; border: 1px solid black; margin-top: 5px;" id="homeImg">
-                                @else
-                                <img src="/img/brand/{{ $brand[0]->brand_id }}/{{ $brand[0]->brand_img }}" style="max-height: 200px; border: 1px solid black; margin-top: 5px;" id="homeImg">
-                                @endif
-                            </div>
-                            <div class="form-group">
-                                <label for="exampleInputFile">Brand's Image</label>
+                                <label for="exampleInputFile">Brand's Logo</label>
                                 <div class="input-group">
                                 <div class="custom-file">
-                                    <input type="file" name="bBPimg" class="custom-file-input" id="bBPimg" accept="image/*">
+                                    <input type="file" name="bLogo" class="custom-file-input" id="bLogo" accept="image/*" value="{{$brand[0]['brand_logo']}}">
+                                    {{-- {{ $brand[0]['brand_logo'] ? 'logo.jpg' : '' }} --}}
                                     <label class="custom-file-label" for="exampleInputFile">Choose file</label>
                                 </div>
                                 <div class="input-group-append">
                                     <span class="input-group-text">Upload</span>
                                 </div>
                                 </div>
-                                @if($brand[0]->brand_des_img == "No_image_2.png")
-                                <img src="/img/No_image_2.png" style="max-height: 200px; border: 1px solid black; margin-top: 5px;" id="brandImg">
+                                @if($brand[0]['brand_logo'] == "No_image_2.png")
+                                <img src="/img/No_image_2.png" style="max-height: 200px; border: 1px solid black; margin-top: 5px;" id="logoImg">
                                 @else
-                                <img src="/img/brand/{{ $brand[0]->brand_id }}/{{ $brand[0]->brand_des_img }}" style="max-height: 200px; border: 1px solid black; margin-top: 5px;" id="brandImg">
+                                <img src="/img/brand/{{ $brand[0]['brand_id'] }}/{{ $brand[0]['brand_logo'] }}" style="max-height: 200px; border: 1px solid black; margin-top: 5px;" id="logoImg">
+                                @endif
+                                {{-- <img src="/img/No_image_2.png" style="max-height: 200px; border: 1px solid black; margin-top: 5px;" id="logoImg"> --}}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="exampleInputFile">Home Page Image</label>
+                                <div class="input-group">
+                                    <div class="custom-file">
+                                        <input type="file" name="bHPimg" class="custom-file-input" id="bHPimg" accept="image/*" value="{{ $brand[0]['brand_img'] ? 'img.jpg' : '' }}">
+                                        <label class="custom-file-label" for="exampleInputFile">Choose file</label>
+                                    </div>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">Upload</span>
+                                    </div>
+                                </div>
+                                @if($brand[0]['brand_img'] == "No_image_2.png")
+                                <img src="/img/No_image_2.png" style="max-height: 200px; border: 1px solid black; margin-top: 5px;" id="homeImg">
+                                @else
+                                <img src="/img/brand/{{ $brand[0]['brand_id'] }}/{{ $brand[0]['brand_img'] }}" style="max-height: 200px; border: 1px solid black; margin-top: 5px;" id="homeImg">
                                 @endif
                             </div>
+                            
+                            <div class="form-group">
+                                <label for="exampleInputFile">Brand's Image</label>
+                                <div class="input-group">
+                                <div class="custom-file">
+                                    <input type="file" name="bBPimg" class="custom-file-input" id="bBPimg" accept="image/*" value="{{ $brand[0]['brand_des_img'] ? 'des.jpg' : '' }}"> 
+                                    <label class="custom-file-label" for="exampleInputFile">Choose file</label>
+                                </div>
+                                <div class="input-group-append">
+                                    <span class="input-group-text">Upload</span>
+                                </div>
+                                </div>
+                                @if($brand[0]['brand_des_img'] == "No_image_2.png")
+                                <img src="/img/No_image_2.png" style="max-height: 200px; border: 1px solid black; margin-top: 5px;" id="brandImg">
+                                @else
+                                <img src="/img/brand/{{ $brand[0]['brand_id'] }}/{{ $brand[0]['brand_des_img'] }}" style="max-height: 200px; border: 1px solid black; margin-top: 5px;" id="brandImg">
+                                @endif
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="exampleInputFile">Brand's Banner</label>
+                                <div class="input-group">
+                                <div class="custom-file">
+                                    <input type="file" name="bBannerimg" class="custom-file-input" id="bBannerimg" accept="image/*" value="{{ $brand[0]['brand_banner'] ? 'banner.jpg' : '' }}">
+                                    <label class="custom-file-label" for="exampleInputFile">Choose file</label>
+                                </div>
+                                <div class="input-group-append">
+                                    <span class="input-group-text">Upload</span>
+                                </div>
+                                </div>
+                                @if($brand[0]['brand_banner'] == "No_image_2.png")
+                                <img src="/img/No_image_2.png" style="max-height: 200px; border: 1px solid black; margin-top: 5px;" id="bannerImg">
+                                @else
+                                <img src="/img/brand/{{ $brand[0]['brand_id'] }}/{{ $brand[0]['brand_banner'] }}" style="max-height: 200px; border: 1px solid black; margin-top: 5px;" id="bannerImg">
+                                @endif
+                            </div>
+                            
                             <div class="form-group">
                                 <label>Description</label>
-                                <textarea name="bDes" class="form-control" rows="3" placeholder="Enter ..." style="min-height: 85.6px;"></textarea>
+                                <textarea name="bDes" class="form-control" rows="3" placeholder="Enter ..." style="min-height: 85.6px;" value="{{ $brand[0]['brand_des'] }}">{{ $brand[0]['brand_des'] }}</textarea>
                             </div>
                         </div>
                         <!-- /.card-body -->
@@ -235,72 +275,159 @@ $(function () {
     bsCustomFileInput.init();
 });
 
-const reset1 = document.getElementById('logoImg').src;
-const reset2 = document.getElementById('homeImg').src;
-const reset3 = document.getElementById('brandImg').src;
+// const reset1 = document.getElementById('logoImg').src;
+// const reset2 = document.getElementById('homeImg').src;
+// const reset3 = document.getElementById('brandImg').src;
+// const reset4 = document.getElementById('bannerImg').src;
 
+// document.getElementById('bLogo').addEventListener('change', (e) => {
+//     console.log(e.target.files[0])
+//     var formData = new FormData();
+//     formData.append('img1', e.target.files[0]);
+//     $.ajax({
+//         type: "POST",
+//         url: "/upload1",
+//         data: formData,
+//         success: function (response) {
+//             document.getElementById('logoImg').src = '/img/brand/temp1/' + e.target.files[0].name;
+//         },
+//         error:function(response){
+//             alert("An error occurd when uploading file!");
+//         },
+//         cache: false,
+//         contentType: false,
+//         processData: false,
+//     });
+// });
+
+// document.getElementById('bHPimg').addEventListener('change', (e) => {
+//     var formData = new FormData();
+//     formData.append('img2', e.target.files[0]);
+//     $.ajax({
+//         type: "POST",
+//         url: "/upload2",
+//         data: formData,
+//         success: function (response) {
+//             document.getElementById('homeImg').src = '/img/brand/temp2/' + e.target.files[0].name;
+//         },
+//         error:function(response){
+//             alert("An error occurd when uploading file!");
+//         },
+//         cache: false,
+//         contentType: false,
+//         processData: false,
+//     });
+// });
+
+// document.getElementById('bBPimg').addEventListener('change', (e) => {
+//     var formData = new FormData();
+//     formData.append('img3', e.target.files[0]);
+//     $.ajax({
+//         type: "POST",
+//         url: "/upload3",
+//         data: formData,
+//         success: function (response) {
+//             document.getElementById('brandImg').src = '/img/brand/temp3/' + e.target.files[0].name;
+//         },
+//         error:function(response){
+//             alert("An error occurd when uploading file!");
+//         },
+//         cache: false,
+//         contentType: false,
+//         processData: false,
+//     });
+// });
 document.getElementById('bLogo').addEventListener('change', (e) => {
-    console.log(e.target.files[0])
-    var formData = new FormData();
-    formData.append('img1', e.target.files[0]);
-    $.ajax({
-        type: "POST",
-        url: "/upload1",
-        data: formData,
-        success: function (response) {
-            document.getElementById('logoImg').src = '/img/brand/temp1/' + e.target.files[0].name;
-        },
-        error:function(response){
-            alert("An error occurd when uploading file!");
-        },
-        cache: false,
-        contentType: false,
-        processData: false,
-    });
+
+    const input = e.target;
+      const preview = document.getElementById('logoImg');
+
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+        };
+
+        reader.readAsDataURL(input.files[0]);
+      }
+
 });
 
 document.getElementById('bHPimg').addEventListener('change', (e) => {
-    var formData = new FormData();
-    formData.append('img2', e.target.files[0]);
-    $.ajax({
-        type: "POST",
-        url: "/upload2",
-        data: formData,
-        success: function (response) {
-            document.getElementById('homeImg').src = '/img/brand/temp2/' + e.target.files[0].name;
-        },
-        error:function(response){
-            alert("An error occurd when uploading file!");
-        },
-        cache: false,
-        contentType: false,
-        processData: false,
-    });
+    
+
+    const input = e.target;
+      const preview = document.getElementById('homeImg');
+
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+        };
+
+        reader.readAsDataURL(input.files[0]);
+      }
+
 });
 
 document.getElementById('bBPimg').addEventListener('change', (e) => {
-    var formData = new FormData();
-    formData.append('img3', e.target.files[0]);
-    $.ajax({
-        type: "POST",
-        url: "/upload3",
-        data: formData,
-        success: function (response) {
-            document.getElementById('brandImg').src = '/img/brand/temp3/' + e.target.files[0].name;
-        },
-        error:function(response){
-            alert("An error occurd when uploading file!");
-        },
-        cache: false,
-        contentType: false,
-        processData: false,
-    });
+    // var formData = new FormData();
+    // formData.append('img3', e.target.files[0]);
+    // $.ajax({
+    //     type: "POST",
+    //     url: "/upload3",
+    //     data: formData,
+    //     success: function (response) {
+    //         document.getElementById('brandImg').src = document.getElementById('brandImg').src.replace('No_image_2.png', 'brand/temp3/' + e.target.files[0].name);
+    //     },
+    //     error:function(response){
+    //         alert("An error occurd when uploading file!");
+    //     },
+    //     cache: false,
+    //     contentType: false,
+    //     processData: false,
+    // });
+
+    const input = e.target;
+      const preview = document.getElementById('brandImg');
+
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+        };
+
+        reader.readAsDataURL(input.files[0]);
+      }
+    
+});
+
+document.getElementById('bBannerimg').addEventListener('change', (e) => {
+    
+
+    const input = e.target;
+      const preview = document.getElementById('bannerImg');
+
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+        };
+
+        reader.readAsDataURL(input.files[0]);
+      }
+    
 });
 
 document.getElementById('resetbtn').addEventListener('click', () => {
-    document.getElementById('logoImg').src = reset1;
-    document.getElementById('homeImg').src = reset2;
-    document.getElementById('brandImg').src = reset3;
+    document.getElementById('logoImg').src = '/img/No_image_2.png';
+    document.getElementById('homeImg').src = '/img/No_image_2.png';
+    document.getElementById('brandImg').src = '/img/No_image_2.png';
+    document.getElementById('bannerImg').src = '/img/No_image_2.png';
 })
 
 function checkForm(){

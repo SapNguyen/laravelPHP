@@ -83,6 +83,8 @@
     <div class="container-fluid mt-3" style="margin-top:40px !important; padding-left: 0px !important ">
       <p style="display: none" id="pid">{{$product->product_id}}</p>
       <div class="row">
+
+
         <div class="col-sm-8" style="background:white;">
           <div class="row">
             <div class="col-sm-6">
@@ -259,6 +261,9 @@
                   </div>
                 @endif
               </div>
+
+
+
               <div class="row" id="div_size" style="margin-top:20px">
                 <h6 class="col-sm-2" style="margin-top: 8px">Size:</h6>
                 @for ($i = 0; $i < count($sizes); $i++)
@@ -312,6 +317,13 @@
               </div>
             </div>
           </div>
+
+
+
+
+
+
+          
           <div>
             <div class="tab row">
               <button class="tablinks col-sm-3 rounded-top active" onclick="openTab(event, 'description')">Mô tả sản phẩm</button>
@@ -356,6 +368,9 @@
               </p>
             </div>
           </div>
+
+
+          
           <div class="feedback-container">
               <p class="title">Đánh giá sản phẩm</p>
               @if (count($feedback) == 0)
@@ -469,6 +484,10 @@
               @endif
           </div>
         </div>
+
+
+
+        
         <div class="col-sm-4">
           <table class="table table-bordered proc-table">
             <thead>

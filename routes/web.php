@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\admin\DiscountController;
-use App\Http\Controllers\admin\ReceiptController;
+use App\Http\Controllers\admin\OrderController;
 use App\Http\Controllers\user\HeaderController;
 use App\Http\Controllers\user\ProductController;
 use App\Http\Controllers\user\HomeController;
@@ -28,12 +28,12 @@ use Illuminate\Support\Facades\DB;
 */
 
 Route::get('/', [
-    HomeController::class,'index',
+    HomeController::class, 'index',
 ]);
 
 Route::get('/products', function () {
     $brands = new HeaderController();
-    return view('user/product',[
+    return view('user/product', [
         'brands' => $brands->load()
     ]);
 });
@@ -43,95 +43,84 @@ Route::get('/products/{id}', [
     'detail'
 ]);
 
-Route::get('/cart/{pid}',[
-    CartController::class,'payment'
+Route::get('/cart/{pid}', [
+    CartController::class, 'payment'
 ]);
 
-Route::get('/cart',[
-    CartController::class,'loadCart'
+Route::get('/cart', [
+    CartController::class, 'loadCart'
 ]);
 
-Route::post('/upload',[ProductController::class,'store']);
+Route::post('/upload', [ProductController::class, 'store']);
 
-Route::get('/delTempImg',[
+Route::get('/delTempImg', [
     ProductController::class,
     'delTempImg'
 ]);
 
-Route::get('/updateImg/{id}',[
+Route::get('/updateImg/{id}', [
     ProductController::class,
     'updateImg'
 ]);
 
-Route::get('/login', function () {
-    if(session('login') == 'true'){
-        return redirect(session('prePage'));
-    }
-    else{
-        $brands = new HeaderController();
-        return view('login',[
-            'brands' => $brands->load()
-        ]);
-    }
-})->name('login');
+Route::get('/login', [
+    HeaderController::class, 'login'
+])->name('login');
 
-Route::post('/login',[
-    LoginController::class,'login'
+Route::post('/login', [
+    LoginController::class, 'login'
 ]);
 
-Route::get('/register', function () {
-    $brands = new HeaderController();
-    return view('register',[
-        'brands' => $brands->load()
-    ]);
-});
-
-Route::post('/register',[
-    LoginController::class,'register'
+Route::get('/register', [
+    HeaderController::class, 'register'
 ]);
 
-Route::get('/logout',[
-    LoginController::class,'logout'
+Route::post('/register', [
+    LoginController::class, 'register'
+]);
+
+Route::get('/logout', [
+    LoginController::class, 'logout'
 ]);
 
 Route::get('/account', [
-    AccountController::class,'loadPage'
+    AccountController::class, 'loadPage'
 ]);
 
-Route::post('/account/password',[
-    AccountController::class,'changePass'
+Route::post('/account/password', [
+    AccountController::class, 'changePass'
 ]);
 
-Route::get('/account/{link}',[
-    AccountController::class,'goLink'
+Route::get('/account/{link}', [
+    AccountController::class, 'goLink'
 ]);
-Route::get('/account/receipt/{status}',[
-    AccountController::class,'receiptStatus'
-]);
-
-Route::post('/account/profile',[
-    AccountController::class,'changeProfile'
+Route::get('/account/order/{status}', [
+    AccountController::class, 'orderStatus'
 ]);
 
-Route::get('/receipt/drop',[
-    AccountController::class,'dropReceipt'
-]);
-Route::get('/receipt/confirm',[
-    AccountController::class,'confirmReceipt'
-]);
-Route::post('/receipt/feedback',[
-    AccountController::class,'addFeedback'
-]);
-Route::post('/feedback/writeRequest',[
-    AccountController::class,'writeRequest'
-]);
-Route::post('/feedback/readRequest',[
-    AccountController::class,'readRequest'
+Route::post('/account/profile', [
+    AccountController::class, 'changeProfile'
 ]);
 
-Route::get('/loadHeader',function(){
-    if(session('login') == 'true'){
-        $user = DB::select('select * from member where mem_id= :uid',[
+Route::get('/order/drop', [
+    AccountController::class, 'droporder'
+]);
+Route::get('/order/confirm', [
+    AccountController::class, 'confirmorder'
+]);
+Route::post('/order/feedback', [
+    AccountController::class, 'addFeedback'
+]);
+Route::post('/feedback/writeRequest', [
+    AccountController::class, 'writeRequest'
+]);
+Route::post('/feedback/readRequest', [
+    AccountController::class, 'readRequest'
+]);
+
+Route::get('/loadHeader', function () {
+    if (session('login') == 'true') {
+        $user = DB::select('select * from member where mem_id= :uid', [
             'uid' => session('user')
         ]);
         $name_user = $user[0]->name;
@@ -140,72 +129,77 @@ Route::get('/loadHeader',function(){
     return response()->json([]);
 });
 
-Route::post('/cart/quantity',[
-    CartController::class,'updateQuantity'
+Route::post('/cart/quantity', [
+    CartController::class, 'updateQuantity'
 ]);
 
-Route::post('/cart/remove',[
-    CartController::class,'removeProduct'
+Route::post('/cart/remove', [
+    CartController::class, 'removeProduct'
 ]);
 
-Route::post('/cart/updateSize',[
-    CartController::class,'updateSize'
+Route::post('/cart/updateSize', [
+    CartController::class, 'updateSize'
 ]);
 
-Route::post('/cart/selectProduct',[
-    CartController::class,'selectProduct',
+Route::post('/cart/selectProduct', [
+    CartController::class, 'selectProduct',
 ]);
 
-Route::post('/payment',[
-    PaymentController::class,'loadPayment'
+Route::post('/payment', [
+    PaymentController::class, 'loadPayment'
 ]);
 
-Route::get('/payment/insert',[
-    PaymentController::class,'insert'
+Route::get('/payment/insert', [
+    PaymentController::class, 'insert'
 ]);
 
-Route::get('/brand/{name}',[
-    BrandController::class,'loadBrand'
+Route::get('/brand/{name}', [
+    BrandController::class, 'loadBrand'
 ]);
 
-Route::get('/promotion',[
-    BrandController::class,'promotion'
+Route::get('/promotion', [
+    BrandController::class, 'promotion'
 ]);
 
-Route::get('/search',[
-    BrandController::class,'search'
+Route::get('/search', [
+    BrandController::class, 'search'
 ]);
+
+
+
+
+
 
 Route::middleware([AdminStaffValidate::class])->group(function () {
     Route::get('/admin', function () {
         return to_route('admin.page');
     });
-    
+
     Route::get('/admin_page', 'App\Http\Controllers\admin\RevenueController@homepage')->name('admin.page');
-    
+
     Route::get('/admin/brands', 'App\Http\Controllers\admin\BrandController@list')->name('a.b.list');
     Route::get('/admin/products', 'App\Http\Controllers\admin\ProductController@list')->name('a.p.list');
     Route::get('/admin/product/view', 'App\Http\Controllers\admin\ProductController@viewred')->name('a.p.view');
     Route::get('/admin/discounts', 'App\Http\Controllers\admin\DiscountController@list')->name('a.d.list');
     Route::get('/admin/discount/view', 'App\Http\Controllers\admin\DiscountController@viewred')->name('a.d.view');
-    Route::get('/admin/receipt', [
-        ReceiptController::class,'index'
+    Route::get('/admin/order', [
+        OrderController::class, 'index'
     ])->name('a.r.list.1');
-    Route::get('admin/receipt_unconfimred', [
-        ReceiptController::class,'index_unconfimred'
+    Route::get('admin/order_unconfimred', [
+        OrderController::class, 'index_unconfimred'
     ])->name('a.r.list.0');
-    
-    Route::get('/admin/receipt_canceled', [
-        ReceiptController::class,'index_canceled'
+
+    Route::get('/admin/order_canceled', [
+        OrderController::class, 'index_canceled'
     ])->name('a.r.list.2');
-    Route::get('/admin/receipt_finished', [
-        ReceiptController::class,'index_finished'
+    Route::get('/admin/order_finished', [
+        OrderController::class, 'index_finished'
     ])->name('a.r.list.3');
-    Route::get('/admin/edit/{receipt}',[ReceiptController::class,'edit'])->name('a.r.edit.red');
-    Route::get('/admin/detail/{receipt}',[ReceiptController::class,'detail'])->name('a.r.edit.red');
-    Route::post('/admin/edit/{receipt}',[ReceiptController::class,'postedit'])->name('a.r.edit');
-    Route::get('/admin/cancel_edit/{receipt}',[ReceiptController::class,'edit'])->name('a.r.edit.red');;
-    Route::post('/admin/cancel_edit/{receipt}',[ReceiptController::class,'canceledit']);
+    Route::get('/admin/edit/{order}', [OrderController::class, 'edit'])->name('a.r.edit.red');
+    Route::get('/admin/detail/{order}', [OrderController::class, 'detail'])->name('a.r.edit.red');
+    Route::post('/admin/edit/{order}', [OrderController::class, 'postedit'])->name('a.r.edit');
+    Route::get('/admin/cancel_edit/{order}', [OrderController::class, 'edit'])->name('a.r.edit.red');;
+    Route::post('/admin/cancel_edit/{order}', [OrderController::class, 'canceledit']);
 
     Route::get('/admin/revenue', 'App\Http\Controllers\admin\RevenueController@show')->name('a.revenue');
     Route::middleware([AdminValidate::class])->group(function () {
@@ -231,17 +225,17 @@ Route::middleware([AdminStaffValidate::class])->group(function () {
         Route::get('/admin/product/edit', 'App\Http\Controllers\admin\ProductController@editred')->name('a.p.edit.red');
         Route::get('/admin/product/delete', 'App\Http\Controllers\admin\ProductController@delred')->name('a.p.del.red');
         Route::post('/deleteProduct', 'App\Http\Controllers\admin\ProductController@delete');
-        Route::post('/admin/discount/add', [DiscountController::class,'add'])->name('a.d.add');
-        Route::get('/admin/discount/add', [DiscountController::class,'addred'])->name('a.d.add.red');
-        Route::post('/activateDiscount', [DiscountController::class,'activate']);
-        Route::post('/deactivateDiscount', [DiscountController::class,'deactivate']);
-        Route::get('/admin/discount/edit', [DiscountController::class,'editred'])->name('a.d.edit.red');
-        Route::post('/admin/discount/edit', [DiscountController::class,'edit'])->name('a.d.edit');
+        Route::post('/admin/discount/add', [DiscountController::class, 'add'])->name('a.d.add');
+        Route::get('/admin/discount/add', [DiscountController::class, 'addred'])->name('a.d.add.red');
+        Route::post('/activateDiscount', [DiscountController::class, 'activate']);
+        Route::post('/deactivateDiscount', [DiscountController::class, 'deactivate']);
+        Route::get('/admin/discount/edit', [DiscountController::class, 'editred'])->name('a.d.edit.red');
+        Route::post('/admin/discount/edit', [DiscountController::class, 'edit'])->name('a.d.edit');
         Route::get('/admin/discount/delete', 'App\Http\Controllers\admin\DiscountController@delred')->name('a.d.del.red');
         Route::post('/deleteDiscount', 'App\Http\Controllers\admin\DiscountController@del');
         Route::post('/addProductDiscount', 'App\Http\Controllers\admin\DiscountController@addproduct');
         Route::post('/subProductDiscount', 'App\Http\Controllers\admin\DiscountController@subproduct');
-        Route::post('/delReceipt', [ReceiptController::class,'delReceipt']);
+        Route::post('/delorder', [OrderController::class, 'delorder']);
         Route::get('/admin/accounts/admin', 'App\Http\Controllers\admin\MemberController@adminshow')->name('a.a.list');
         Route::post('/admin/accounts/admin', 'App\Http\Controllers\admin\MemberController@update_admin')->name('a.a.update');
         Route::get('/admin/accounts/staff', 'App\Http\Controllers\admin\MemberController@staffshow')->name('a.s.list');

@@ -1,4 +1,24 @@
 
+.container{
+    background-image:url(/img/slider_5.jpg);
+    /* background-image: url(https://theme.hstatic.net/200000265619/1001091352/14/banner_project_1.jpg?v=426); */
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.shadow{
+    margin-left: 20%;
+    width: 30%;
+    height: 200px;
+    background-color: #ffffffa8 !important;
+}
 .carousel-control-prev{
     height: fit-content ;
     top: 45% ;

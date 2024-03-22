@@ -124,25 +124,25 @@
 									<tbody>
 									@foreach($staff as $s)
 									<tr>
-										<input type="hidden" value="{{ $s->mem_id }}">
+										<input type="hidden" name="sId" class="sIdInput" value="{{ $s['mem_id'] }}">
 										<td>
-											<input type="text" value="{{ $s->username }}" class="sUserInput" title="{{ $s->username }}" disabled>
-											<input type="hidden" value="{{ $s->username }}">
+											<input type="text" name="sUserInput" value="{{ $s['username'] }}" class="sUserInput" title="{{ $s['username'] }}" disabled>
+											<input type="hidden" name="sUserInput" value="{{ $s['username'] }}">
 										</td>
 										<td>
-											<input type="text" value="{{ $s->password }}" class="sPassInput" title="{{ $s->password }}" disabled>
+											<input type="text" name="sPassInput" value="{{ $s['password'] }}" class="sPassInput" title="{{ $s['password'] }}" disabled>
 										</td>
 										<td>
-											<input type="text" value="{{ $s->name }}" class="sNameInput" title="{{ $s->name }}" disabled>
+											<input type="text" name="sNameInput" value="{{ $s['name'] }}" class="sNameInput" title="{{ $s['name'] }}" disabled>
 										</td>
                     <td>
-                      <input type="text" value="{{ $s->phone }}" class="sPhoneInput" title="{{ $s->phone }}" disabled>
-                      <input type="hidden" value="{{ $s->phone }}">
+                      <input type="text" value="{{ $s['phone'] }}" name="sPhoneInput" class="sPhoneInput" title="{{ $s['phone'] }}" disabled>
+                      <input type="hidden" value="{{ $s['phone'] }}" name="sPhoneInput">
                     </td>
 										<td>
-											<select disabled>
-												@if($s->mem_active == 1)
-												<option value="1" selected>Active</option>
+											<select name="mem_active" class="sActiveInput" disabled>
+												@if($s['mem_active'] == 1)
+												<option value="1"  selected>Active</option>
 												<option value="0">Inactive</option>
 												@else
 												<option value="1">Active</option>
@@ -152,7 +152,7 @@
 										</td>
 										<td>
 											<button type="button" class="btn btn-block btn-primary changebtn">Change</button>
-											<button type="button" class="btn btn-block btn-danger deletebtn" data-sid="{{ $s->mem_id }}">Delete</button>
+											<button type="button" class="btn btn-block btn-danger deletebtn" data-sid="{{ $s['mem_id'] }}">Delete</button>
 											<button type="button" class="btn btn-block btn-success savebtn">Save</button>
 											<button type="button" class="btn btn-block btn-warning resetbtn">Reset</button>
 											<button type="button" class="btn btn-block btn-danger cancelbtn">Cancel</button>
@@ -202,10 +202,12 @@
 <script>
 
 const accs = <?php echo json_encode($accs); ?>;
+const inputId = document.getElementsByClassName('sIdInput');
 const inputUser = document.getElementsByClassName('sUserInput');
 const inputPass = document.getElementsByClassName('sPassInput');
 const inputName = document.getElementsByClassName('sNameInput');
 const inputPhone = document.getElementsByClassName('sPhoneInput');
+const inputActive = document.getElementsByClassName('sActiveInput');
 
 $.ajaxSetup({
     headers: {
@@ -230,6 +232,12 @@ $('.savebtn').click(function(){
     formData.append('sName', tr[7].childNodes[1].value);
     formData.append('sPhone', tr[9].childNodes[1].value);
     formData.append('sStas', tr[11].childNodes[1].value);
+	// formData.append('sId', inputId);
+    // formData.append('sUser', inputUser);
+    // formData.append('sPass', inputPass);
+    // formData.append('sName', inputName);
+    // formData.append('sPhone', inputPhone);
+    // formData.append('sStas', inputActive);
 
     $.ajax({
         type: "POST",

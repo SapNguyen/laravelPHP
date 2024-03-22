@@ -163,19 +163,19 @@
 						  <span class="badge bg-light rankingbg">{{ $i + 1 }}</span>
 					  	</td>
 						<td>
-							@if($topsale[$i]->product_image == 'No_image_2.png')
+							@if($topsale[$i]['product_image'] == 'No_image_2.png')
 							<img src="/img/No_image_2.png" class="toppimg">
 							@else
-							<img src="/img/product/{{ $topsale[$i]->product_id }}/{{ $topsale[$i]->product_image }}" class="toppimg">
+							<img src="/img/product/{{ $topsale[$i]['product_id'] }}/{{ $topsale[$i]['product_image'] }}" class="toppimg">
 							@endif
 						</td>
                       	<td>
-							<a href="{{ route('a.p.view', ['pid'=>$topsale[$i]->product_id]) }}">
-								{{ $topsale[$i]->product_name }}
+							<a href="{{ route('a.p.view', ['pid'=>$topsale[$i]['product_id']]) }}">
+								{{ $topsale[$i]['product_name'] }}
 							</a>
 						</td>
                       	<td>
-							{{ $topsale[$i]->totalq }}
+							{{ $topsale[$i]['totalq'] }}
 						</td>
                     </tr>
 					@endfor

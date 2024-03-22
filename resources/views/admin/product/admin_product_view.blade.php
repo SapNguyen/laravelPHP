@@ -72,7 +72,7 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Product No.{{ $product[0]->product_id }}</h1>
+            <h1>Product No.{{ $product[0]['product_id'] }}</h1>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
@@ -108,35 +108,46 @@
                                     <tbody>
                                         <tr>
                                             <th>Product No.</th>
-                                            <td>{{ $product[0]->product_id }}</td>
+                                            <td>{{ $product[0]['product_id'] }}</td>
                                         </tr>
                                         <tr>
                                             <th>Name</th>
-                                            <td>{{ $product[0]->product_name }}</td>
+                                            <td>{{ $product[0]['product_name'] }}</td>
                                         </tr>
                                         <tr>
                                             <th>Brand</th>
-                                            <td>{{ $product[0]->brand_name }}</td>
+                                            <td>{{ $product[0]['brand_name'] }}</td>
                                         </tr>
                                         <tr>
                                             <th>Material</th>
-                                            <td>{{ $product[0]->product_material }}</td>
+                                            <td>{{ $product[0]['product_material'] }}</td>
                                         </tr>
                                         <tr>
                                             <th>Price&nbsp;&nbsp;&nbsp;(VND)</th>
-                                            <td>{{ $product[0]->product_price }}</td>
+                                            <td>{{ $product[0]['product_price'] }}</td>
                                         </tr>
                                         <tr>
-                                            <th>Left</th>
+                                            <th>Genre</th>
+                                            @if( $product[0]['product_genre'] == 1)
+                                            <td>Nam</td>
+                                            @elseif( $product[0]['product_genre'] ==0)
+                                            <td>Nữ</td>
+                                            @else
+                                            <td>Nam và nữ</td>
+                                            @endif
+                                        </tr>
+                                        <tr>
+                                            <th>Total</th>
                                             <td id="totalLeft">0</td>
                                         </tr>
                                         <tr>
                                             <th>Description</th>
-                                            <td>{{ $product[0]->product_des }}</td>
+                                            <td>{{ $product[0]['product_des'] }}</td>
                                         </tr>
+                                        
                                         <tr>
                                             <th>Status</th>
-                                            @if( $product[0]->product_active == 1)
+                                            @if( $product[0]['product_active'] == 1)
                                             <td>Active</td>
                                             @else
                                             <td>Inactive</td>
@@ -144,7 +155,7 @@
                                         </tr>
                                         <tr>
                                             <th>Last updated on</th>
-                                            <td>{{ $product[0]->product_updated_date }}</td>
+                                            <td>{{ $product[0]['product_updated_date'] }}</td>
                                         </tr>
                                     </tbody>
                                     </table>
@@ -160,24 +171,24 @@
                                         <tbody>
                                         @foreach($psc1 as $sc1)
                                         <tr>
-                                            <td rowspan="{{ $sc1->row + 1 }}">
+                                            <td rowspan="{{ $sc1['row'] + 1 }}">
                                                 <div class="imgshow">
-                                                @foreach(explode(',', $sc1->product_image) as $img)
+                                                @foreach(explode(',', $sc1['product_image']) as $img)
                                                     @if($img == "No_image_2.png")
                                                     <img src = "/img/No_image_2.png">
                                                     @else
-                                                    <img src="/img/product/{{ $product[0]->product_id }}/{{ $img }}">
+                                                    <img src="/img/product/{{ $product[0]['product_id'] }}/{{ $img }}">
                                                     @endif
                                                 @endforeach
                                                 </div>
                                             </td>
-                                            <td rowspan="{{ $sc1->row + 1 }}">{{ $sc1->color }}</td>
+                                            <td rowspan="{{ $sc1['row'] + 1 }}">{{ $sc1['color'] }}</td>
                                         </tr>
                                         @foreach($psc2 as $sc2)   
-                                            @if($sc2->product_id == $sc1->product_id && $sc2->color == $sc1->color)
+                                            @if($sc2['product_id'] == $sc1['product_id'] && $sc2['color'] == $sc1['color'])
                                         <tr>    
-                                            <td>{{ $sc2->size }}</td>
-                                            <td class="pq">{{ $sc2->quantity }}</td>
+                                            <td>{{ $sc2['size'] }}</td>
+                                            <td class="pq">{{ $sc2['quantity'] }}</td>
                                         </tr>
                                             @endif
                                         @endforeach
@@ -186,12 +197,12 @@
                                         </tbody>
                                     </table>
                                     <div style="width: 100%; padding: 12px;">
-                                        @if($product[0]->product_active == 1)
-                                        <button type="button" class="btn btn-block btn-danger" style="width: 40%; float: left;" data-pid="{{ $product[0]->product_id }}" onclick="deactivate(this)">Deactivate</button>
+                                        @if($product[0]['product_active'] == 1)
+                                        <button type="button" class="btn btn-block btn-danger" style="width: 40%; float: left;" data-pid="{{ $product[0]['product_id'] }}" onclick="deactivate(this)">Deactivate</button>
                                         @else
-                                        <button type="button" class="btn btn-block btn-success" style="width: 40%; float: left;" data-pid="{{ $product[0]->product_id }}" onclick="activate(this)">Activate</button>
+                                        <button type="button" class="btn btn-block btn-success" style="width: 40%; float: left;" data-pid="{{ $product[0]['product_id'] }}" onclick="activate(this)">Activate</button>
                                         @endif
-                                        <a href="{{ route('a.p.edit.red', ['pid'=>$product[0]->product_id]) }}" style="width: 40%; float: right;">
+                                        <a href="{{ route('a.p.edit.red', ['pid'=>$product[0]['product_id']]) }}" style="width: 40%; float: right;">
                                             <button type="button" class="btn btn-block btn-info">Edit</button>
                                         </a>
                                     </div>

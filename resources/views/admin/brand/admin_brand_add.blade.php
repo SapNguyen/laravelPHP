@@ -106,7 +106,7 @@
                     <div class="card-header">
                         <h3 class="card-title">Please fill in this form to add new brand</h3>
                     </div>
-                    <form method="post" action="{{ route('a.b.add') }}" onsubmit="return checkForm()">
+                    <form method="post" action="{{ route('a.b.add') }}" onsubmit="return checkForm()" enctype="multipart/form-data">
                         @csrf
                         <div class="card-body">
                             <div class="form-group">
@@ -152,6 +152,19 @@
                                 </div>
                                 </div>
                                 <img src="/img/No_image_2.png" style="max-height: 200px; border: 1px solid black; margin-top: 5px;" id="brandImg">
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputFile">Brand's Banner</label>
+                                <div class="input-group">
+                                <div class="custom-file">
+                                    <input type="file" name="bBannerimg" class="custom-file-input" id="bBannerimg" accept="image/*">
+                                    <label class="custom-file-label" for="exampleInputFile">Choose file</label>
+                                </div>
+                                <div class="input-group-append">
+                                    <span class="input-group-text">Upload</span>
+                                </div>
+                                </div>
+                                <img src="/img/No_image_2.png" style="max-height: 200px; border: 1px solid black; margin-top: 5px;" id="bannerImg">
                             </div>
                             <div class="form-group">
                                 <label>Description</label>
@@ -231,67 +244,126 @@ $(function () {
 });
 
 document.getElementById('bLogo').addEventListener('change', (e) => {
-    console.log(e.target.files[0])
-    var formData = new FormData();
-    formData.append('img1', e.target.files[0]);
-    $.ajax({
-        type: "POST",
-        url: "/upload1",
-        data: formData,
-        success: function (response) {
-            document.getElementById('logoImg').src = document.getElementById('logoImg').src.replace('No_image_2.png', 'brand/temp1/' + e.target.files[0].name);
-        },
-        error:function(response){
-            alert("An error occurd when uploading file!");
-        },
-        cache: false,
-        contentType: false,
-        processData: false,
-    });
+    // console.log(e.target.files[0])
+    // var formData = new FormData();
+    // formData.append('img1', e.target.files[0]);
+    // $.ajax({
+    //     type: "POST",
+    //     url: "/upload1",
+    //     data: formData,
+    //     success: function (response) {
+    //         document.getElementById('logoImg').src = e.target.files[0].name;
+    //     },
+    //     error:function(response){
+    //         alert("An error occurd when uploading file!");
+    //     },
+    //     cache: false,
+    //     contentType: false,
+    //     processData: false,
+    // });
+
+    const input = e.target;
+      const preview = document.getElementById('logoImg');
+
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+        };
+
+        reader.readAsDataURL(input.files[0]);
+      }
+
 });
 
 document.getElementById('bHPimg').addEventListener('change', (e) => {
-    var formData = new FormData();
-    formData.append('img2', e.target.files[0]);
-    $.ajax({
-        type: "POST",
-        url: "/upload2",
-        data: formData,
-        success: function (response) {
-            document.getElementById('homeImg').src = document.getElementById('homeImg').src.replace('No_image_2.png', 'brand/temp2/' + e.target.files[0].name);
-        },
-        error:function(response){
-            alert("An error occurd when uploading file!");
-        },
-        cache: false,
-        contentType: false,
-        processData: false,
-    });
+    // var formData = new FormData();
+    // formData.append('img2', e.target.files[0]);
+    // $.ajax({
+    //     type: "POST",
+    //     url: "/upload2",
+    //     data: formData,
+    //     success: function (response) {
+    //         document.getElementById('homeImg').src = document.getElementById('homeImg').src.replace('No_image_2.png', 'brand/temp2/' + e.target.files[0].name);
+    //     },
+    //     error:function(response){
+    //         alert("An error occurd when uploading file!");
+    //     },
+    //     cache: false,
+    //     contentType: false,
+    //     processData: false,
+    // });
+
+    const input = e.target;
+      const preview = document.getElementById('homeImg');
+
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+        };
+
+        reader.readAsDataURL(input.files[0]);
+      }
+
 });
 
 document.getElementById('bBPimg').addEventListener('change', (e) => {
-    var formData = new FormData();
-    formData.append('img3', e.target.files[0]);
-    $.ajax({
-        type: "POST",
-        url: "/upload3",
-        data: formData,
-        success: function (response) {
-            document.getElementById('brandImg').src = document.getElementById('brandImg').src.replace('No_image_2.png', 'brand/temp3/' + e.target.files[0].name);
-        },
-        error:function(response){
-            alert("An error occurd when uploading file!");
-        },
-        cache: false,
-        contentType: false,
-        processData: false,
-    });
+    // var formData = new FormData();
+    // formData.append('img3', e.target.files[0]);
+    // $.ajax({
+    //     type: "POST",
+    //     url: "/upload3",
+    //     data: formData,
+    //     success: function (response) {
+    //         document.getElementById('brandImg').src = document.getElementById('brandImg').src.replace('No_image_2.png', 'brand/temp3/' + e.target.files[0].name);
+    //     },
+    //     error:function(response){
+    //         alert("An error occurd when uploading file!");
+    //     },
+    //     cache: false,
+    //     contentType: false,
+    //     processData: false,
+    // });
+
+    const input = e.target;
+      const preview = document.getElementById('brandImg');
+
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+        };
+
+        reader.readAsDataURL(input.files[0]);
+      }
+    
+});
+
+document.getElementById('bBannerimg').addEventListener('change', (e) => {
+    const input = e.target;
+      const preview = document.getElementById('bannerImg');
+
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+        };
+
+        reader.readAsDataURL(input.files[0]);
+      }
+    
 });
 
 document.getElementById('resetbtn').addEventListener('click', () => {
     document.getElementById('logoImg').src = '/img/No_image_2.png';
     document.getElementById('homeImg').src = '/img/No_image_2.png';
     document.getElementById('brandImg').src = '/img/No_image_2.png';
+    document.getElementById('bannerImg').src = '/img/No_image_2.png';
 })
 
 function checkForm(){

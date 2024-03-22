@@ -1,7 +1,7 @@
 <aside class="main-sidebar sidebar-dark-danger elevation-4">
     <!-- Brand Logo -->
     <a href="{{ route('admin.page') }}" class="brand-link">
-      <span class="brand-text font-weight-light">Group 7 - 65PM2<br>Onine Shoes Store</span>
+      <span class="brand-text font-weight-light">Nguyễn Thế Anh<br>Onine Shoes Store</span>
     </a>
 
     <!-- Sidebar -->
@@ -125,36 +125,36 @@
                 </ul>
             </li>
 
-            <!-- Receipt -->
-            <li class="nav-item {{ request()->is('admin/receipt*') ? 'menu-open' : '' }}">
-                <a href="#" class="nav-link {{ request()->is('admin/receipt*') ? 'active' : '' }}">
+            <!-- order -->
+            <li class="nav-item {{ request()->is('admin/order*') ? 'menu-open' : '' }}">
+                <a href="#" class="nav-link {{ request()->is('admin/order*') ? 'active' : '' }}">
                 <i class="fa-solid fa-file-invoice-dollar nav-icon" style="color: #ffffff;"></i>
                 <p>
-                    Receipts
+                    Orders
                     <i class="right fas fa-angle-left"></i>
                 </p>
                 </a>
                 <ul class="nav nav-treeview">
                 <li class="nav-item">
-                    <a href="{{ route('a.r.list.0') }}" class="nav-link {{ request()->is('admin/receipt_unconfimred') ? 'active' : '' }}">
+                    <a href="{{ route('a.r.list.0') }}" class="nav-link {{ request()->is('admin/order_unconfimred') ? 'active' : '' }}">
                     <i class="far fa-circle nav-icon"></i>
                     <p>Unconfirmed</p>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('a.r.list.1') }}" class="nav-link {{ request()->is('admin/receipt') ? 'active' : '' }}">
+                    <a href="{{ route('a.r.list.1') }}" class="nav-link {{ request()->is('admin/order') ? 'active' : '' }}">
                     <i class="far fa-circle nav-icon"></i>
                     <p>Confirmed</p>
                     </a>
                 </li>
                 <li class="nav-item">
-                  <a href="{{ route('a.r.list.2') }}" class="nav-link {{ request()->is('admin/receipt_canceled') ? 'active' : '' }}">
+                  <a href="{{ route('a.r.list.2') }}" class="nav-link {{ request()->is('admin/order_canceled') ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Canceled</p>
                   </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('a.r.list.3') }}" class="nav-link {{ request()->is('admin/receipt_finished') ? 'active' : '' }}">
+                    <a href="{{ route('a.r.list.3') }}" class="nav-link {{ request()->is('admin/order_finished') ? 'active' : '' }}">
                     <i class="far fa-circle nav-icon"></i>
                     <p>Finished</p>
                     </a>

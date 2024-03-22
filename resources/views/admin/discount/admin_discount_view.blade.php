@@ -115,19 +115,19 @@
 <tbody>
     @foreach($products as $product)
     <tr data-widget="expandable-table" aria-expanded="false">
-        <td valign="middle">{{$product->product_id}}</td>
-        <td valign="middle"><img src="/img/product/{{$product->product_id}}/{{explode(',',$product->product_image)[0]}}" class="img"></td>
-            <td valign="middle">{{$product->product_name}}</td>
-            <td valign="middle">{{$product->product_material}}</td>
-            <td valign="middle">{{$product->product_price}}</td>
-            @if($product->product_active == 1)
+        <td valign="middle">{{$product['product_id']}}</td>
+        <td valign="middle"><img src="/img/product/{{$product['product_id']}}/{{explode(',',$product['product_image'])[0]}}" class="img"></td>
+            <td valign="middle">{{$product['product_name']}}</td>
+            <td valign="middle">{{$product['product_material']}}</td>
+            <td valign="middle">{{$product['product_price']}}</td>
+            @if($product['product_active'] == 1)
                                         <td valign="middle">Active</td>
                                         @else
                                         <td valign="middle">Inactive</td>
                                         @endif
             <td>
               
-              <button type="button" class="btn btn-primary mr-2" onclick="add(this)" data-did="{{$product->product_id}}"  data-diid="{{$discountes}}" ><i class="fa fa-plus"></i></button>
+              <button type="button" class="btn btn-primary mr-2" onclick="add(this)" data-did="{{$product['product_id']}}"  data-diid="{{$discountes}}" ><i class="fa fa-plus"></i></button>
                 
             </td>
         
@@ -206,19 +206,19 @@
 <tbody>
 @foreach($product_eds as $producted)
 <tr data-widget="expandable-table" aria-expanded="false">
-    <td valign="middle">{{$producted->product_id}}</td>
-    <td valign="middle"><img src="/img/product/{{$producted->product_id}}/{{explode(',',$producted->product_image)[0]}}" class="img"></td>
-  <td valign="middle">{{$producted->product_name}}</td>
-  <td valign="middle">{{$producted->product_material}}</td>
-  <td valign="middle">{{$producted->product_price}}</td>
-  @if($producted->product_active == 1)
+    <td valign="middle">{{$producted['product_id']}}</td>
+    <td valign="middle"><img src="/img/product/{{$producted['product_id']}}/{{explode(',',$producted['product_image'])[0]}}" class="img"></td>
+  <td valign="middle">{{$producted['product_name']}}</td>
+  <td valign="middle">{{$producted['product_material']}}</td>
+  <td valign="middle">{{$producted['product_price']}}</td>
+  @if($producted['product_active'] == 1)
                               <td valign="middle">Active</td>
                               @else
                               <td valign="middle">Inactive</td>
                               @endif
   <td>
       
-      <button type="button" class="btn btn-primary mr-2" onclick="sub(this)" data-did="{{$producted->product_id}}"><i class="fa fa-minus"></i></button>
+      <button type="button" class="btn btn-primary mr-2" onclick="sub(this)" data-did="{{$producted['product_id']}}"><i class="fa fa-minus"></i></button>
     
   </td>
 

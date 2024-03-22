@@ -126,16 +126,17 @@
                                     <tbody>
                                         @foreach($brand as $b)
                                         <tr data-widget="expandable-table" aria-expanded="false">
-                                            <td>{{ $b->brand_id }}.</td>
-                                            <td class="bName">{{ $b->brand_name }}</td>
+                                            <td>{{ $b['brand_id'] }}.</td>
+                                            <td class="bName">{{ $b['brand_name'] }}</td>
                                             <td>
-                                                @if($b->brand_logo == "No_image_2.png")
-                                                <img src="/img/No_image_2.png" style="max-height: 75px; border: 1px solid black;">
+                                                @if($b['brand_logo'] === NULL)
+                                                <img src="" style="max-height: 75px; border: 1px solid black;">
                                                 @else
-                                                <img src="/img/brand/{{ $b->brand_id }}/{{ $b->brand_logo }}" style="max-height: 75px; border: 1px solid black;">
+                                                <img src="/img/brand/{{ $b['brand_id'] }}/{{ $b['brand_logo'] }}" style="max-height: 75px; border: 1px solid black;">
+                                                {{-- <img src="{{ asset('storage/' . $b['brand_logo) }}" style="max-height: 75px; border: 1px solid black;"> --}}
                                                 @endif
                                             </td>
-                                            @if($b->brand_active == 1)
+                                            @if($b['brand_active'] == 1)
                                             <td>Active</td>
                                             @else
                                             <td>Inactive</td>
@@ -156,17 +157,19 @@
                                                 </tr>
                                                 <tr>
                                                     <td>
-                                                        @if($b->brand_img == "No_image_2.png")
-                                                        <img src="/img/No_image_2.png" style="max-width: 100%; max-height: 100%; border: 1px solid black;">
+                                                        @if($b['brand_img'] === NULL)
+                                                        <img src="" style="max-width: 100%; max-height: 100%; border: 1px solid black;">
                                                         @else
-                                                        <img src="/img/brand/{{ $b->brand_id }}/{{ $b->brand_img }}" style="max-width: 100%; max-height: 200px; border: 1px solid black;">
+                                                        <img src="/img/brand/{{ $b['brand_id'] }}/{{ $b['brand_img'] }}" style="max-width: 100%; max-height: 200px; border: 1px solid black;">
+                                                        {{-- <img src="{{ asset('storage/' . $b['brand_img) }}" style="max-width: 100%; max-height: 200px; border: 1px solid black;"> --}}
                                                         @endif
                                                     </td>
                                                     <td>
-                                                        @if($b->brand_des_img == "No_image_2.png")
-                                                        <img src="/img/No_image_2.png" style="max-width: 100%; max-height: 100%; border: 1px solid black;">
+                                                        @if($b['brand_des_img'] === NULL)
+                                                        <img src="" style="max-width: 100%; max-height: 100%; border: 1px solid black;">
                                                         @else
-                                                        <img src="/img/brand/{{ $b->brand_id }}/{{ $b->brand_des_img }}" style="max-width: 100%; max-height: 200px; border: 1px solid black;">
+                                                        <img src="/img/brand/{{ $b['brand_id'] }}/{{ $b['brand_des_img'] }}" style="max-width: 100%; max-height: 200px; border: 1px solid black;">
+                                                        {{-- <img src="{{ asset('storage/' . $b->brand_des_img) }}" style="max-width: 100%; max-height: 200px; border: 1px solid black;"> --}}
                                                         @endif
                                                     </td>
                                                     
@@ -175,23 +178,23 @@
                                                     <th colspan="2">Description</th>
                                                 </tr>
                                                 <tr>
-                                                    @if($b->brand_des <> "")
-                                                    <td colspan="2">{{ $b->brand_des }}</td>
+                                                    @if($b['brand_des'] <> "")
+                                                    <td colspan="2">{{ $b['brand_des'] }}</td>
                                                     @else
                                                     <td colspan="2">No data</td>
                                                     @endif
                                                 </tr>
                                                 <tr>
                                                     <td colspan="2">
-                                                    @if($b->brand_active == 1)
-                                                        <button type="button" class="btn btn-block btn-danger deactivebtn" onclick="deactivate(this)" data-bid="{{ $b->brand_id }}">Deactivate</button>
+                                                    @if($b['brand_active'] == 1)
+                                                        <button type="button" class="btn btn-block btn-danger deactivebtn" onclick="deactivate(this)" data-bid="{{ $b['brand_id'] }}">Deactivate</button>
                                                         <a style="width: 40%; float: right;">
                                                             <button type="button" class="btn btn-block btn-warning disabled">Delete</button>
                                                         </a>
                                                     @else
-                                                        <button type="button" class="btn btn-block btn-success activebtn" onclick="activate(this)" data-bid="{{ $b->brand_id }}">Activate</button>
+                                                        <button type="button" class="btn btn-block btn-success activebtn" onclick="activate(this)" data-bid="{{ $b['brand_id'] }}">Activate</button>
                                                         <a style="width: 40%; float: right;">
-                                                            <button type="button" class="btn btn-block btn-warning" onclick="deleteBrand(this)" data-bid="{{ $b->brand_id }}">Delete</button>
+                                                            <button type="button" class="btn btn-block btn-warning" onclick="deleteBrand(this)" data-bid="{{ $b['brand_id'] }}">Delete</button>
                                                         </a>    
                                                     @endif
                                                     </td>    
@@ -322,6 +325,7 @@ function deleteBrand(button){
         $.ajax({
             type: "POST",
             url: "/deleteBrand",
+            // url: "https://s25sneaker.000webhostapp.com/api/admin/deleteBrand",
             data: formData,
             success: function (response) {
                 alert('Brand no.' + bid + ' has been deleted.');

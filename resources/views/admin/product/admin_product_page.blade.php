@@ -105,7 +105,7 @@
                                             <th>Name</th>
                                             <th>Brand</th>
                                             <th>Price</th>
-                                            <th>Left</th>
+                                            <th>Total</th>
                                             <th>Last updated on</th>
                                             <th>Status</th>
                                         </tr>
@@ -113,19 +113,19 @@
                                     <tbody>
                                         @foreach($product as $p)
                                         <tr data-widget="expandable-table" aria-expanded="false">
-                                            <td>{{ $p->product_id }}.</td>
-                                            <td>{{ $p->product_name }}</td>
-                                            <td>{{ $p->brand_name }}</td>
-                                            <td>{{ $p->product_price }}</td>
+                                            <td>{{ $p['product_id'] }}.</td>
+                                            <td>{{ $p['product_name'] }}</td>
+                                            <td>{{ $p['brand_name'] }}</td>
+                                            <td>{{ $p['product_price'] }}</td>
                                             <td>
                                                 @foreach($quan as $q)
-                                                @if($q->product_id == $p->product_id)
-                                                {{ $q->quan }}
+                                                @if($q['product_id'] == $p['product_id'])
+                                                {{ $q['quan'] }}
                                                 @endif
                                                 @endforeach
                                             </td>
-                                            <td>{{ $p->product_updated_date }}</td>
-                                            @if( $p->product_active == 1)
+                                            <td>{{ $p['product_updated_date'] }}</td>
+                                            @if( $p['product_active'] == 1)
                                             <td>Active</td>
                                             @else
                                             <td>Inactive</td>
@@ -133,12 +133,12 @@
                                         </tr>
                                         <tr class="expandable-body">
                                             <td colspan="7">
-                                                @if($p->product_active == 1)
-                                                <button type="button" class="btn btn-block btn-danger" style="width: 40%; float: left;" data-pid="{{ $p->product_id }}" onclick="deactivate(this)">Deactivate</button>
+                                                @if($p['product_active'] == 1)
+                                                <button type="button" class="btn btn-block btn-danger" style="width: 40%; float: left;" data-pid="{{ $p['product_id'] }}" onclick="deactivate(this)">Deactivate</button>
                                                 @else
-                                                <button type="button" class="btn btn-block btn-success" style="width: 40%; float: left;" data-pid="{{ $p->product_id }}" onclick="activate(this)">Activate</button>
+                                                <button type="button" class="btn btn-block btn-success" style="width: 40%; float: left;" data-pid="{{ $p['product_id'] }}" onclick="activate(this)">Activate</button>
                                                 @endif
-                                                <a href="{{ route('a.p.view', ['pid'=>$p->product_id]) }}" style="width: 40%; float: right;">
+                                                <a href="{{ route('a.p.view', ['pid'=>$p['product_id']]) }}" style="width: 40%; float: right;">
                                                     <button type="button" class="btn btn-block btn-info">Detail</button>
                                                 </a>
                                             </td>

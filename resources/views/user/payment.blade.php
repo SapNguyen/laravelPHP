@@ -35,6 +35,8 @@
                         <div class="payment-product-info-header-breadcrumb-item-pt">Phương thức thanh toán</div>
                     </div>
                 </div>
+
+                
                 <form id="form_payment" action="/payment/insert">
                 <div class="payment-product-section">
                   <div class="payment-product-section-header">
@@ -85,6 +87,8 @@
                   </div>
                   @endif
                 </form>
+
+
                 <div class="payment-product-footer">
                   <div class="payment-product-footer-form">
                     <button class="payment-product-footer-content btn_disabled" type="submit" id="btn_submit" disabled>

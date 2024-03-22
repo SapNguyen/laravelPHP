@@ -17,8 +17,8 @@
     <script src="{{asset('js/jquery.min.js')}}"></script>
 </head>
 
-<body style="background:#f5f5f5">
-  @include('module.header')
+<body class="container">
+  {{-- @include('module.header') --}}
   <main align="center" style="margin-top: 30px;margin: 60px 35%;background: white;padding: 20px 30px;border-radius: 10px" class="shadow">
     <p style="font-size: 25px;font-weight: 800">ĐĂNG KÝ</p>
     <form  id='form_register'>
@@ -54,7 +54,7 @@
       </div>
   </div>
   </main>
-  @include('module.footer')
+  {{-- @include('module.footer') --}}
   
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
     integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous">

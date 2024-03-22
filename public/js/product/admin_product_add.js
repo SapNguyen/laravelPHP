@@ -359,6 +359,7 @@ for(var i = 0; i < imgInput.length; i++){
 			formData.append(j, e.target.files[j]);
 		}
 		formData.append('old', e.target.closest('div').querySelector('.imgText').value);
+		// formData.append('old', e.target.closest('div').querySelector('.imgText').value);
 		$.ajax({
 			type: 'POST',
 			url: '/addPimg',

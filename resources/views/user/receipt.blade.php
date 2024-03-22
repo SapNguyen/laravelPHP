@@ -102,21 +102,6 @@
         </div>
         <div class='feedback-box'>
             <p class="feedback-title">Đánh Giá Sản Phẩm</p>
-            {{-- <div>
-                <div class="flex starbox">
-                    @for ($i = 1; $i < 6; $i++)
-                    <div class="div_star" id="{{$i}}">
-                        <span class="material-symbols-outlined star" style="font-size: 30px">
-                        star
-                        </span>
-                        <span class="material-symbols-outlined star-fill star-deactive">
-                        star
-                        </span>
-                    </div>
-                    @endfor
-                </div>
-                <textarea class="comment" placeholder="Nhập đánh giá của bạn"></textarea>
-            </div> --}}
             <div class="flex mt-3" style="justify-content: center">
                 <p class="error-txt"></p>
                 <button class="btn_cancel-feedback">TRỞ LẠI</button>
@@ -129,54 +114,7 @@
         </div>
         <div class='feedback-box-view'>
             <p class="feedback-title">Đánh Giá Của Bạn</p>
-            {{-- <div class="feedback-product-view">
-                <div class="product-feedback">
-                    <img src="" class="img-product-feedback">
-                    <div style="margin-left: 10px;text-align: left">
-                        <p class="name-product-feedback">Giày</p>
-                        <p class="product-classify">Size: 31, Màu: Trắng</p>
-                    </div>
-                </div>
-                <div class="flex mt-3" style="justify-content: left;">
-                    <div class="comment-box">
-                        <div class="avata material-symbols-outlined">
-                            account_circle
-                        </div>
-                        <div class="comment-info">
-                            <div class="name">
-                                Tam Minh
-                            </div>
-                            <div class="rate">
-                                <div class="flex" >
-                                    @for ($k = 0; $k < 4; $k++)
-                                        <div style="position: relative;height:20px">
-                                            <span class="material-symbols-outlined star" style="font-size: 20px;cursor: default">
-                                                star
-                                            </span>
-                                            <span class="material-symbols-outlined star-fill" style="width: 100%;font-size:20px;cursor: default">
-                                                star
-                                            </span>
-                                        </div>
-                                    @endfor
-                                    @for ($k = 0; $k < 5-4; $k++)
-                                        <div style="position: relative;height:20px">
-                                            <span class="material-symbols-outlined star" style="font-size: 20px;cursor: default">
-                                                star
-                                            </span>
-                                            <span class="material-symbols-outlined star-fill" style="width: 0px;font-size: 20px;cursor: default">
-                                                star
-                                            </span>
-                                        </div>
-                                    @endfor
-                                </div>
-                            </div>
-                            <div class="content">
-                                OK
-                            </div>
-                        </div>
-                    </div>    
-                </div>
-            </div> --}}
+            
             <div style="display: flex; justify-content: right;margin-top: 20px">
                 <div class="btn-gray btn_close" style="width: 100px">OK</div>
             </div>

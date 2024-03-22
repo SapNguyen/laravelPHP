@@ -73,37 +73,37 @@
         <div class="row">
             <div class="card card-info" style="width: 100%;">
                 <div class="card-header">
-                    <h3 class="card-title">Change discount no.{{ $discount[0]->discount_id }} 's infomation</h3>
+                    <h3 class="card-title">Change discount no.{{ $discount[0]['discount_id'] }} 's infomation</h3>
                 </div>
       <div class="main-discount" >
       <div class="input-discord">
-      <form name=f action="{{route('a.d.edit', ['did'=>$discount[0]->discount_id])}}" method=Post onsubmit="return checkForm()">
+      <form name=f action="{{route('a.d.edit', ['did'=>$discount[0]['discount_id']])}}" method=Post onsubmit="return checkForm()">
         @csrf
         <div class="card-body">
         <div class="form-group">
           <label for="exampleInputEmail1">Mã giảm giá:<b style="color: red;"> *</b></label>
-          <div>{{ $discount[0]->discount_id }}</div>
+          <div>{{ $discount[0]['discount_id'] }}</div>
           
         </div>
         <div class="form-group">
           <label for="exampleInputEmail1">Tên giảm giá:<b style="color: red;"> *</b></label>
-          <input type="text" name="txtname" class="form-control" id="exampleInputEmail1" value="{{ $discount[0]->discount_name }}"
+          <input type="text" name="txtname" class="form-control" id="exampleInputEmail1" value="{{ $discount[0]['discount_name'] }}"
           required oninvalid="this.setCustomValidity('Please fill in discount\'s name!')" oninput="this.setCustomValidity('')">
         </div>
         
         <div class="form-group">
           <label for="exampleInputEmail1">Ngày bắt đầu:</label>
-          <input type="date"  name="date-start" class="form-control" id="exampleInputEmail1" value="{{ $discount[0]->discount_start }}"
+          <input type="date"  name="date-start" class="form-control" id="exampleInputEmail1" value="{{ $discount[0]['discount_start'] }}"
           required oninvalid="this.setCustomValidity('Please fill in discount\'s date-start!')" oninput="this.setCustomValidity('')">
         </div>
         <div class="form-group">
           <label for="exampleInputEmail1">Ngày kết thúc:<b style="color: red;"> *</b></label>
-          <input type="date" name="date-end" class="form-control" id="exampleInputEmail1" value="{{ $discount[0]->discount_end }}"
+          <input type="date" name="date-end" class="form-control" id="exampleInputEmail1" value="{{ $discount[0]['discount_end'] }}"
           required oninvalid="this.setCustomValidity('Please fill in discount\'s date-end!')" oninput="this.setCustomValidity('')">
         </div>
         <div class="form-group">
           <label for="exampleInputEmail1">Mức giảm:<b style="color: red;"> *</b></label>
-          <input type="text" name="txtvalue" class="form-control" id="exampleInputEmail1" value="{{ $discount[0]->discount_value }}"
+          <input type="text" name="txtvalue" class="form-control" id="exampleInputEmail1" value="{{ $discount[0]['discount_value'] }}"
           required oninvalid="this.setCustomValidity('Please fill in discount\'s value!')" oninput="this.setCustomValidity('')">
         </div> 
           

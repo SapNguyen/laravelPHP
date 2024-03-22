@@ -122,19 +122,19 @@
         @foreach($discounts as $discount)
         <tr data-widget="expandable-table" aria-expanded="false">
             
-                <td valign="middle">{{$discount->discount_id}}</td>
-                <td valign="middle">{{$discount->discount_name}}</td>
-                <td valign="middle">{{$discount->discount_start}}</td>
-                <td valign="middle">{{$discount->discount_end}}</td>
-                <td valign="middle">{{$discount->discount_value}}</td>
-                @if($discount->discount_active == 1)
+                <td valign="middle">{{$discount['discount_id']}}</td>
+                <td valign="middle">{{$discount['discount_name']}}</td>
+                <td valign="middle">{{$discount['discount_start']}}</td>
+                <td valign="middle">{{$discount['discount_end']}}</td>
+                <td valign="middle">{{$discount['discount_value']}}</td>
+                @if($discount['discount_active'] == 1)
                                             <td valign="middle">Active</td>
                                             @else
                                             <td valign="middle">Inactive</td>
                                             @endif
                 <td>
-                  <a class="btn btn-primary mr-2" href="{{ route('a.d.edit.red', ['did'=>$discount->discount_id]) }}"><i class="fa fa-edit"></i></a>
-                    <a class="btn btn-primary mr-2" href="{{ route('a.d.view', ['discount_id'=>$discount->discount_id]) }}"><i class="fa fa-plus"></i></a>
+                  <a class="btn btn-primary mr-2" href="{{ route('a.d.edit.red', ['did'=>$discount['discount_id']]) }}"><i class="fa fa-edit"></i></a>
+                    <a class="btn btn-primary mr-2" href="{{ route('a.d.view', ['discount_id'=>$discount['discount_id']]) }}"><i class="fa fa-plus"></i></a>
                     
                 </td>
             
@@ -150,10 +150,10 @@
                       
                       <tr>
                           <td colspan="1">
-                          @if($discount->discount_active == 1)
-                              <button type="button" class="btn btn-block btn-danger deactivebtn" onclick="deactivate(this)" data-did="{{$discount->discount_id}}">Deactivate</button>
+                          @if($discount['discount_active'] == 1)
+                              <button type="button" class="btn btn-block btn-danger deactivebtn" onclick="deactivate(this)" data-did="{{$discount['discount_id']}}">Deactivate</button>
                           @else
-                              <button type="button" class="btn btn-block btn-success activebtn" onclick="activate(this)" data-did="{{$discount->discount_id}}">Activate</button>
+                              <button type="button" class="btn btn-block btn-success activebtn" onclick="activate(this)" data-did="{{$discount['discount_id']}}">Activate</button>
                           @endif
                           </td>
                       </tr>

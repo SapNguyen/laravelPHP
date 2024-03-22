@@ -1,3 +1,15 @@
+.container{
+    background-image:url(/img/slider_5.jpg) ;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    line-height: normal;
+    width: 100vw;
+    height: 100vh;
+}
+.shadow{
+    background-color: #ffffffe3 !important;
+}
 .btn:disabled{
     pointer-events: all;
 }

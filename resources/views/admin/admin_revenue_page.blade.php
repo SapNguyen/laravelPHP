@@ -98,8 +98,8 @@
                       <td>
                         <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
                         {{ $year[$y]->year }}
-						<span class="ytotal">Number of receipts: {{ $year[$y]->nor }}</span>
-						<span class="ytotal">Total sale of year: {{ $year[$y]->value }} (VND)</span>
+						<span class="ytotal">Number of receipts: {{ $year[$y]['nor'] }}</span>
+						<span class="ytotal">Total sale of year: {{ $year[$y]['value'] }} (VND)</span>
 						
                       </td>
                     </tr>
@@ -112,37 +112,37 @@
 							@for ($i = 1; $i < 13; $i++)
 								<?php $check = 0 ?>
 								@foreach($month as $m)
-								@if($m->month == $i && $m->year == $year[$y]->year)
+								@if($m['month'] == $i && $m['year'] == $year[$y]['year'])
 								<tr data-widget="expandable-table" aria-expanded="false">
 									<td style="background-color: #ccffcc;">
 									<i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
-									@if($m->month == 1)
+									@if($m['month'] == 1)
 									January
-									@elseif($m->month == 2)
+									@elseif($m['month'] == 2)
 									February
-									@elseif($m->month == 3)
+									@elseif($m['month'] == 3)
 									March
-									@elseif($m->month == 4)
+									@elseif($m['month'] == 4)
 									April
-									@elseif($m->month == 5)
+									@elseif($m['month'] == 5)
 									May
-									@elseif($m->month == 6)
+									@elseif($m['month'] == 6)
 									June
-									@elseif($m->month == 7)
+									@elseif($m['month'] == 7)
 									July
-									@elseif($m->month == 8)
+									@elseif($m['month'] == 8)
 									August
-									@elseif($m->month == 9)
+									@elseif($m['month'] == 9)
 									September
-									@elseif($m->month == 10)
+									@elseif($m['month'] == 10)
 									October
-									@elseif($m->month == 11)
+									@elseif($m['month'] == 11)
 									November
-									@elseif($m->month == 12)
+									@elseif($m['month'] == 12)
 									December
 									@endif
-									<span class="mtotal">Number of receipts: <i>{{ $m->nor }}<i></span>
-									<span class="mtotal">Total sale of month: <i>{{ $m->value }}</i> (VND)</span>
+									<span class="mtotal">Number of receipts: <i>{{ $m['nor'] }}<i></span>
+									<span class="mtotal">Total sale of month: <i>{{ $m['value'] }}</i> (VND)</span>
 									</td>
 								</tr>
 								<tr class="expandable-body">
@@ -151,12 +151,12 @@
 										<table class="table table-hover">
 										<tbody>
 											@foreach($day as $d)
-											@if($d->month == $m->month && $d->year == $year[$y]->year)
+											@if($d['month'] == $m['month'] && $d['year'] == $year[$y]['year'])
 											<tr>
 											<td style="background-color: #ffffcc;">
-												<b>{{ $d->day.' / '.$m->month.' / '.$year[$y]->year }}</b>
-												<span class="dtotal">Number of receipts: <b>{{ $d->nor }}</b></span>
-												<span class="dtotal">Sum up of day: <b>{{ $d->value }}</b> (VND)</span>
+												<b>{{ $d['day'].' / '.$m['month'].' / '.$year[$y]['year'] }}</b>
+												<span class="dtotal">Number of receipts: <b>{{ $d['nor'] }}</b></span>
+												<span class="dtotal">Sum up of day: <b>{{ $d['value'] }}</b> (VND)</span>
 											</td>
 											</tr>
 											@endif
