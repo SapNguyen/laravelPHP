@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\user;
 
 use App\Models\admin\cart;
+use App\Models\admin\order;
 use App\Models\admin\product;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -943,4 +944,60 @@ class CartController extends Controller
             return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
         }
     }
+
+    public function order_user_api(Request $request)
+    {
+        try {
+            $user_id = $request->query('id');
+            $order_status = $request->query('status');
+            if ($order_status == 3) {
+                $orders = order::where('mem_id', $user_id)
+                    ->with([
+                        'members', 'feedbacks', 'details'
+                        => function ($query) {
+                            $query->with([
+                                'product'
+                                //  => function ($query) {
+                                //     $query->with(['details', 'discounts' => function ($query) {
+                                //         $query->where('discount_active', 1);
+                                //     }]);
+                                // }
+                            ]);
+                        }
+
+                    ])
+                    ->get();
+                return response()->json([
+                    'status' => 'success',
+                    'products' => $orders,
+                ]);
+            } else {
+                $orders = order::where('mem_id', $user_id)
+                    ->where('order_status', $order_status)
+                    ->with([
+                        'members', 'details' => function ($query) {
+                            $query->with([
+                                'product'
+                                //     ,
+                                //      'discounts' => function ($query) {
+                                //         $query->where('discount_active', 1);
+                                //     }
+                                // ]);
+                                //}
+                            ]);
+                        }
+
+                    ])
+                    ->get();
+                return response()->json([
+                    'status' => 'success',
+                    'products' => $orders,
+                ]);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
+        }
+    }
+
+    
 }

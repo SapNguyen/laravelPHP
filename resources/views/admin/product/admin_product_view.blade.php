@@ -133,7 +133,7 @@
                                             @elseif( $product[0]['product_genre'] ==0)
                                             <td>Nữ</td>
                                             @else
-                                            <td>Nam và nữ</td>
+                                            <td>Unisex</td>
                                             @endif
                                         </tr>
                                         <tr>

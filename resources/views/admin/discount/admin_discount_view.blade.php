@@ -149,13 +149,13 @@
         <div style="float: right">
             @if (isset($searchName) && isset($searchNamed))
                 {{ $products->appends([
-                  'get' => $products->currentPage(),
+                  'page' => $products->currentPage(),
                   'searchName'=>$searchName ?? '',
                   'searchNamed'=>$searchNamed ?? ''
               ])->links() }}
             @else
                 {{ $products->appends([
-                    'get' => $products->currentPage(),
+                    'page' => $products->currentPage(),
                     'discount_id'=>$discount_id ?? ''
                 ])->links() }}
             @endif
@@ -239,13 +239,13 @@
 <div style="float: right">
     @if (isset($searchName) && isset($searchNamed))
     {{ $product_eds->appends([
-        'geted' => $product_eds->currentPage(),
+        'paged' => $product_eds->currentPage(),
         'searchName'=>$searchName ?? '',
         'searchNamed'=>$searchNamed ?? ''
     ])->links() }}
     @else
         {{ $product_eds->appends([
-            'geted' => $product_eds->currentPage(),
+            'paged' => $product_eds->currentPage(),
             'discount_id'=>$discount_id ?? ''
         ])->links() }}
     @endif

@@ -113,7 +113,7 @@
                                     <tbody>
                                         @foreach($product as $p)
                                         <tr data-widget="expandable-table" aria-expanded="false">
-                                            <td>{{ $p['product_id'] }}.</td>
+                                            <td>{{ $p['product_id'] }}</td>
                                             <td>{{ $p['product_name'] }}</td>
                                             <td>{{ $p['brand_name'] }}</td>
                                             <td>{{ $p['product_price'] }}</td>

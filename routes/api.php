@@ -34,6 +34,9 @@ Route::get('/home', [
 Route::get('/product/feedback', [
     HomeController::class, 'feedback_product_api',
 ]);
+Route::post('/payment/store', [
+    HomeController::class, 'payment_store_api',
+]);
 Route::get('/cart/user', [
     CartController::class, 'user_cart_api',
 ]);
@@ -216,6 +219,10 @@ Route::post('/cart/updateSize', [
 
 Route::post('/cart/selectProduct', [
     CartController::class, 'selectProduct_api',
+]);
+
+Route::get('/order/user', [
+    CartController::class, 'order_user_api'
 ]);
 
 

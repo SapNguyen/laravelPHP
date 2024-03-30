@@ -116,6 +116,16 @@ if(File::exists($path)){
 												</select>
 											</td>
                                         </tr>
+										<tr>
+                                            <th>Genre</th>
+                                            <td>
+												<select id="pGenre">
+													<option value="Unisex">Unisex</option>
+													<option value="Nam">Nam</option>
+													<option value="Nữ">Nữ</option>
+												</select>
+											</td>
+                                        </tr>
                                         <tr>
                                             <th>Material</th>
                                             <td>
@@ -151,7 +161,7 @@ if(File::exists($path)){
 														<button type="button" class="btn btn-block btn-warning addImg">Select</button> --}}
 														<input type="file" class="imgInput" multiple>
 														<input type="hidden" class="imgText">
-														<span>Images (max 6 images)</span>
+														<span>Images</span>
 														<button type="button" class="btn btn-block btn-warning addImg">Select</button>
 													</div>
 												</th>
@@ -291,12 +301,14 @@ submitbtn.addEventListener('click', (e) => {
 	}
 	var Name = pName.value;
 	var Brand = pBrand.value;
+	var Genre = pGenre.value;
 	var Material = pMaterial.value;
 	var Price = pPrice.value;
 	var Des = pDes.value;
 	var formData = new FormData();
 	formData.append('name', Name);
 	formData.append('brand', Brand);
+	formData.append('genre', Genre);
 	formData.append('material', Material);
 	formData.append('price', Price);
 	formData.append('des', Des);

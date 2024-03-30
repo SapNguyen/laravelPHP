@@ -41,8 +41,9 @@ class BrandController extends Controller
         // }
 
         $searchName = request('searchName');
+        $page = request('page', 1);
 
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/brands', ['searchName' => $searchName]);
+        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/brands', ['searchName' => $searchName, 'page' => $page]);
 
         // Kiểm tra nếu yêu cầu thành công (status code 200)
         if ($response->successful()) {
@@ -61,10 +62,16 @@ class BrandController extends Controller
             $perPage = 7; // Hoặc bất kỳ giá trị nào bạn muốn
 
             // Trang hiện tại
-            $currentPage = $responseData['data']['current_page'];
+            // $currentPage = $responseData['data']['current_page'];
 
             // Tạo LengthAwarePaginator
-            $paginator = new LengthAwarePaginator($brands, $responseData['count'], $perPage, $currentPage);
+            $paginator = new LengthAwarePaginator(
+                $brands,
+                $responseData['count'],
+                $perPage,
+                $page,
+                ['path' => url()->current(), 'query' => request()->query()]
+            );
 
             // Trả về view và truyền dữ liệu vào view
             // return view('admin.brand.admin_brand_page', compact('data'));
@@ -98,12 +105,37 @@ class BrandController extends Controller
     }
     public function add(Request $request)
     {
-        $id = brand::max('brand_id');
-        if (isset($id)) {
-            $id += 1;
-        } else {
-            $id = 1;
-        }
+        // $id = brand::max('brand_id');
+        // if (isset($id)) {
+        //     $id += 1;
+        // } else {
+        //     $id = 1;
+        // }
+        $totalPages = 1;
+        $currentPage = 1;
+        $maxBrandId = 0;
+        do {
+            $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/brands?page=' . $currentPage);
+
+            if ($response->successful()) {
+                $responseData = $response->json();
+
+
+                $id = collect($responseData['data']['data'])->max('brand_id') + 1;
+                if ($id > $maxBrandId) {
+                    $maxBrandId = $id;
+                }
+
+                $currentPage++;
+
+                $totalPages = $responseData['data']['last_page'];
+            } else {
+                $statusCode = $response->status();
+                $errorMessage = $response->body();
+                break;
+            }
+        } while ($currentPage <= $totalPages);
+        
         $brandImagePath = "img/brand/{$id}";
         if (!File::exists($brandImagePath)) {
             File::makeDirectory($brandImagePath, 0755, true, true);
@@ -332,8 +364,9 @@ class BrandController extends Controller
         //     $get = brand::where('brand_active', '!=', -1)->paginate(7);
         // }
         // return view('admin.brand.admin_brand_delete', ['brand' => $get, 'count' => $count, 'title' => 'Delete Brands']);
+        $page = request('page', 1);
 
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/brand/delete', ['searchName' => $searchName]);
+        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/brand/delete', ['searchName' => $searchName, 'page' => $page]);
 
         // Kiểm tra nếu yêu cầu thành công (status code 200)
         if ($response->successful()) {
@@ -346,9 +379,15 @@ class BrandController extends Controller
 
             $perPage = 7; // Hoặc bất kỳ giá trị nào bạn muốn
 
-            $currentPage = $responseData['data']['current_page'];
+            // $currentPage = $responseData['data']['current_page'];
 
-            $paginator = new LengthAwarePaginator($brands, $responseData['count'], $perPage, $currentPage);
+            $paginator = new LengthAwarePaginator(
+                $brands,
+                $responseData['count'],
+                $perPage,
+                $page,
+                ['path' => url()->current(), 'query' => request()->query()]
+            );
 
             // return view('admin.brand.admin_brand_page', ['brand' => $paginator, 'count' => $count, 'title' => 'Brands List']);
             return view('admin.brand.admin_brand_delete', ['brand' => $paginator, 'count' => $count, 'title' => 'Delete Brands']);
@@ -507,26 +546,6 @@ class BrandController extends Controller
                 $bannerImg = NULL;
             }
 
-            // $brand = brand::created([
-            //     'brand_id' => $id,
-            //     'brand_name' => $request->input('brand_name'),
-            //     'brand_logo' => $logoImg,
-            //     'brand_img' => $homeImg,
-            //     'brand_des' => $request->input('brand_des'),
-            //     'brand_des_img' => $brandImg,
-            //     'brand_banner' => $bannerImg,
-            // ]);
-
-            // $b->brand_id = $id;
-            // $b->brand_name = request('bName');
-            // $b->brand_logo = $logoImg;
-            // $b->brand_img = $homeImg;
-            // $b->brand_des_img = $brandImg;
-            // $b->brand_banner = $bannerImg;
-            // $b->brand_des = request('bDes');
-            // if (!isset($b->brand_des)) {
-            //     $b->brand_des = "No data";
-            // }
             $b = new brand();
             $b->brand_id = $request->input('brand_id');
             $b->brand_name = $request->input('brand_name');
@@ -543,6 +562,7 @@ class BrandController extends Controller
                 $error = $b->errors()->all(); // Lấy tất cả lỗi khi lưu
                 return response()->json(['error' => 'Failed to save data', 'details' => $error], 500);
             }
+
             return response()->json(['status' => 'success', 'message' => 'Thêm brand thành công!', 'data' => $b], 201);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Thêm brand thất bại', 'error' => $e->getMessage()], 500);
@@ -584,11 +604,10 @@ class BrandController extends Controller
     }
     public function edit_api(Request $request)
     {
-        // $id = request('bid');
 
         try {
-            $idb = $request->input('brand_id');
-
+            $idb= $request->input('brand_id');
+            
             $request->validate([
                 'brand_name' => 'required|string',
             ]);
@@ -637,6 +656,7 @@ class BrandController extends Controller
             }
             $brand_des = request('bDes');
 
+
             brand::where('brand_id', $idb)->update([
                 'brand_name' => $request->input('brand_name'),
                 'brand_logo' => $request->input('brand_logo'),
@@ -675,23 +695,13 @@ class BrandController extends Controller
     {
         try {
             $get = $request->all();
-            // $idb = $request->input('brand_id');
             brand::where('brand_id', $get['bid'])->update([
-                'brand_name' => $get['bid'] . 'deleted',
                 'brand_active' => -1,
 
             ]);
             product::where('brand_id', $get['bid'])->update([
                 'product_active' => 0
             ]);
-            // $get = $request->all();
-            // brand::where('brand_id', $get['bid'])->update([
-            //     'brand_name' => $get['bid'] . 'deleted',
-            //     'brand_active' => -1,
-            // ]);
-            // product::where('brand_id', $get['bid'])->update([
-            //     'product_active' => 0
-            // ]);
             return response()->json(['status' => 'success', 'message' => 'Xóa thành công'], 201);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Xóa thất bại', 'error' => $e->getMessage()], 500);

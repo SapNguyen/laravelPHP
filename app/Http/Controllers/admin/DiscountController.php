@@ -20,10 +20,10 @@ class DiscountController extends Controller
         // if (isset($searchName)) {
         //     $count = discount::where('discount_active', '!=', -1)->where('discount_name', 'like', '%' . $searchName . '%')->count('discount_id');
         //     $get = discount::where('discount_active', '!=', -1)
-        //         ->where('discount_name', 'like', '%' . $searchName . '%')->paginate(7);
+        //         ->where('discount_name', 'like', '%' . $searchName . '%')->paginate(1);
         // } else {
         //     $count = discount::where('discount_active', '!=', -1)->count('discount_id');
-        //     $get = discount::where('discount_active', '!=', -1)->paginate(7);
+        //     $get = discount::where('discount_active', '!=', -1)->paginate(1);
         // }
         // return view(
         //     'admin.discount.admin_discount_page',
@@ -36,7 +36,9 @@ class DiscountController extends Controller
         // );
         $searchName = request('searchName');
 
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/discounts', ['searchName' => $searchName]);
+        $page = request('page', 1);
+
+        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/discounts', ['searchName' => $searchName, 'page' => $page]);
 
         // Kiểm tra nếu yêu cầu thành công (status code 200)
         if ($response->successful()) {
@@ -49,9 +51,15 @@ class DiscountController extends Controller
 
             $perPage = 7;
 
-            $currentPage = $responseData['data']['current_page'];
+            // $currentPage = $responseData['data']['current_page'];
 
-            $paginator = new LengthAwarePaginator($brands, $responseData['count'], $perPage, $currentPage);
+            $paginator = new LengthAwarePaginator(
+                $brands,
+                $responseData['count'],
+                $perPage,
+                $page,
+                ['path' => url()->current(), 'query' => request()->query()]
+            );
 
             // Trả về view và truyền dữ liệu vào view
             // return view('admin.brand.admin_brand_page', compact('data'));
@@ -247,11 +255,18 @@ class DiscountController extends Controller
         //     'searchNamed' => $searchNamed
         // ]);
 
+        $page = request('page', 1);
+
+        $paged = request('paged', 1);
+
         $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/discount/view', [
             'searchName' => $searchName,
             'searchNamed' => $searchNamed,
-            'discount_id' => $discount_id
+            'discount_id' => $discount_id,
+            'page' => $page,
+            'paged' => $paged
         ]);
+
 
         // Kiểm tra nếu yêu cầu thành công (status code 200)
         if ($response->successful()) {
@@ -283,14 +298,26 @@ class DiscountController extends Controller
             $perPage = 7; // Hoặc bất kỳ giá trị nào bạn muốn
 
             // Trang hiện tại
-            $currentPage = $responseData['products']['current_page'];
+            // $currentPage = $responseData['products']['current_page'];
 
-            $currentPaged = $responseData['product_eds']['current_page'];
+            // $currentPaged = $responseData['product_eds']['current_page'];
 
             // Tạo LengthAwarePaginator
-            $paginator = new LengthAwarePaginator($products, $responseData['count'], $perPage, $currentPage);
+            $paginator = new LengthAwarePaginator(
+                $products,
+                $responseData['count'],
+                $perPage,
+                $page,
+                ['path' => url()->current(), 'query' => request()->query()]
+            );
 
-            $paginatord = new LengthAwarePaginator($product_eds, $responseData['count'], $perPage, $currentPaged);
+            $paginatord = new LengthAwarePaginator(
+                $product_eds,
+                $responseData['countd'],
+                $perPage,
+                $paged,
+                ['path' => url()->current(), 'query' => request()->query()]
+            );
 
             // Trả về view và truyền dữ liệu vào view
             // return view('admin.brand.admin_brand_page', compact('data'));
@@ -415,6 +442,8 @@ class DiscountController extends Controller
     public function delred()
     {
         $searchName = request('searchName');
+        $page = request('page', 1);
+
         // if (isset($searchName)) {
         //     $count = discount::where('discount_active', '!=', -1)->where('discount_name', 'like', '%' . $searchName . '%')->count('discount_id');
         //     $get = discount::where('discount_active', '!=', -1)
@@ -424,7 +453,7 @@ class DiscountController extends Controller
         //     $get = discount::where('discount_active', '!=', -1)->paginate(7);
         // }
         // return view('admin.discount.admin_discount_delete', ['discounts' => $get, 'count' => $count, 'title' => 'Delete Discounts', 'searchName' => $searchName]);
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/discount/delete', ['searchName' => $searchName]);
+        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/discount/delete', ['searchName' => $searchName, 'page' => $page]);
 
         // Kiểm tra nếu yêu cầu thành công (status code 200)
         if ($response->successful()) {
@@ -437,9 +466,15 @@ class DiscountController extends Controller
 
             $perPage = 7; // Hoặc bất kỳ giá trị nào bạn muốn
 
-            $currentPage = $responseData['data']['current_page'];
+            // $currentPage = $responseData['data']['current_page'];
 
-            $paginator = new LengthAwarePaginator($discounts, $responseData['count'], $perPage, $currentPage);
+            $paginator = new LengthAwarePaginator(
+                $discounts,
+                $responseData['count'],
+                $perPage,
+                $page,
+                ['path' => url()->current(), 'query' => request()->query()]
+            );
 
             return view('admin.discount.admin_discount_delete', ['discounts' => $paginator, 'count' => $count, 'title' => 'Delete Discounts', 'searchName' => $searchName]);
         } else {
@@ -584,46 +619,86 @@ class DiscountController extends Controller
                 $count = product::join('product_size_color', 'product.product_id', '=', 'product_size_color.product_id')
                     ->where('discount_id', NULL)
                     ->count('product.product_id');
+                // $get = product::where('discount_id', NULL)
+                //     ->paginate(7, ['*'], 'get');
+                // for ($i = 0; $i < count($get); $i++) {
+                //     $img = DB::select('select product.product_id,product_size_color.product_image from product 
+                //     inner join product_size_color on product_size_color.product_id = product.product_id
+                //     where product.product_active = 1 and product.product_id = :pid
+                //     GROUP by product_id,product_size_color.product_image', [
+                //         'pid' => $get[$i]->product_id
+                //     ]);
+                //     $get[$i]->product_image = $img[0]->product_image;
+                // }
                 $get = product::where('discount_id', NULL)
+                    ->where('product_name', 'like', '%' . $searchName . '%')
                     ->paginate(7, ['*'], 'get');
-                for ($i = 0; $i < count($get); $i++) {
-                    $img = DB::select('select product.product_id,product_size_color.product_image from product 
-                    inner join product_size_color on product_size_color.product_id = product.product_id
-                    where product.product_active = 1 and product.product_id = :pid
-                    GROUP by product_id,product_size_color.product_image', [
-                        'pid' => $get[$i]->product_id
-                    ]);
-                    $get[$i]->product_image = $img[0]->product_image;
+
+                foreach ($get as $product) {
+                    $img = DB::table('product')
+                        ->join('product_size_color', 'product_size_color.product_id', '=', 'product.product_id')
+                        ->select('product.product_id', 'product_size_color.product_image')
+                        ->where('product.product_active', 1)
+                        ->where('product.product_id', $product->product_id)
+                        ->groupBy('product.product_id', 'product_size_color.product_image')
+                        ->first();
+
+                    if ($img) {
+                        $product->product_image = $img->product_image;
+                    } else {
+                        $product->product_image = ''; // Hoặc giá trị mặc định khác nếu không có hình ảnh
+                    }
                 }
             }
             $searchNamed = request('searchNamed');
             if (isset($searchNamed)) {
                 $counted = product::where('discount_id',  '=', $discount)->where('product_name', 'like', '%' . $searchNamed . '%')->count('product_id');
-                $geted = product::where('product_name', 'like', '%' . $searchNamed . '%')
-                    ->where('discount_id', '=', $discount)
-                    ->paginate(7, ['*'], 'geted');
-                for ($i = 0; $i < count($geted); $i++) {
-                    $img = DB::select('select product.product_id,product_size_color.product_image from product 
-                    inner join product_size_color on product_size_color.product_id = product.product_id
-                    where product.product_active = 1 and product.product_id = :pid
-                    GROUP by product_id,product_size_color.product_image', [
-                        'pid' => $geted[$i]->product_id
-                    ]);
-                    $geted[$i]->product_image = $img[0]->product_image;
+                // $geted = product::where('product_name', 'like', '%' . $searchNamed . '%')
+                //     ->where('discount_id', '=', $discount)
+                //     ->paginate(7, ['*'], 'geted');
+                // for ($i = 0; $i < count($geted); $i++) {
+                //     $img = DB::select('select product.product_id,product_size_color.product_image from product 
+                //     inner join product_size_color on product_size_color.product_id = product.product_id
+                //     where product.product_active = 1 and product.product_id = :pid
+                //     GROUP by product_id,product_size_color.product_image', [
+                //         'pid' => $geted[$i]->product_id
+                //     ]);
+                //     $geted[$i]->product_image = $img[0]->product_image;
+                // }
+                $geted = product::where('discount_id', NULL)
+                    ->where('product_name', 'like', '%' . $searchNamed . '%')
+                    ->paginate(7, ['*'], 'get');
+
+                foreach ($geted as $product) {
+                    $img = DB::table('product')
+                        ->join('product_size_color', 'product_size_color.product_id', '=', 'product.product_id')
+                        ->select('product.product_id', 'product_size_color.product_image')
+                        ->where('product.product_active', 1)
+                        ->where('product.product_id', $product->product_id)
+                        ->groupBy('product.product_id', 'product_size_color.product_image')
+                        ->first();
+
+                    if ($img) {
+                        $product->product_image = $img->product_image;
+                    } else {
+                        $product->product_image = ''; 
+                    }
                 }
+
             } else {
                 $counted = product::where('discount_id',  '=', $discount)->count('product_id');
-                $geted = product::where('discount_id',  '=', $discount)
-                    ->paginate(7, ['*'], 'geted');
-                for ($i = 0; $i < count($geted); $i++) {
-                    $img = DB::select('select product.product_id,product_size_color.product_image from product 
-                        inner join product_size_color on product_size_color.product_id = product.product_id
-                        where product.product_active = 1 and product.product_id = :pid
-                        GROUP by product_id,product_size_color.product_image', [
-                        'pid' => $geted[$i]->product_id
-                    ]);
-                    $geted[$i]->product_image = $img[0]->product_image;
-                }
+                // $geted = product::where('discount_id',  '=', $discount)
+                //     ->paginate(7, ['*'], 'geted');
+                // for ($i = 0; $i < count($geted); $i++) {
+                //     $img = DB::select('select product.product_id,product_size_color.product_image from product 
+                //         inner join product_size_color on product_size_color.product_id = product.product_id
+                //         where product.product_active = 1 and product.product_id = :pid
+                //         GROUP by product_id,product_size_color.product_image', [
+                //         'pid' => $geted[$i]->product_id
+                //     ]);
+                //     $geted[$i]->product_image = $img[0]->product_image;
+                // }
+
             }
             return response()->json([
                 'status' => 'success',

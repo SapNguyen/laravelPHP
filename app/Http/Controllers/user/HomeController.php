@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\user;
 
-// use App\Models\product;
+//use App\Models\product;
 use Illuminate\Http\Request;
 use App\Http\Resources\ProductImgs;
 use App\Http\Resources\BrandHome;
@@ -10,11 +10,16 @@ use App\Http\Resources\Brands;
 use App\Http\Resources\Products;
 use App\Http\Resources\ProductsHot;
 use App\Models\admin\product;
-use App\Models\admin\product_size_color;
+use App\Models\admin\member;
+use App\Models\admin\order;
+use App\Models\admin\product_order;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Query\JoinClause;
+use App\Models\admin\product_size_color;
+use Illuminate\Support\Carbon;
+
 
 
 /**
@@ -201,13 +206,14 @@ class HomeController extends Controller
         // ]);
 
     }
+
     public function img_product_api(Request $request)
     {
         $id = $request->query('q');
 
-        //$data = product_size_color::where('product_id', $id);
-
         $data = DB::select("SELECT * FROM `product_size_color` WHERE product_id = $id");
+
+        //$data = DB::select('select * from product_size_color');
 
         // Kiểm tra xem có dữ liệu hay không
         return response()->json(['status' => 'success', 'data' => $data]);
@@ -216,11 +222,10 @@ class HomeController extends Controller
     public function detail_product_api()
     {
         try {
-            // $products = product::with('details')->with('discounts')->get();
-            $products = Product::with(['details', 'discounts' => function ($query) {
+            //$products = product::where('product_active','=','1')->with('discounts')->get();
+            $products = product::where('product_active', '=', '1')->with(['details', 'discounts' => function ($query) {
                 $query->where('discount_active', 1);
-            }])->with('feedbacks')->get();
-
+            }])->get();
             return response()->json([
                 'status' => 'success',
                 'products' => $products,
@@ -235,8 +240,44 @@ class HomeController extends Controller
         try {
             $product_name = $request->query('name');
             // $products = product::with('details')->with('discounts')->get();
-            $products = Product::with('details')->where('product_name', 'like', '%' . $product_name . '%')->where('product_active', 1)->get();
+            $products = Product::where('product_active', '=', '1')->where('product_name', 'like', '%' . $product_name . '%')->with(['details', 'discounts' => function ($query) {
+                $query->where('discount_active', 1);
+            }])->get();
 
+            return response()->json([
+                'status' => 'success',
+                'products' => $products,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
+        }
+    }
+    public function detail_product_id_api(Request $request)
+    {
+        try {
+            $product_id = $request->query('id');
+            // $products = product::with('details')->with('discounts')->get();
+            $products = Product::where('product_active', '=', '1')->where('product_id', '=', $product_id)->with(['details', 'discounts' => function ($query) {
+                $query->where('discount_active', 1);
+            }])->with('brands', 'feedbacks')->get();
+
+            return response()->json([
+                'status' => 'success',
+                'products' => $products,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
+        }
+    }
+
+    public function similar_product_api(Request $request)
+    {
+        try {
+            $brand_id = $request->query('id');
+            // $products = product::with('details')->with('discounts')->get();
+            $products = Product::where('product_active', '=', '1')->where('brand_id', '=', $brand_id)->with(['details', 'discounts' => function ($query) {
+                $query->where('discount_active', 1);
+            }])->get();
             return response()->json([
                 'status' => 'success',
                 'products' => $products,
@@ -267,6 +308,86 @@ class HomeController extends Controller
                 'status' => 'success',
                 'products' => $products,
             ]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
+        }
+    }
+
+    public function count_feedback_api(Request $request)
+    {
+        try {
+            $product_id = $request->query('id');
+
+            $products = DB::table('feedback')
+                ->selectRaw('COUNT(*) as total_feedbacks')
+                ->selectRaw('SUM(CASE WHEN star = 5 THEN 1 ELSE 0 END) as star_5_feedbacks')
+                ->selectRaw('SUM(CASE WHEN star = 4 THEN 1 ELSE 0 END) as star_4_feedbacks')
+                ->selectRaw('SUM(CASE WHEN star = 3 THEN 1 ELSE 0 END) as star_3_feedbacks')
+                ->selectRaw('SUM(CASE WHEN star = 2 THEN 1 ELSE 0 END) as star_2_feedbacks')
+                ->selectRaw('SUM(CASE WHEN star = 1 THEN 1 ELSE 0 END) as star_1_feedbacks')
+                ->where('product_id', $product_id)
+                ->first();
+
+
+            return response()->json([
+                'status' => 'success',
+                'products' => $products,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
+        }
+    }
+
+    public function user_api(Request $request)
+    {
+        try {
+            $user_id = $request->query('id');
+
+            $users = member::where('mem_id', $user_id)->get();
+
+            return response()->json([
+                'status' => 'success',
+                'users' => $users,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
+        }
+    }
+
+    public function payment_store_api(Request $request)
+    {
+        try {
+            // Tạo đơn hàng mới
+            $order = new order();
+            $order->created_date = DB::raw('CURRENT_TIMESTAMP()');
+            $order->mem_id = $request->input('mem_id');
+            $order->receiver_name = $request->input('receiver_name');
+            $order->receiver_phone = $request->input('receiver_phone');
+            $order->receiver_address = $request->input('receiver_address');
+            $order->order_value = $request->input('total');
+            $order->save();
+
+            // // // Lấy id của đơn hàng vừa tạo
+            $orderId = $order->order_id;
+
+            $products = $request->input('products');
+            $array = json_decode($products, true);
+            if (is_array($array) || is_object($array)) {
+                foreach ($array as $product) {
+                    $orderProduct = new product_order();
+                    $orderProduct->order_id = $orderId;
+                    $orderProduct->product_id = $product['product_id'];
+                    $orderProduct->size = $product['size'];
+                    $orderProduct->color = $product['color'];
+                    $orderProduct->quantity = $product['quantity'];
+                    $orderProduct->sell_price = $product['price'];
+                    $orderProduct->save();
+                }
+                return response()->json(['message' => 'Đã thêm đơn hàng thành công'], 201);
+            } else {
+
+                return response()->json(['status' => 'error', 'error' => 'Không phải mảng']);
+            }
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
         }

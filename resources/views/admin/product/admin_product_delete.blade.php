@@ -116,6 +116,7 @@
                                             <td>{{ $p['product_id'] }}.</td>
                                             <td>{{ $p['product_name'] }}</td>
                                             <td>{{ $p['brand_name'] }}</td>
+                                            <td>{{ $p['product_genre'] }}</td>
                                             <td>{{ $p['product_price'] }}</td>
                                             <td>
                                                 @foreach($quan as $q)

@@ -97,7 +97,7 @@
 					@endif
                       <td>
                         <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
-                        {{ $year[$y]->year }}
+                        {{ $year[$y]['year'] }}
 						<span class="ytotal">Number of receipts: {{ $year[$y]['nor'] }}</span>
 						<span class="ytotal">Total sale of year: {{ $year[$y]['value'] }} (VND)</span>
 						

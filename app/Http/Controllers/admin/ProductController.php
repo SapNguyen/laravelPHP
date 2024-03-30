@@ -4,6 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
 
 use App\Models\admin\product;
 use App\Models\admin\product_size_color;
@@ -32,15 +33,17 @@ class ProductController extends Controller
         //     $get = product::join('brand', 'product.brand_id', '=', 'brand.brand_id')
         //         ->where('product_active', '!=', -1)
         //         ->where('product_name', 'like', '%' . $search . '%')
-        //         ->paginate(7);
+        //         ->paginate(1);
         // } else {
         //     $count = product::where('product_active', '!=', -1)->count('product_id');
         //     $get = product::join('brand', 'product.brand_id', '=', 'brand.brand_id')
-        //         ->where('product_active', '!=', -1)->paginate(7);
+        //         ->where('product_active', '!=', -1)->paginate(1);
         // }
         // return view('admin.product.admin_product_page', ['product' => $get, 'count' => $count, 'quan' => $pq, 'title' => 'Products List']);
 
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/products', ['searchName' => $search]);
+        $page = request('page', 1);
+
+        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/products', ['searchName' => $search, 'page' => $page,]);
 
         // Kiểm tra nếu yêu cầu thành công (status code 200)
         if ($response->successful()) {
@@ -54,14 +57,25 @@ class ProductController extends Controller
             // Lấy dữ liệu thương hiệu từ $data['data']
             $product = collect($responseData['product']['data']);
 
+            // $product = $responseData['product']['data'];
+
             // Số lượng mục trên mỗi trang
             $perPage = 7; // Hoặc bất kỳ giá trị nào bạn muốn
 
             // Trang hiện tại
-            $currentPage = $responseData['product']['current_page'];
+            // $currentPage = $responseData['product']['current_page'];
+
+            // $currentPage = Paginator::resolveCurrentPage() ?: 1; // Trang hiện tại, mặc định là 1 nếu không có trang nào được chỉ định
+            // $paginator = new Paginator($product, $perPage, $currentPage);
 
             // Tạo LengthAwarePaginator
-            $paginator = new LengthAwarePaginator($product, $responseData['count'], $perPage, $currentPage);
+            $paginator = new LengthAwarePaginator(
+                $product,
+                $responseData['count'],
+                $perPage,
+                $page,
+                ['path' => url()->current(), 'query' => request()->query()]
+            );
 
             return view('admin.product.admin_product_page', ['product' => $paginator, 'count' => $count, 'quan' => $quan, 'title' => 'Products List']);
         } else {
@@ -89,7 +103,9 @@ class ProductController extends Controller
         //     'product' => $get, 'psc1' => $get2, 'psc2' => $get3, 'title' => 'View Product'
         // ]);
         $pid = request('pid');
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/product/view', ['pid' => $pid]);
+        $page = request('page', 1);
+
+        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/product/view', ['pid' => $pid, 'page' => $page]);
 
         // Kiểm tra nếu yêu cầu thành công (status code 200)
         if ($response->successful()) {
@@ -105,10 +121,15 @@ class ProductController extends Controller
             $perPage = 7;
 
             // Trang hiện tại
-            $currentPage = $responseData['product']['current_page'];
+            // $currentPage = $responseData['product']['current_page'];
 
             // Tạo LengthAwarePaginator
-            $paginator = new LengthAwarePaginator($product, $perPage, $currentPage);
+            $paginator = new LengthAwarePaginator(
+                $product,
+                $perPage,
+                $page,
+                ['path' => url()->current(), 'query' => request()->query()]
+            );
 
             return view('admin.product.admin_product_view', [
                 'product' => $paginator, 'psc1' => $psc1, 'psc2' => $psc2, 'title' => 'View Product'
@@ -125,9 +146,9 @@ class ProductController extends Controller
         // return view('admin.product.admin_product_add', ['brand' => $brand, 'title' => 'Add New Product']);
         $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/product/add');
 
+
         if ($response->successful()) {
             $responseData = $response->json();
-
             $get = $responseData['brand'];
 
 
@@ -154,34 +175,47 @@ class ProductController extends Controller
         // if (!isset($id)) {
         //     $id = 1;
         // }
+        $totalPages = 1;
+        $currentPage = 1;
+        $maxProductId = 0;
+        do {
+            $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/products?page=' . $currentPage);
 
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/products');
+            if ($response->successful()) {
+                $responseData = $response->json();
 
-        if ($response->successful()) {
-            $responseData = $response->json();
 
-            $id = collect($responseData['product']['data'])->max('product_id') + 1;
+                $id = collect($responseData['product']['data'])->max('product_id') + 1;
+                if ($id > $maxProductId) {
+                    $maxProductId = $id;
+                }
 
-            $filepath = public_path('/img/product/' . $id);
-            $temppath = public_path('/img/product/temp');
-            if (File::exists($filepath)) {
-                File::cleanDirectory($filepath);
+                $currentPage++;
+
+                $totalPages = $responseData['product']['last_page'];
+
+                
             } else {
-                File::makeDirectory($filepath);
+                $statusCode = $response->status();
+                $errorMessage = $response->body();
+                break;
             }
-            if (!File::exists($temppath)) {
-                File::makeDirectory($temppath);
-            }
-            $imgs = File::allFiles($temppath);
-            for ($i = 0; $i < count($imgs); $i++) {
-                File::move($temppath . '/' . $imgs[$i]->getFilename(), $filepath . '/' . $imgs[$i]->getFileName());
-            }
+        } while ($currentPage <= $totalPages);
+
+        $filepath = public_path('/img/product/' . $id);
+        $temppath = public_path('/img/product/temp');
+        if (File::exists($filepath)) {
+            File::cleanDirectory($filepath);
         } else {
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
+            File::makeDirectory($filepath);
         }
-
-
+        if (!File::exists($temppath)) {
+            File::makeDirectory($temppath);
+        }
+        $imgs = File::allFiles($temppath);
+        for ($i = 0; $i < count($imgs); $i++) {
+            File::move($temppath . '/' . $imgs[$i]->getFilename(), $filepath . '/' . $imgs[$i]->getFileName());
+        }
 
         // $pcsq = $get['pcsq'];
         // $pcs = array();
@@ -200,10 +234,19 @@ class ProductController extends Controller
         //     'message' => 'Product added successfully.'
         // ]);
 
+        if ($get['genre'] == "Unisex") {
+            $genre = 2;
+        } else if ($get['genre'] == "Nam") {
+            $genre = 1;
+        } else if ($get['genre'] == "Nữ") {
+            $genre = 0;
+        }
+
         $postData = [
             'product_id' => $id,
             'product_name' => $get['name'],
             'product_material' => $get['material'],
+            'product_genre' => $genre,
             'product_des' => $get['des'],
             'product_price' => $get['price'],
             'brand_id' => $get['brand'],
@@ -317,10 +360,19 @@ class ProductController extends Controller
         //     $pcs[$i]->save();
         // }
 
+        if ($get['genre'] == "Unisex") {
+            $genre = 2;
+        } else if ($get['genre'] == "Nam") {
+            $genre = 1;
+        } else if ($get['genre'] == "Nữ") {
+            $genre = 0;
+        }
+
         $postData = [
             'product_id' => $id,
             'product_name' => $get['name'],
             'product_material' => $get['material'],
+            'product_genre' => $genre,
             'product_des' => $get['des'],
             'product_price' => $get['price'],
             'brand_id' => $get['brand'],
@@ -368,8 +420,9 @@ class ProductController extends Controller
         // return view('admin.product.admin_product_delete', [
         //     'product' => $get, 'count' => $count, 'quan' => $pq, 'title' => 'Products List'
         // ]);
+        $page = request('page', 1);
 
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/product/delete', ['searchName' => $search]);
+        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/product/delete', ['searchName' => $search, 'page' => $page]);
 
         if ($response->successful()) {
             $responseData = $response->json();
@@ -382,9 +435,15 @@ class ProductController extends Controller
 
             $perPage = 7;
 
-            $currentPage = $responseData['product']['current_page'];
+            // $currentPage = $responseData['product']['current_page'];
 
-            $paginator = new LengthAwarePaginator($product, $responseData['count'], $perPage, $currentPage);
+            $paginator = new LengthAwarePaginator(
+                $product,
+                $responseData['count'],
+                $perPage,
+                $page,
+                ['path' => url()->current(), 'query' => request()->query()]
+            );
 
 
             return view('admin.product.admin_product_delete', [

@@ -120,7 +120,7 @@ class MemberController extends Controller
             'mem_active' => $get['sStas']
         ];
 
-        
+
         $response = Http::post('https://s25sneaker.000webhostapp.com/api/updatestaff', $postData);
 
         if ($response->successful()) {
@@ -217,8 +217,9 @@ class MemberController extends Controller
         //     ->groupBy('mem_id')
         //     ->get(['mem_id', order::raw('COUNT(order_id) as nor')]);
         // return view('admin.account.admin_member_acc_page', ['member' => $get, 'nor' => $nor, 'count' => $count, 'title' => 'Member Accounts']);
+        $page = request('page', 1);
 
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/accounts/member');
+        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/accounts/member', ['page' => $page]);
 
         if ($response->successful()) {
             $responseData = $response->json();
@@ -231,9 +232,15 @@ class MemberController extends Controller
 
             $perPage = 10;
 
-            $currentPage = $responseData['member']['current_page'];
+            // $currentPage = $responseData['member']['current_page'];
 
-            $paginator = new LengthAwarePaginator($members, $responseData['count'], $perPage, $currentPage);
+            $paginator = new LengthAwarePaginator(
+                $members,
+                $responseData['count'],
+                $perPage,
+                $page,
+                ['path' => url()->current(), 'query' => request()->query()]
+            );
 
             return view('admin.account.admin_member_acc_page', ['member' => $paginator, 'nor' => $nor, 'count' => $count, 'title' => 'Member Accounts']);
         } else {

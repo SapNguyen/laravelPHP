@@ -33,10 +33,10 @@ addColorBtn.addEventListener('click', (e) => {
 					input1_1.setAttribute('class', 'imgInput');
 					input1_1.setAttribute('multiple', true);
 					input1_1.addEventListener('change', (e) => {
-						if(e.target.files.length > 6){
-							alert('You can\'t upload more than 6 images!');
-							return;
-						}
+						// if(e.target.files.length > 6){
+						// 	alert('You can\'t upload more than 6 images!');
+						// 	return;
+						// }
 						var formData = new FormData();
 						for(var j = 0; j < e.target.files.length; j++){
 							formData.append(j, e.target.files[j]);
@@ -350,10 +350,10 @@ for(var i = 0; i < addImg.length; i++){
 var imgInput = document.getElementsByClassName('imgInput');
 for(var i = 0; i < imgInput.length; i++){
 	imgInput[i].addEventListener('change', (e) => {
-		if(e.target.files.length > 6){
-			alert('You can\'t upload more than 6 images!');
-			return;
-		}
+		// if(e.target.files.length > 6){
+		// 	alert('You can\'t upload more than 6 images!');
+		// 	return;
+		// }
 		var formData = new FormData();
 		for(var j = 0; j < e.target.files.length; j++){
 			formData.append(j, e.target.files[j]);

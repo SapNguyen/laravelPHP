@@ -131,6 +131,16 @@ if(File::exists($filepath)){
                                         </td>
                                       </tr>
                                       <tr>
+                                        <th>Genre</th>
+                                        <td>
+                                          <select id="pGenre" name="pGenre">
+                                            <option value="Unisex" {{ $product[0]['product_genre'] == 2 ? 'selected' : '' }}>Unisex</option>
+                                            <option value="Nam" {{ $product[0]['product_genre'] == 1 ? 'selected' : '' }}>Nam</option>
+                                            <option value="Nữ" {{ $product[0]['product_genre'] == 0 ? 'selected' : '' }}>Nữ</option>
+                                        </select>
+                  </td>
+                                    </tr>
+                                      <tr>
                                         <th>Material</th>
                                         <td>
                                           <input type="text" id="pMaterial" value="{{ $product[0]['product_material'] }}">
@@ -161,7 +171,7 @@ if(File::exists($filepath)){
                                             <div>
                                               <input type="file" class="imgInput" multiple>
                                               <input type="hidden" class="imgText" value="{{ $ps1['product_image'] }}">
-                                              <span>Images (max 6 images)</span>
+                                              <span>Images</span>
                                               <button type="button" class="btn btn-block btn-warning addImg">Select</button>
                                             </div>
                                           </th>
@@ -295,6 +305,7 @@ submitbtn.addEventListener('click', (e) => {
 	var ID = e.target.closest('form').querySelector('#pID').value;
 	var Name = pName.value;
 	var Brand = pBrand.value;
+  var Genre = pGenre.value;
 	var Material = pMaterial.value;
 	var Price = pPrice.value;
 	var Des = pDes.value;
@@ -302,6 +313,7 @@ submitbtn.addEventListener('click', (e) => {
 	formData.append('id', ID);
 	formData.append('name', Name);
 	formData.append('brand', Brand);
+  formData.append('genre', Genre);
 	formData.append('material', Material);
 	formData.append('price', Price);
 	formData.append('des', Des);

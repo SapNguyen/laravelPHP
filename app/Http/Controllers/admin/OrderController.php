@@ -34,8 +34,9 @@ class OrderController extends Controller
         //     'count' => $count,
         //     'searchName' => $searchName
         // ]);
+        $page = request('page', 1);
 
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/order', ['searchName' => $searchName]);
+        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/order', ['searchName' => $searchName, 'page' => $page,]);
 
         if ($response->successful()) {
             $responseData = $response->json();
@@ -46,9 +47,15 @@ class OrderController extends Controller
 
             $perPage = 7; // Hoặc bất kỳ giá trị nào bạn muốn
 
-            $currentPage = $responseData['orders']['current_page'];
+            // $currentPage = $responseData['orders']['current_page'];
 
-            $paginator = new LengthAwarePaginator($orders, $responseData['count'], $perPage, $currentPage);
+            $paginator = new LengthAwarePaginator(
+                $orders,
+                $responseData['count'],
+                $perPage,
+                $page,
+                ['path' => url()->current(), 'query' => request()->query()]
+            );
 
             return view('admin.order.confirm', [
 
@@ -81,8 +88,9 @@ class OrderController extends Controller
         //     'count' => $count,
         //     'searchName' => $searchName
         // ]);
+        $page = request('page', 1);
 
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/order_unconfimred', ['searchName' => $searchName]);
+        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/order_unconfimred', ['searchName' => $searchName, 'page' => $page]);
 
         if ($response->successful()) {
             $responseData = $response->json();
@@ -93,9 +101,15 @@ class OrderController extends Controller
 
             $perPage = 7; // Hoặc bất kỳ giá trị nào bạn muốn
 
-            $currentPage = $responseData['orders']['current_page'];
+            // $currentPage = $responseData['orders']['current_page'];
 
-            $paginator = new LengthAwarePaginator($orders, $responseData['count'], $perPage, $currentPage);
+            $paginator = new LengthAwarePaginator(
+                $orders,
+                $responseData['count'],
+                $perPage,
+                $page,
+                ['path' => url()->current(), 'query' => request()->query()]
+            );
 
             return view('admin.order.unconfimred', [
 
@@ -128,8 +142,9 @@ class OrderController extends Controller
         //     'count' => $count,
         //     'searchName' => $searchName
         // ]);
+        $page = request('page', 1);
 
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/order_canceled', ['searchName' => $searchName]);
+        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/order_canceled', ['searchName' => $searchName, 'page' => $page]);
 
         if ($response->successful()) {
             $responseData = $response->json();
@@ -140,9 +155,15 @@ class OrderController extends Controller
 
             $perPage = 7; // Hoặc bất kỳ giá trị nào bạn muốn
 
-            $currentPage = $responseData['orders']['current_page'];
+            // $currentPage = $responseData['orders']['current_page'];
 
-            $paginator = new LengthAwarePaginator($orders, $responseData['count'], $perPage, $currentPage);
+            $paginator = new LengthAwarePaginator(
+                $orders,
+                $responseData['count'],
+                $perPage,
+                $page,
+                ['path' => url()->current(), 'query' => request()->query()]
+            );
 
             return view('admin.order.canceled_confirm', [
 
@@ -176,8 +197,9 @@ class OrderController extends Controller
         //     'searchName' => $searchName
         // ]);
 
+        $page = request('page', 1);
 
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/order_finished', ['searchName' => $searchName]);
+        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/order_finished', ['searchName' => $searchName, 'page' => $page]);
 
         if ($response->successful()) {
             $responseData = $response->json();
@@ -188,9 +210,15 @@ class OrderController extends Controller
 
             $perPage = 7; // Hoặc bất kỳ giá trị nào bạn muốn
 
-            $currentPage = $responseData['orders']['current_page'];
+            // $currentPage = $responseData['orders']['current_page'];
 
-            $paginator = new LengthAwarePaginator($orders, $responseData['count'], $perPage, $currentPage);
+            $paginator = new LengthAwarePaginator(
+                $orders,
+                $responseData['count'],
+                $perPage,
+                $page,
+                ['path' => url()->current(), 'query' => request()->query()]
+            );
 
             return view('admin.order.finished', [
 
