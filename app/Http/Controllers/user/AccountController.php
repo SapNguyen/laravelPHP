@@ -339,7 +339,6 @@ class AccountController extends Controller
 
 
     // API
-
     public function loadPage_api()
     {
         try {
@@ -348,21 +347,21 @@ class AccountController extends Controller
             //     return redirect('/login');
             // } 
             // else {
-                $uid = session('user');
-                $user = DB::select('select * from member where mem_id= :uid', [
-                    'uid' => $uid,
-                ]);
-                if ($user[0]->phone == 0) {
-                    $user[0]->phone = null;
-                }
-                $brands = new HeaderController();
-                // return view('user/profile',[
-                //     'user' => $user[0],
-                //     'brands' => $brands->load()
-                // ]);
-                // return new UserCollection($user[0],$brands);
+            $uid = session('user');
+            $user = DB::select('select * from member where mem_id= :uid', [
+                'uid' => $uid,
+            ]);
+            if ($user[0]->phone == 0) {
+                $user[0]->phone = null;
+            }
+            $brands = new HeaderController();
+            // return view('user/profile',[
+            //     'user' => $user[0],
+            //     'brands' => $brands->load()
+            // ]);
+            // return new UserCollection($user[0],$brands);
 
-                return response()->json(['status' => 'success', 'brands' => $brands, 'user' => $user[0]]);
+            return response()->json(['status' => 'success', 'brands' => $brands, 'user' => $user[0]]);
             // }
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
@@ -375,44 +374,44 @@ class AccountController extends Controller
             // if (session('login') != 'true') {
             //     return redirect('/login');
             // } else {
-                $uid = session('user');
-                $user = DB::select('select * from member where mem_id= :uid', [
-                    'uid' => $uid,
-                ]);
-                if ($user[0]->phone == 0) {
-                    $user[0]->phone = null;
-                }
-                $brands = new HeaderController();
-                if ($link == 'order') {
-                    $orders = DB::select('select order.*,feedback.comment from order 
+            $uid = session('user');
+            $user = DB::select('select * from member where mem_id= :uid', [
+                'uid' => $uid,
+            ]);
+            if ($user[0]->phone == 0) {
+                $user[0]->phone = null;
+            }
+            $brands = new HeaderController();
+            if ($link == 'order') {
+                $orders = DB::select('select order.*,feedback.comment from order 
                     left join feedback on feedback.order_id = order.order_id
                     where order.mem_id= :uid order by order.order_id desc', [
-                        'uid' => $uid
-                    ]);
-                    $product_orders = DB::select('select order.*,product_size_color.product_image,product.*,product_order.* from order 
+                    'uid' => $uid
+                ]);
+                $product_orders = DB::select('select order.*,product_size_color.product_image,product.*,product_order.* from order 
                     inner join product_order on product_order.order_id = order.order_id 
                     inner join product on product.product_id = product_order.product_id
                     inner join product_size_color on product_size_color.size = product_order.size and 
                         product_size_color.color = product_order.color and product_size_color.product_id = product_order.product_id
                         where order.mem_id= :uid', [
-                        'uid' => $uid
-                    ]);
-                    return view('user/' . $link, [
-                        'user' => $user[0],
-                        'brands' => $brands->load(),
-                        'orders' => $orders,
-                        'product_orders' => $product_orders
-                    ]);
-                }
-                // return view('user/' . $link, [
-                //     'user' => $user[0],
-                //     'brands' => $brands->load()
-                // ]);
-                return response()->json([
-                    'status' => 'success',
-                    'user' => $user[0],
-                    'brands' => $brands->load()
+                    'uid' => $uid
                 ]);
+                return view('user/' . $link, [
+                    'user' => $user[0],
+                    'brands' => $brands->load(),
+                    'orders' => $orders,
+                    'product_orders' => $product_orders
+                ]);
+            }
+            // return view('user/' . $link, [
+            //     'user' => $user[0],
+            //     'brands' => $brands->load()
+            // ]);
+            return response()->json([
+                'status' => 'success',
+                'user' => $user[0],
+                'brands' => $brands->load()
+            ]);
             // }
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
@@ -669,34 +668,34 @@ class AccountController extends Controller
             // if (session('login') != 'true') {
             //     return response()->json(['redirect', '/login']);
             // } else {
-                $request->validate([
-                    'old_pass' => 'required',
-                    'new_pass' => 'required',
-                    'confirm_pass' => 'required'
+            $request->validate([
+                'old_pass' => 'required',
+                'new_pass' => 'required',
+                'confirm_pass' => 'required'
+            ]);
+            $uid = session('user');
+            $user = DB::select('select * from member where mem_id= :uid', [
+                'uid' => $uid,
+            ]);
+            if ($user[0]->password != $request->old_pass) {
+                return response()->json([
+                    'success' => 'fail',
+                    'error' => 'pass'
                 ]);
-                $uid = session('user');
-                $user = DB::select('select * from member where mem_id= :uid', [
-                    'uid' => $uid,
+            }
+            if ($request->new_pass != $request->confirm_pass) {
+                return response()->json([
+                    'success' => 'fail',
+                    'error' => 'confirm'
                 ]);
-                if ($user[0]->password != $request->old_pass) {
-                    return response()->json([
-                        'success' => 'fail',
-                        'error' => 'pass'
-                    ]);
-                }
-                if ($request->new_pass != $request->confirm_pass) {
-                    return response()->json([
-                        'success' => 'fail',
-                        'error' => 'confirm'
-                    ]);
-                }
+            }
 
-                DB::select('update member set password= :pass where mem_id= :uid', [
-                    'uid' => $uid,
-                    'pass' => $request->new_pass
-                ]);
-                // return response()->json(['success' => 'true']);
-                return response()->json(['status' => 'success', 'message' => 'Thay đổi mật khẩu thành công!'], 201);
+            DB::select('update member set password= :pass where mem_id= :uid', [
+                'uid' => $uid,
+                'pass' => $request->new_pass
+            ]);
+            // return response()->json(['success' => 'true']);
+            return response()->json(['status' => 'success', 'message' => 'Thay đổi mật khẩu thành công!'], 201);
             // }
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Thay đổi mật khẩu thất bại', 'error' => $e->getMessage()], 500);
@@ -711,20 +710,20 @@ class AccountController extends Controller
             // if (session('login') != 'true') {
             //     return response()->json(['redirect', '/login']);
             // } else {
-                $request->validate([
-                    'name' => 'required',
-                    'phone' => 'required|digits:10|max:10|min:10',
-                    'address' => 'required'
-                ]);
-                $query = DB::select('update member set name= :name, phone= :phone,address= :address where mem_id= :uid', [
-                    'name' => $request->name,
-                    'phone' => $request->phone,
-                    'address' => $request->address,
-                    'uid' => session('user')
-                ]);
+            $request->validate([
+                'name' => 'required',
+                'phone' => 'required|digits:10|max:10|min:10',
+                'address' => 'required'
+            ]);
+            $query = DB::select('update member set name= :name, phone= :phone,address= :address where mem_id= :uid', [
+                'name' => $request->name,
+                'phone' => $request->phone,
+                'address' => $request->address,
+                'uid' => session('user')
+            ]);
 
-                // return response()->json(['name' => $request->name]);
-                return response()->json(['status' => 'success', 'message' => 'Thay đổi thông tin thành công!', 'name' => $request->name], 201);
+            // return response()->json(['name' => $request->name]);
+            return response()->json(['status' => 'success', 'message' => 'Thay đổi thông tin thành công!', 'name' => $request->name], 201);
             // }
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Thay đổi thông tin thất bại', 'error' => $e->getMessage()], 500);

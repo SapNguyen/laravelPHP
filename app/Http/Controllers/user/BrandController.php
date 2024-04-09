@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\Paginator;
+use App\Models\admin\brand;
 use Illuminate\Database\Query\JoinClause;
 
 class BrandController extends Controller
@@ -454,7 +455,7 @@ class BrandController extends Controller
     public function banner_api()
     {
         try {
-            $data = DB::select('select * from brand where brand_banner != "" LIMIT 5');
+            $data = DB::select("SELECT brand.*, COUNT(product.product_id) as product_count FROM brand INNER JOIN product ON brand.brand_id = product.brand_id WHERE brand.brand_banner != '' GROUP BY brand.brand_id,brand.brand_name,brand.brand_des,brand.brand_img,brand.brand_banner,brand.brand_des_img,brand.brand_logo,brand.brand_active LIMIT 5");
             // return response()->json($data);
             return response()->json(['status' => 'success', 'data' => $data], 201);
         } catch (\Exception $e) {
@@ -465,7 +466,64 @@ class BrandController extends Controller
     {
         try {
             // $data = DB::select('select * from brands where homeimg != ""  ');
-            $data = DB::select("SELECT brand.*, COUNT(product.product_id) as product_count FROM brand INNER JOIN product ON brand.brand_id = product.product_id WHERE brand.brand_img != '' GROUP BY brand.brand_id,brand.brand_name,brand.brand_des,brand.brand_img,brand.brand_banner,brand.brand_des_img,brand.brand_logo,brand.brand_active LIMIT 5");
+            $data = DB::select("SELECT brand.*, COUNT(product.product_id) as product_count FROM brand INNER JOIN product ON brand.brand_id = product.brand_id WHERE brand.brand_img != '' GROUP BY brand.brand_id,brand.brand_name,brand.brand_des,brand.brand_img,brand.brand_banner,brand.brand_des_img,brand.brand_logo,brand.brand_active LIMIT 5");
+
+            // return response()->json($data);
+            return response()->json(['status' => 'success', 'data' => $data], 201);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function logo_api()
+    {
+        try {
+            // $data = DB::select('select * from brands where homeimg != ""  ');
+            $data = DB::select("select * from brand where brand_logo != '' ");
+
+            // return response()->json($data);
+            return response()->json(['status' => 'success', 'data' => $data], 201);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function brand_api()
+    {
+        try {
+            $data = DB::select("select * from brand where brand_active = 1 ");
+
+            // return response()->json($data);
+            return response()->json(['status' => 'success', 'data' => $data], 201);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    // public function product_brand_api(Request $request)
+    // {
+    //     try {
+    //         $brand_name = $request->input('brand_name');
+
+    //         //$data = DB::select("select * from brand where brand_active = 1 ");
+
+    //         $data = brand::where('brand_active', '!=', 1)
+    //                 ->where('brand_name', '=',$brand_name)->paginate(7)->get();
+
+    //         // return response()->json($data);
+    //         return response()->json(['status' => 'success', 'data' => $data], 201);
+    //     } catch (\Exception $e) {
+    //         return response()->json(['status' => 'error', 'error' => $e->getMessage()], 500);
+    //     }
+    // }
+
+    public function detail_brand_api(Request $request)
+    {
+        try {
+            $brand_name = $request->input('brand_name');
+
+            $data = brand::where('brand_active', '=', 1)
+                ->where('brand_name', '=', $brand_name)->get();
 
             // return response()->json($data);
             return response()->json(['status' => 'success', 'data' => $data], 201);

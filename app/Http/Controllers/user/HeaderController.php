@@ -20,24 +20,24 @@ class HeaderController extends Controller
         // if (session('login') == 'true') {
         //     return redirect(session('prePage'));
         // } else {
-            // $brands = new HeaderController();
-            // return view('login', [
-            //     'brands' => $brands->load()
-            // ]);
-            $response = Http::get('https://s25sneaker.000webhostapp.com/api/load');
+        // $brands = new HeaderController();
+        // return view('login', [
+        //     'brands' => $brands->load()
+        // ]);
+        $response = Http::get('https://s25sneaker.000webhostapp.com/api/load');
 
-            if ($response->successful()) {
-                $responseData = $response->json();
+        if ($response->successful()) {
+            $responseData = $response->json();
 
-                $brands = $responseData['brands'];
+            $brands = $responseData['brands'];
 
-                return view('login', [
-                    'brands' => $brands
-                ]);
-            } else {
-                $statusCode = $response->status();
-                $errorMessage = $response->body();
-            }
+            return view('login', [
+                'brands' => $brands
+            ]);
+        } else {
+            $statusCode = $response->status();
+            $errorMessage = $response->body();
+        }
         // }
     }
 
@@ -50,18 +50,18 @@ class HeaderController extends Controller
 
         $response = Http::get('https://s25sneaker.000webhostapp.com/api/load');
 
-            if ($response->successful()) {
-                $responseData = $response->json();
+        if ($response->successful()) {
+            $responseData = $response->json();
 
-                $brands = $responseData['brands'];
+            $brands = $responseData['brands'];
 
-                return view('register', [
-                    'brands' => $brands
-                ]);
-            } else {
-                $statusCode = $response->status();
-                $errorMessage = $response->body();
-            }
+            return view('register', [
+                'brands' => $brands
+            ]);
+        } else {
+            $statusCode = $response->status();
+            $errorMessage = $response->body();
+        }
     }
 
 

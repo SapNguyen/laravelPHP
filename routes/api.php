@@ -31,14 +31,47 @@ use Illuminate\Support\Facades\File;
 Route::get('/home', [
     HomeController::class, 'index_api',
 ]);
+Route::get('/detailproduct', [
+    HomeController::class, 'detail_product_api',
+]);
+Route::get('/product/detail', [
+    HomeController::class, 'detail_product_id_api',
+]);
+Route::get('/product/similar', [
+    HomeController::class, 'similar_product_api',
+]);
 Route::get('/product/feedback', [
     HomeController::class, 'feedback_product_api',
+]);
+Route::get('/product/feedback/count', [
+    HomeController::class, 'count_feedback_api',
+]);
+Route::get('/searchproduct', [
+    HomeController::class, 'search_product_api',
+]);
+Route::get('/detail/user', [
+    HomeController::class, 'user_api',
+]);
+Route::get('/brand/products', [
+    HomeController::class, 'product_brand_api',
+]);
+Route::get('/products/new', [
+    HomeController::class, 'product_new_api',
+]);
+Route::get('/products/discount', [
+    HomeController::class, 'product_discount_api',
+]);
+Route::get('/genre/products', [
+    HomeController::class, 'product_genre_api',
 ]);
 Route::post('/payment/store', [
     HomeController::class, 'payment_store_api',
 ]);
-Route::get('/cart/user', [
-    CartController::class, 'user_cart_api',
+Route::post('/user/update/info', [
+    HomeController::class, 'update_info_user_api',
+]);
+Route::post('/user/update/password', [
+    HomeController::class, 'update_password_api',
 ]);
 
 // Brand
@@ -91,7 +124,6 @@ Route::get('/admin/order', [
 Route::get('admin/order_unconfimred', [
     OrderController::class, 'index_unconfimred_api'
 ]);
-Route::post('/delorder', [OrderController::class, 'delorder_api']);
 
 Route::get('/admin/order_canceled', [
     OrderController::class, 'index_canceled_api'
@@ -104,6 +136,7 @@ Route::get('/admin/detail/{order}', [OrderController::class, 'detail_api']);
 Route::post('/admin/edit/{order}', [OrderController::class, 'postedit_api']);
 Route::get('/admin/cancel_edit/{order}', [OrderController::class, 'edit_api']);;
 Route::post('/admin/cancel_edit/{order}', [OrderController::class, 'canceledit_api']);
+Route::post('/delorder', [OrderController::class, 'delorder_api']);
 
 
 
@@ -125,15 +158,7 @@ Route::post('/deleteProduct', 'App\Http\Controllers\admin\ProductController@dele
 
 
 //User API
-Route::get('/imgproduct', [
-    HomeController::class, 'img_product_api',
-]);
-Route::get('/detailproduct', [
-    HomeController::class, 'detail_product_api',
-]);
-Route::get('/searchproduct', [
-    HomeController::class, 'search_product_api',
-]);
+
 //Brand
 Route::get('/user/brand/{name}', [
     BrandController::class, 'loadBrand_api'
@@ -153,7 +178,20 @@ Route::get('/user/banner', [
 Route::get('/user/home', [
     BrandController::class, 'home_api'
 ]);
+Route::get('/user/logo', [
+    BrandController::class, 'logo_api'
+]);
+Route::get('/brands', [
+    BrandController::class, 'brand_api'
+]);
+Route::get('/detail/brand', [
+    BrandController::class, 'detail_brand_api'
+]);
 
+
+Route::get('/imgproduct', [
+    HomeController::class, 'img_product_api',
+]);
 
 
 
@@ -198,34 +236,53 @@ Route::post('/feedback/readRequest', [
 
 //Cart
 
-Route::get('/cart/{pid}', [
-    CartController::class, 'payment_api'
-]);
+//Route::get('/cart/{pid}', [
+//CartController::class, 'payment_api'
+//]);
 
-Route::get('/cart', [
-    CartController::class, 'loadCart_api'
-]);
-Route::post('/cart/quantity', [
-    CartController::class, 'updateQuantity_api'
-]);
+// Route::get('/cart', [
+//     CartController::class, 'loadCart_api'
+// ]);
+// Route::post('/cart/quantity', [
+//     CartController::class, 'updateQuantity_api'
+// ]);
 
+// Route::post('/cart/remove', [
+//     CartController::class, 'removeProduct_api'
+// ]);
+
+// Route::post('/cart/updateSize', [
+//     CartController::class, 'updateSize_api'
+// ]);
+
+// Route::post('/cart/selectProduct', [
+//     CartController::class, 'selectProduct_api',
+// ]);
+Route::post('/cart/add_product', [
+    CartController::class, 'cart_api',
+]);
+Route::get('/cart/user', [
+    CartController::class, 'user_cart_api',
+]);
+Route::post('/cart/update', [
+    CartController::class, 'update_cart_api',
+]);
 Route::post('/cart/remove', [
-    CartController::class, 'removeProduct_api'
-]);
-
-Route::post('/cart/updateSize', [
-    CartController::class, 'updateSize_api'
-]);
-
-Route::post('/cart/selectProduct', [
-    CartController::class, 'selectProduct_api',
+    CartController::class, 'remove_cart_api',
 ]);
 
 Route::get('/order/user', [
     CartController::class, 'order_user_api'
 ]);
-
-
+Route::post('/feedback/product', [
+    CartController::class, 'feedback_api',
+]);
+Route::post('/order/canceled', [
+    CartController::class, 'update_canceled_api',
+]);
+Route::post('/order/completion', [
+    CartController::class, 'update_completion_api',
+]);
 
 //Header
 Route::get('/products', [
@@ -237,14 +294,21 @@ Route::get('/login', [
 Route::get('/register', [
     HeaderController::class, 'get_register_api'
 ]);
+Route::get('/load', [
+    HeaderController::class, 'load_api'
+]);
+
 
 
 //Login
-Route::post('/login', [
+Route::get('/login', [
     LoginController::class, 'login_api'
 ]);
 Route::post('/register', [
     LoginController::class, 'register_api'
+]);
+Route::post('/forget', [
+    LoginController::class, 'forget_api'
 ]);
 
 Route::get('/logout', [

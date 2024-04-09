@@ -113,7 +113,7 @@
                       <p>Name:&nbsp;&nbsp;&nbsp;{{ $m['name'] }}</p>
                       <p>Contact:&nbsp;&nbsp;&nbsp;{{ $m['phone'] }}</p>
                       <p>Address:&nbsp;&nbsp;&nbsp;{{ $m['address'] }}</p>
-                      <p>Number of receipts:&nbsp;&nbsp;&nbsp;
+                      <p>Number of orders:&nbsp;&nbsp;&nbsp;
                         <?php $i = 0; ?>
                         @if(count($nor) == 0)
                           {{ $i }}

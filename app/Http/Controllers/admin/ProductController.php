@@ -193,8 +193,6 @@ class ProductController extends Controller
                 $currentPage++;
 
                 $totalPages = $responseData['product']['last_page'];
-
-                
             } else {
                 $statusCode = $response->status();
                 $errorMessage = $response->body();
@@ -568,7 +566,6 @@ class ProductController extends Controller
 
     // API
 
-
     public function list_api()
     {
         try {
@@ -634,41 +631,42 @@ class ProductController extends Controller
             $get = $request->all();
 
             $product = new product();
-            $product->product_name = $get['name'];
-            $product->product_material = $get['material'];
-            $product->product_des = $get['des'];
-            $product->product_price = $get['price'];
-            $product->product_genre = $get['genre'];
-            $product->brand_id = $get['brand'];
+            $product->product_id = $request->input('product_id');
+            $product->product_name = $request->input('product_name');
+            $product->product_material = $request->input('product_material');
+            $product->product_des = $request->input('product_des');
+            $product->product_price = $request->input('product_price');
+            $product->product_genre = $request->input('product_genre');
+            $product->brand_id = $request->input('brand_id');
             $product->save();
 
-            $id = product::max('product_id');
-            if (!isset($id)) {
-                $id = 1;
-            }
+            //$id = product::max('product_id');
+            //if (!isset($id)) {
+            //    $id = 1;
+            //}
 
-            $filepath = public_path('/img/product/' . $id);
-            $temppath = public_path('/img/product/temp');
-            if (File::exists($filepath)) {
-                File::cleanDirectory($filepath);
-            } else {
-                File::makeDirectory($filepath);
-            }
-            if (!File::exists($temppath)) {
-                File::makeDirectory($temppath);
-            }
+            // $filepath = public_path('/img/product/' . $id);
+            // $temppath = public_path('/img/product/temp');
+            // if (File::exists($filepath)) {
+            //     File::cleanDirectory($filepath);
+            // } else {
+            //     File::makeDirectory($filepath);
+            // }
+            // if (!File::exists($temppath)) {
+            //     File::makeDirectory($temppath);
+            // }
 
-            $imgs = File::allFiles($temppath);
-            for ($i = 0; $i < count($imgs); $i++) {
-                File::move($temppath . '/' . $imgs[$i]->getFilename(), $filepath . '/' . $imgs[$i]->getFileName());
-            }
+            // $imgs = File::allFiles($temppath);
+            // for ($i = 0; $i < count($imgs); $i++) {
+            //     File::move($temppath . '/' . $imgs[$i]->getFilename(), $filepath . '/' . $imgs[$i]->getFileName());
+            // }
 
-            $pcsq = $get['pcsq'];
+            $pcsq = $request->input('pcsq');
             $pcs = array();
             for ($i = 0; $i < count($pcsq); $i++) {
                 $ex = explode('|', $pcsq[$i]);
                 $pcs[$i] = new product_size_color();
-                $pcs[$i]->product_id = $id;
+                $pcs[$i]->product_id = $request->input('product_id');
                 $pcs[$i]->color = $ex[0];
                 $pcs[$i]->size = $ex[1];
                 $pcs[$i]->quantity = $ex[2];
@@ -713,37 +711,41 @@ class ProductController extends Controller
     public function update_api(Request $request)
     {
         try {
-            $get = $request->all();
+            // $get = $request->all();
+            $id = $request->input('product_id');
 
-            product::where('product_id', $get['id'])->update([
-                'product_name' => $get['name'],
-                'product_material' => $get['material'],
-                'product_des' => $get['des'],
-                'product_price' => $get['price'],
-                'brand_id' => $get['brand'],
+
+            product::where('product_id', $id)->update([
+                'product_name' => $request->input('product_name'),
+                'product_material' => $request->input('product_material'),
+                'product_des' => $request->input('product_des'),
+                'product_price' => $request->input('product_price'),
+                'product_genre' => $request->input('product_genre'),
+                'brand_id' => $request->input('brand_id'),
                 'product_updated_date' => Carbon::now()->toDateString()
             ]);
 
-            $id = $get['id'];
+            // $id = $get['id'];
 
-            $filepath = public_path('/img/product/' . $id);
-            $temppath = public_path('/img/product/temp');
-            if (File::exists($filepath)) {
-                File::cleanDirectory($filepath);
-            } else {
-                File::makeDirectory($filepath);
-            }
-            if (!File::exists($temppath)) {
-                File::makeDirectory($temppath);
-            }
-            $imgs = File::allFiles($temppath);
-            for ($i = 0; $i < count($imgs); $i++) {
-                File::move($temppath . '/' . $imgs[$i]->getFilename(), $filepath . '/' . $imgs[$i]->getFileName());
-            }
+            // $filepath = public_path('/img/product/' . $id);
+            // $temppath = public_path('/img/product/temp');
+            // if (File::exists($filepath)) {
+            //     File::cleanDirectory($filepath);
+            // } else {
+            //     File::makeDirectory($filepath);
+            // }
+            // if (!File::exists($temppath)) {
+            //     File::makeDirectory($temppath);
+            // }
+            // $imgs = File::allFiles($temppath);
+            // for ($i = 0; $i < count($imgs); $i++) {
+            //     File::move($temppath . '/' . $imgs[$i]->getFilename(), $filepath . '/' . $imgs[$i]->getFileName());
+            // }
 
 
-            product_size_color::where('product_id', $get['id'])->delete();
-            $pcsq = $get['pcsq'];
+            product_size_color::where('product_id', $id)->delete();
+            //$pcsq = $get['pcsq'];
+            $pcsq = $request->input('pcsq');
             $pcs = array();
             for ($i = 0; $i < count($pcsq); $i++) {
                 $ex = explode('|', $pcsq[$i]);
@@ -755,6 +757,26 @@ class ProductController extends Controller
                 $pcs[$i]->product_image = $ex[3];
                 $pcs[$i]->save();
             }
+
+
+
+            // product_size_color::where('product_id', $id)->delete();
+            // product_size_color::where('product_size_color_id', 9)->update([
+            //     'color' => 'Hi'
+            // ]);
+            //DB::update('update product_size_color set color = ? where product_size_color_id = ?', ['Hi', 9]);
+            // $pcsq = $get['pcsq'];
+            // $pcs = array();
+            // for ($i = 0; $i < count($pcsq); $i++) {
+            //     $ex = explode('|', $pcsq[$i]);
+            //     $pcs[$i] = new product_size_color();
+            //     $pcs[$i]->product_id = $id;
+            //     $pcs[$i]->color = $ex[0];
+            //     $pcs[$i]->size = $ex[1];
+            //     $pcs[$i]->quantity = $ex[2];
+            //     $pcs[$i]->product_image = $ex[3];
+            //     $pcs[$i]->save();
+            // }
 
             return response()->json(['status' => 'success', 'message' => 'Sửa sản phẩm thành công!'], 201);
         } catch (\Exception $e) {

@@ -191,7 +191,7 @@
               <div class="row"><div class="col-sm-12 col-md-6"></div>
               <div class="col-sm-12 col-md-6"></div></div><div class="row">
                   <div class="col-sm-12"> 
-                    <h3>Danh sách sản phẩm đã được thêm mã khuyến mại </h3>
+                    <h3>Danh sách sản phẩm đã được thêm mã khuyến mãi </h3>
 <table class="table table-bordered table-hover">
 <thead>
 <tr>
@@ -299,7 +299,7 @@
     }
 });
 function add(button) {
-    if(confirm('Bạn có muốn thêm product  này vào khuyến mại này không ?')){
+    if(confirm('Bạn có muốn thêm product  này vào khuyến mãi này không ?')){
         var did = button.getAttribute("data-did");
         var diid = button.getAttribute("data-diid");
         var formData = new FormData();
@@ -326,7 +326,7 @@ function add(button) {
     }
 }
 function sub(button) {
-    if(confirm('Bạn có muốn xóa product  này ra khỏi khuyến mại này không ?')){
+    if(confirm('Bạn có muốn xóa product  này ra khỏi khuyến mãi này không ?')){
         var did = button.getAttribute("data-did");
         var formData = new FormData();
         formData.append('did', did);

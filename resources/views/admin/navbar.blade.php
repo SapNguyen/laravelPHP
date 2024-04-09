@@ -156,7 +156,7 @@
                 <li class="nav-item">
                     <a href="{{ route('a.r.list.3') }}" class="nav-link {{ request()->is('admin/order_finished') ? 'active' : '' }}">
                     <i class="far fa-circle nav-icon"></i>
-                    <p>Finished</p>
+                    <p>Completed</p>
                     </a>
                   </li>
               
@@ -205,7 +205,7 @@
             </li>
 
             <li class="nav-item">
-                <a href="/" class="nav-link" target="_blank">
+                <a href="http://localhost:3000" class="nav-link" target="_blank">
                     <i class="fa-globe fa-solid fa-chart-simple nav-icon" style="color: #ffffff;"></i>
                     <p>
                         Web

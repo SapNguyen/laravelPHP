@@ -516,6 +516,8 @@ class DiscountController extends Controller
 
     // API
 
+    // API
+
     public function list_api()
     {
         try {
@@ -579,11 +581,11 @@ class DiscountController extends Controller
             ]);
 
             $d = new discount();
-            $d->discount_id = request('txtid');
-            $d->discount_name = request('txtname');
-            $d->discount_start = request('date-start');
-            $d->discount_end = request('date-end');
-            $d->discount_value = request('txtvalue');
+            $d->discount_id = $request->input('discount_id');
+            $d->discount_name = $request->input('discount_name');
+            $d->discount_start = $request->input('discount_start');
+            $d->discount_end = $request->input('discount_end');
+            $d->discount_value = $request->input('discount_value');
             $d->save();
             $id = DB::table('discount')->count('discount_id') + 1;
             return response()->json(['status' => 'success', 'message' => 'Thêm giảm giá thành công!', 'data' => $d], 201);
@@ -601,22 +603,43 @@ class DiscountController extends Controller
             $discount =  request('discount_id');
 
             if (isset($searchName)) {
-                $count = product::where('discount_id', NULL)->where('product_name', 'like', '%' . $searchName . '%')->count('product_id');
+                $count = product::where('discount_id', NULL)->where('product_active', 1)->where('product_name', 'like', '%' . $searchName . '%')->count('product_id');
 
+                // $get = product::where('discount_id', NULL)
+                //     ->where('product_name', 'like', '%' . $searchName . '%')
+                //     ->paginate(7, ['*'], 'get');
+                // for ($i = 0; $i < count($get); $i++) {
+                //     $img = DB::select('select product.product_id,product_size_color.product_image from product 
+                //     inner join product_size_color on product_size_color.product_id = product.product_id
+                //     where product.product_active = 1 and product.product_id = :pid
+                //     GROUP by product_id,product_size_color.product_image', [
+                //         'pid' => $get[$i]->product_id
+                //     ]);
+                //     //$get[$i]->product_image = $img[0]->product_image;
+                // }
                 $get = product::where('discount_id', NULL)
+                    ->where('product_active', 1)
                     ->where('product_name', 'like', '%' . $searchName . '%')
                     ->paginate(7, ['*'], 'get');
-                for ($i = 0; $i < count($get); $i++) {
-                    $img = DB::select('select product.product_id,product_size_color.product_image from product 
-                    inner join product_size_color on product_size_color.product_id = product.product_id
-                    where product.product_active = 1 and product.product_id = :pid
-                    GROUP by product_id,product_size_color.product_image', [
-                        'pid' => $get[$i]->product_id
-                    ]);
-                    $get[$i]->product_image = $img[0]->product_image;
+
+                foreach ($get as $product) {
+                    $img = DB::table('product')
+                        ->join('product_size_color', 'product_size_color.product_id', '=', 'product.product_id')
+                        ->select('product.product_id', 'product_size_color.product_image')
+                        ->where('product.product_active', 1)
+                        ->where('product.product_id', $product->product_id)
+                        ->groupBy('product.product_id', 'product_size_color.product_image')
+                        ->first();
+
+                    if ($img) {
+                        $product->product_image = $img->product_image;
+                    } else {
+                        $product->product_image = ''; // Hoặc giá trị mặc định khác nếu không có hình ảnh
+                    }
                 }
             } else {
                 $count = product::join('product_size_color', 'product.product_id', '=', 'product_size_color.product_id')
+                    ->where('product_active', 1)
                     ->where('discount_id', NULL)
                     ->count('product.product_id');
                 // $get = product::where('discount_id', NULL)
@@ -628,10 +651,10 @@ class DiscountController extends Controller
                 //     GROUP by product_id,product_size_color.product_image', [
                 //         'pid' => $get[$i]->product_id
                 //     ]);
-                //     $get[$i]->product_image = $img[0]->product_image;
+                //     //$get[$i]->product_image = $img[0]->product_image;
                 // }
                 $get = product::where('discount_id', NULL)
-                    ->where('product_name', 'like', '%' . $searchName . '%')
+                    ->where('product_active', 1)
                     ->paginate(7, ['*'], 'get');
 
                 foreach ($get as $product) {
@@ -652,7 +675,7 @@ class DiscountController extends Controller
             }
             $searchNamed = request('searchNamed');
             if (isset($searchNamed)) {
-                $counted = product::where('discount_id',  '=', $discount)->where('product_name', 'like', '%' . $searchNamed . '%')->count('product_id');
+                $counted = product::where('discount_id',  '=', $discount)->where('product_active', 1)->where('product_name', 'like', '%' . $searchNamed . '%')->count('product_id');
                 // $geted = product::where('product_name', 'like', '%' . $searchNamed . '%')
                 //     ->where('discount_id', '=', $discount)
                 //     ->paginate(7, ['*'], 'geted');
@@ -663,9 +686,10 @@ class DiscountController extends Controller
                 //     GROUP by product_id,product_size_color.product_image', [
                 //         'pid' => $geted[$i]->product_id
                 //     ]);
-                //     $geted[$i]->product_image = $img[0]->product_image;
+                //     //$geted[$i]->product_image = $img[0]->product_image;
                 // }
-                $geted = product::where('discount_id', NULL)
+                $geted = product::where('discount_id', $discount)
+                    ->where('product_active', 1)
                     ->where('product_name', 'like', '%' . $searchNamed . '%')
                     ->paginate(7, ['*'], 'get');
 
@@ -681,12 +705,13 @@ class DiscountController extends Controller
                     if ($img) {
                         $product->product_image = $img->product_image;
                     } else {
-                        $product->product_image = ''; 
+                        $product->product_image = '';
                     }
                 }
-
             } else {
-                $counted = product::where('discount_id',  '=', $discount)->count('product_id');
+                $counted = product::where('discount_id',  '=', $discount)
+                    ->where('product_active', 1)
+                    ->count('product_id');
                 // $geted = product::where('discount_id',  '=', $discount)
                 //     ->paginate(7, ['*'], 'geted');
                 // for ($i = 0; $i < count($geted); $i++) {
@@ -696,9 +721,27 @@ class DiscountController extends Controller
                 //         GROUP by product_id,product_size_color.product_image', [
                 //         'pid' => $geted[$i]->product_id
                 //     ]);
-                //     $geted[$i]->product_image = $img[0]->product_image;
+                //     //$geted[$i]->product_image = $img[0]->product_image;
                 // }
+                $geted = product::where('discount_id', $discount)
+                    ->where('product_active', 1)
+                    ->paginate(7, ['*'], 'get');
 
+                foreach ($geted as $product) {
+                    $img = DB::table('product')
+                        ->join('product_size_color', 'product_size_color.product_id', '=', 'product.product_id')
+                        ->select('product.product_id', 'product_size_color.product_image')
+                        ->where('product.product_active', 1)
+                        ->where('product.product_id', $product->product_id)
+                        ->groupBy('product.product_id', 'product_size_color.product_image')
+                        ->first();
+
+                    if ($img) {
+                        $product->product_image = $img->product_image;
+                    } else {
+                        $product->product_image = '';
+                    }
+                }
             }
             return response()->json([
                 'status' => 'success',
@@ -749,9 +792,10 @@ class DiscountController extends Controller
     }
     public function edit_api(Request $request)
     {
-        $id = request('did');
+        // $id = request('did');
 
         try {
+            $id = $request->input('discount_id');
             $request->validate([
                 'discount_name' => 'required|string',
                 'discount_start' => 'required|date',
@@ -759,16 +803,16 @@ class DiscountController extends Controller
                 'discount_value' => 'required|numeric',
             ]);
 
-            $discount_name = request('txtname');
-            $discount_start = request('date-start');
-            $discount_end = request('date-end');
-            $discount_value = request('txtvalue');
+            // $discount_name = request('txtname');
+            // $discount_start = request('date-start');
+            // $discount_end = request('date-end');
+            // $discount_value = request('txtvalue');
 
             discount::where('discount_id', $id)->update([
-                'discount_name' => $discount_name,
-                'discount_start' => $discount_start,
-                'discount_end' => $discount_end,
-                'discount_value' => $discount_value,
+                'discount_name' => $request->input('discount_name'),
+                'discount_start' => $request->input('discount_start'),
+                'discount_end' => $request->input('discount_end'),
+                'discount_value' => $request->input('discount_value'),
             ]);
 
             return response()->json(['status' => 'success', 'message' => 'Sửa giảm giá thành công!'], 201);
@@ -797,18 +841,25 @@ class DiscountController extends Controller
     {
         try {
             $get = $request->all();
-            DB::select(
-                "update discount inner join product on discount.discount_id = product.discount_id 
-            set discount_name = 'deleted',
-            discount_end = NULL,
-            discount_active = -1,
-            product.discount_id = NULL
-            where discount.discount_id = :discount_id
-        ",
-                [
-                    'discount_id' => $get['did']
-                ]
-            );
+            //     DB::select(
+            //         "update discount inner join product on discount.discount_id = product.discount_id 
+            //     set discount_active = -1,
+            //     product.discount_id = NULL
+            //     where discount.discount_id = :discount_id
+            // ",
+            //         [
+            //             'discount_id' => $get['did']
+            //         ]
+            //     );
+            Discount::where('discount_id', $get['did'])
+                ->update([
+                    'discount_active' => -1,
+                ]);
+
+            Product::where('discount_id', $get['did'])
+                ->update([
+                    'discount_id' => NULL,
+                ]);
             return response()->json(['status' => 'success', 'message' => 'Xóa thành công'], 201);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Xóa thất bại', 'error' => $e->getMessage()], 500);

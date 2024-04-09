@@ -70,11 +70,11 @@
           <div class="container-fluid">
             <div class="row mb-2">
               <div class="col-sm-6">
-                <h1>List orders Unconfimred</h1>
+                <h1>List Orders Unconfimred</h1>
               </div>
               <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                  <li class="breadcrumb-item">orders</li>
+                  <li class="breadcrumb-item">Orders</li>
                   <li class="breadcrumb-item">List</li>
                 </ol>
               </div>
@@ -109,15 +109,14 @@
     <table class="table table-bordered table-hover">
           <thead>
             <tr>
-              <th>Mã biên lai</th>
+              <th>Mã đơn hàng</th>
               <th>Ngày tạo</th>
               <th>Ngày xác thực</th>
               <th>Ngày hủy</th>
               <th>Ngày hoàn thành</th>
-              <th>Giá trị biên lai</th>
+              <th>Giá trị</th>
               <th>Trạng thái xác thực</th>
               <th>Mã khách hàng</th>
-              <th>Mã nhân viên</th>
               {{-- <th>Địa chỉ khách hàng</th>
               <th>SĐT khách hàng</th>
               <th>Email khách hàng</th> --}}
@@ -131,18 +130,17 @@
                       <td valign="middle">{{$order['validated_date']}}</td>
                       <td valign="middle">{{$order['canceled_date']}}</td>
                       <td valign="middle">{{$order['completion_date']}}</td>
-                      <td valign="middle">{{$order['order_value']}}</td>
+                      <td valign="middle">{{number_format($order['order_value'])}}</td>
                       @if($order['order_status'] == 0)
                       <td valign="middle"><b style="color: blue;">Chưa xác nhận</b></td>
                                             
                                             @endif
                       
                       <td valign="middle">{{$order['mem_id']}}</td>
-                      <td valign="middle">{{$order['staff_id']}}</td>
                       <td>
                         <a class="btn btn-primary mr-2" href="/admin/edit/{{$order['order_id']}}"><i class="fa fa-edit"></i></a>
                         {{-- <a class="btn btn-danger " href="/admin/delete_order/{{$order->order_id}}" onclick="return confirm('Bạn có chắc hủy biên lai này không?');"><i class="fa fa-trash"></i></a> --}}
-                        <button type="button" class="btn btn-danger" onclick="del(this)" data-did="{{$order['order_id']}}"><i class="fa fa-trash"></i></button>
+                        {{-- <button type="button" class="btn btn-danger" onclick="del(this)" data-did="{{$order['order_id']}}"><i class="fa fa-trash"></i></button> --}}
 
                     </td>
                   </tr>

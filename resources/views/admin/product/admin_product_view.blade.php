@@ -124,7 +124,7 @@
                                         </tr>
                                         <tr>
                                             <th>Price&nbsp;&nbsp;&nbsp;(VND)</th>
-                                            <td>{{ $product[0]['product_price'] }}</td>
+                                            <td>{{ number_format($product[0]['product_price']) }}</td>
                                         </tr>
                                         <tr>
                                             <th>Genre</th>

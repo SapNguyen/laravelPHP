@@ -261,7 +261,6 @@ class RevenueController extends Controller
         // trend chart
         try {
             $lastmonth = new Carbon('first day of last month');
-            echo $lastmonth;
             $trend_name = product_order::join('product', 'product_order.product_id', '=', 'product.product_id')
                 ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
                 ->join('order', 'product_order.order_id', '=', 'order.order_id')
@@ -364,4 +363,34 @@ class RevenueController extends Controller
             return response()->json(['status' => 'error', 'error' => $e->getMessage()], 500);
         }
     }
+
+    // public function homepage_api()
+    // {
+    //     try {
+    //         $lastmonth = new Carbon('first day of last month');
+    //         $trend_name = product_order::join('product', 'product_order.product_id', '=', 'product.product_id')
+    //             ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
+    //             ->join('order', 'product_order.order_id', '=', 'order.order_id')
+    //             ->whereBetween('validated_date', [$lastmonth, Carbon::now()->toDateString()])
+    //             ->groupBy('brand.brand_name')
+    //             ->get([
+    //                 'brand_name',
+    //             ]);
+    //         if (isset($trend_name[0])) {
+    //             $trendname = '"' . $trend_name[0]->brand_name . '"';
+    //             for ($i = 1; $i < count($trend_name); $i++) {
+    //                 $trendname = $trendname . ',"' . $trend_name[$i]->brand_name . '"';
+    //             }
+    //         } else {
+    //             $trendname = '"None"';
+    //         }
+
+    //         return response()->json([
+    //             'status' => 'success',
+    //             'trendName' => $trendname,
+    //         ], 201);
+    //     } catch (\Exception $e) {
+    //         return response()->json(['status' => 'error', 'error' => $e->getMessage()], 500);
+    //     }
+    // }
 }

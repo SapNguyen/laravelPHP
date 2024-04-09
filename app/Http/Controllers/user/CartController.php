@@ -443,7 +443,6 @@ class CartController extends Controller
 
 
     // API
-
     public function payment_api(Request $request, $pid)
     {
         try {
@@ -927,18 +926,95 @@ class CartController extends Controller
         }
     }
 
+    public function cart_api(Request $request)
+    {
+        try {
+            $cart = DB::select('select * from cart where cart_active=1 and mem_id= :mem_id and product_id= :product_id and color= :color', [
+                'mem_id' => $request->input('mem_id'),
+                'product_id' => $request->input('product_id'),
+                'color' => $request->input('color'),
+            ]);
+            if ($cart) {
+                return response()->json(['error' => 'Giỏ hàng của bạn đã tồn tại sản phẩm này']);
+            }
+            DB::table("cart")->insert([
+                'mem_id' => $request->input('mem_id'),
+                'product_id' => $request->input('product_id'),
+                'color' => $request->input('color'),
+                'size' => $request->input('size'),
+                'quantity' => $request->input('quantity')
+            ]);
+
+            $cart = DB::select('select * from cart where cart_active=1 and mem_id= :mem_id and product_id= :product_id and color= :color and size= :size', [
+                'mem_id' => $request->input('mem_id'),
+                'product_id' => $request->input('product_id'),
+                'color' => $request->input('color'),
+                'size' => $request->input('size'),
+                'quantity' => $request->input('quantity')
+            ]);
+            return response()->json(['status' => 'success', 'cart' => $cart]);
+            // }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
+        }
+    }
+
     public function user_cart_api(Request $request)
     {
         try {
             $user_id = $request->query('id');
-            // $products = product::with('details')->with('discounts')->get();
-            $products = cart::where('mem_id', '=', $user_id)->with(['members', 'products'
-            => function ($query) {
-                $query->with('details');
-            }])->get();
+            $products = Cart::where('mem_id', $user_id)->where('cart_active', '=', 1)
+                ->with(['members', 'products' => function ($query) {
+                    $query->with(['details', 'discounts' => function ($query) {
+                        $query->where('discount_active', 1);
+                    }]);
+                }])
+                ->get();
             return response()->json([
                 'status' => 'success',
                 'products' => $products,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
+        }
+    }
+
+    public function update_cart_api(Request $request)
+    {
+        try {
+            $cartId = $request->input('cart_id');
+            $color = $request->input('color');
+            $size = $request->input('size');
+
+            DB::table('cart')
+                ->where('cart_id', $cartId)
+                ->update([
+                    'color' => $color,
+                    'size' => $size
+                ]);
+            return response()->json([
+                'status' => 'success',
+                'update' => 'update thành công',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
+        }
+    }
+
+    public function remove_cart_api(Request $request)
+    {
+        try {
+            $cartId = $request->input('cart_id');
+
+            //DB::table('cart')->where('cart_id', $cartId)->delete();
+            DB::table('cart')
+                ->where('cart_id', $cartId)
+                ->update([
+                    'cart_active' => 0,
+                ]);
+            return response()->json([
+                'status' => 'success',
+                'Xóa' => 'Xóa thành công',
             ]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
@@ -953,15 +1029,14 @@ class CartController extends Controller
             if ($order_status == 3) {
                 $orders = order::where('mem_id', $user_id)
                     ->with([
-                        'members', 'feedbacks', 'details'
+                        'members', 'feedbacks' => function ($query) {
+                            $query->with([
+                                'member'
+                            ]);
+                        }, 'details'
                         => function ($query) {
                             $query->with([
                                 'product'
-                                //  => function ($query) {
-                                //     $query->with(['details', 'discounts' => function ($query) {
-                                //         $query->where('discount_active', 1);
-                                //     }]);
-                                // }
                             ]);
                         }
 
@@ -975,15 +1050,13 @@ class CartController extends Controller
                 $orders = order::where('mem_id', $user_id)
                     ->where('order_status', $order_status)
                     ->with([
-                        'members', 'details' => function ($query) {
+                        'members', 'feedbacks' => function ($query) {
+                            $query->with([
+                                'member'
+                            ]);
+                        }, 'details' => function ($query) {
                             $query->with([
                                 'product'
-                                //     ,
-                                //      'discounts' => function ($query) {
-                                //         $query->where('discount_active', 1);
-                                //     }
-                                // ]);
-                                //}
                             ]);
                         }
 
@@ -999,5 +1072,78 @@ class CartController extends Controller
         }
     }
 
-    
+    public function feedback_api(Request $request)
+    {
+        try {
+            $order_id = intval($request->input('order_id'));
+
+            DB::table("feedback")->insert([
+                'mem_id' => $request->input('mem_id'),
+                'product_id' => $request->input('product_id'),
+                'comment' => $request->input('comment'),
+                'star' => $request->input('star'),
+                'order_id' => $order_id,
+            ]);
+
+            return response()->json(['status' => 'success', 'message' => 'Feedback thành công']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
+        }
+    }
+
+    public function update_canceled_api(Request $request)
+    {
+        try {
+
+            $details = $request->input('details');
+            $array = json_decode($details, true);
+            if (is_array($array) || is_object($array)) {
+                $order_id = intval($request->input('order_id'));
+
+                DB::table('order')
+                    ->where('order_id', $order_id)
+                    ->update([
+                        'order_status' => -1,
+                        'canceled_date' => DB::raw('CURRENT_TIMESTAMP()')
+                    ]);
+
+                foreach ($array as $product) {
+
+                    DB::table('product_size_color')
+                        ->where('product_id', $product['product_id'])
+                        ->where('size', $product['size'])
+                        ->where('color', $product['color'])
+                        ->update(['quantity' => DB::raw('quantity + ' . $product['quantity'])]);
+                }
+                return response()->json([
+                    'status' => 'success',
+                    'update' => 'Hủy đơn hàng thành công',
+                ]);
+            } else {
+                return response()->json(['status' => 'error']);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
+        }
+    }
+
+    public function update_completion_api(Request $request)
+    {
+        try {
+            $order_id = intval($request->input('order_id'));
+
+            DB::table('order')
+                ->where('order_id', $order_id)
+                ->update([
+                    'order_status' => 2,
+                    'completion_date' => DB::raw('CURRENT_TIMESTAMP()')
+                ]);
+            return response()->json([
+                'status' => 'success',
+                'update' => 'Xác nhận nhận đơn hàng thành công',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
+        }
+    }
 }

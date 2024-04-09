@@ -116,7 +116,7 @@
                                             <td>{{ $p['product_id'] }}</td>
                                             <td>{{ $p['product_name'] }}</td>
                                             <td>{{ $p['brand_name'] }}</td>
-                                            <td>{{ $p['product_price'] }}</td>
+                                            <td>{{ number_format($p['product_price']) }}</td>
                                             <td>
                                                 @foreach($quan as $q)
                                                 @if($q['product_id'] == $p['product_id'])

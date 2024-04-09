@@ -35,11 +35,6 @@
     </form>
         <button id="btn_login" class="btn btn-dark btn_disabled" style="padding: 10px 20px;" disabled>Đăng nhập</button>
     </form>
-    <div style="border-top: 1px solid rgb(222, 219, 219); margin-top: 20px">
-        <button class="btn" style="padding: 10px 20px; background: #4CAF50; margin-top: 20px">
-            <a href="/register" style="color: white">Tạo tài khoản mới</a>
-        </button>
-    </div>
   </main>
   {{-- @include('module.footer') --}}
   

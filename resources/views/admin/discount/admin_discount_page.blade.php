@@ -110,12 +110,12 @@
   <table class="table table-bordered table-hover">
     <thead>
       <tr>
-        <th>Mã khuyến mại</th>
-        <th>Tên khuyến mại</th>
+        <th>Mã khuyến mãi</th>
+        <th>Tên khuyến mãi</th>
         <th>Ngày bắt đầu</th>
         <th>Ngày kết thúc</th>
-        <th>Giá trị khuyến mại</th>
-        <th>Trạng thái khuyến mại</th>
+        <th>Giá trị khuyến mãi</th>
+        <th>Trạng thái khuyến mãi</th>
     </tr>
     </thead>
     <tbody>
@@ -227,7 +227,7 @@
     }
 });
 function activate(button) {
-    if(confirm('Bạn có muốn active khuyến mại này không ?')){
+    if(confirm('Bạn có muốn active khuyến mãi này không ?')){
         var did = button.getAttribute("data-did");
         var formData = new FormData();
         formData.append('did', did);
@@ -253,7 +253,7 @@ function activate(button) {
 }
 
 function deactivate(button) {
-    if(confirm('Bạn có muốn deactive khuyến mại này không ?')){
+    if(confirm('Bạn có muốn deactive khuyến mãi này không ?')){
         var did = button.getAttribute("data-did");
         var formData = new FormData();
         formData.append('did', did);

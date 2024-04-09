@@ -286,6 +286,7 @@ class MemberController extends Controller
 
 
     //  API
+    //  API
 
     public function adminshow_api()
     {
@@ -306,9 +307,10 @@ class MemberController extends Controller
                 'username' => 'required|string',
                 'password' => 'required|string',
             ]);
-            member::where('mem_id', request('aId'))->update([
-                'username' => request('aName'),
-                'password' => request('aPass')
+            $id = $request->input('mem_id');
+            member::where('mem_id', $id)->update([
+                'username' => $request->input('username'),
+                'password' => $request->input('password')
             ]);
             return response()->json(['status' => 'success', 'message' => 'Cập nhật admin thành công'], 201);
         } catch (\Exception $e) {
@@ -340,21 +342,32 @@ class MemberController extends Controller
     public function update_staff_api(Request $request)
     {
         try {
-            $get = $request->all();
-            $request->validate([
-                'username' => 'required|string',
-                'password' => 'required|string',
-                'name' => 'required|string',
-                'phone' => 'required|numeric',
-            ]);
+            // $get = $request->all();
+            // $request->validate([
+            //     'username' => 'required|string',
+            //     'password' => 'required|string',
+            //     'name' => 'required|string',
+            //     'phone' => 'required|numeric',
+            // ]);
 
-            member::where('mem_id', $get['sId'])->update([
-                'username' => $get['sUser'],
-                'password' => $get['sPass'],
-                'name' => $get['sName'],
-                'phone' => $get['sPhone'],
-                'mem_active' => $get['sStas']
+            // $get = $request->all();
+            $id = $request->input('mem_id');
+            member::where('mem_id', $id)->update([
+                'username' => $request->input('username'),
+                'password' => $request->input('password'),
+                'name' => $request->input('name'),
+                'address' => $request->input('address'),
+                'phone' => $request->input('phone'),
+                'mem_active' => $request->input('mem_active'),
             ]);
+            // member::where('mem_id',3)->update([
+            //     'username' => 'Sap1@gmail.com',
+            //     'password' => $get['password'],
+            //     'name' => $get['name'],
+            //     'address' => $get['address'],
+            //     'phone' => $get['phone'],
+            //     'mem_active' => $get['mem_active']
+            // ]);
             return response()->json(['status' => 'success', 'message' => 'Cập nhật nhân viên thành công'], 201);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Cập nhật nhân viên thất bại', 'error' => $e->getMessage()], 500);
@@ -402,11 +415,11 @@ class MemberController extends Controller
             ]);
 
             $staff = new member();
-            $staff->username = request('nsUser');
-            $staff->password = request('nsPass');
-            $staff->name = request('nsName');
-            $staff->phone = request('nsPhone');
-            $staff->address = '0';
+            $staff->username = $request->input('username');
+            $staff->password = $request->input('password');
+            $staff->name = $request->input('name');
+            $staff->phone = $request->input('phone');
+            $staff->address = $request->input('address');
             $staff->role = 'staff';
             $staff->save();
 

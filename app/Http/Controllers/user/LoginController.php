@@ -46,7 +46,7 @@ class LoginController extends Controller
             'username' => $request->email,
             'password' => $request->pswd
         ];
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/login',$postData);
+        $response = Http::get('https://s25sneaker.000webhostapp.com/api/login', $postData);
 
         if ($response->successful()) {
             $responseData = $response->json();
@@ -134,13 +134,17 @@ class LoginController extends Controller
 
 
     // API
+    // API
     public function login_api(Request $request)
     {
         try {
-            $user = DB::select('select * from member where username = :uname and password= :pswd', [
-                'uname' => $request->email,
-                'pswd' => $request->pswd
-            ]);
+            $user = DB::select(
+                'select * from member where username = :uname and password= :pswd',
+                [
+                    'uname' => $request->input('username'),
+                    'pswd' => $request->input('password')
+                ]
+            );
             return response()->json(['status' => 'success', 'user' => $user]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
@@ -149,38 +153,53 @@ class LoginController extends Controller
     public function register_api(Request $request)
     {
         try {
-            $request->validate([
-                'name' => 'required',
-                'email' => 'required|email:filter',
-                'pswd' => 'required'
-            ]);
             $user = DB::select('select * from member where username= :uname', [
-                'uname' => $request->email
+                'uname' => $request->input('username')
             ]);
             if ($user) {
                 return response()->json(['error' => 'Email đã tồn tại']);
-            } else {
-                session(['login' => 'true']);
+            }
+            DB::table("member")->insert([
+                'username' => $request->input('username'),
+                'password' => $request->input('password'),
+                'name' => $request->input('name'),
+                'address' => 0,
+                'phone' => 0
+            ]);
 
-                DB::table("member")->insert([
-                    'username' => $request->email,
-                    'password' => $request->pswd,
-                    'name' => $request->name,
-                    'address' => 0,
-                    'phone' => 0
-                ]);
+            $user = DB::select('select * from member where username = :uname', [
+                'uname' => $request->input('username')
+            ]);
+            return response()->json(['status' => 'success', 'user' => $user]);
+            // }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
+        }
+    }
+
+    public function forget_api(Request $request)
+    {
+        try {
+            $user = DB::select('select * from member where username= :uname and phone= :phone', [
+                'uname' => $request->input('username'),
+                'phone' => $request->input('phone'),
+            ]);
+            if ($user) {
+                DB::table("member")->where('username', $request->input('username'))
+                    ->where('phone', $request->input('phone'))
+                    ->update([
+                        'password' => $request->input('password')
+                    ]);
 
                 $user = DB::select('select * from member where username = :uname', [
-                    'uname' => $request->email
+                    'uname' => $request->input('username')
                 ]);
-                session(['user' => $user[0]->mem_id]);
-
-                $dir = session('prePage');
-                return response()->json([
-                    'status' => 'success',
-                    'dir' => $dir
-                ]);
+                return response()->json(['status' => 'success', 'user' => $user]);
+            } else {
+                return response()->json(['status' => 'error', 'error' => 'Email và số điện thoại không trùng khớp']);
             }
+
+            // }
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
         }

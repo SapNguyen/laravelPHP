@@ -98,7 +98,7 @@
                       <td>
                         <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
                         {{ $year[$y]['year'] }}
-						<span class="ytotal">Number of receipts: {{ $year[$y]['nor'] }}</span>
+						<span class="ytotal">Number of orders: {{ $year[$y]['nor'] }}</span>
 						<span class="ytotal">Total sale of year: {{ $year[$y]['value'] }} (VND)</span>
 						
                       </td>
@@ -141,7 +141,7 @@
 									@elseif($m['month'] == 12)
 									December
 									@endif
-									<span class="mtotal">Number of receipts: <i>{{ $m['nor'] }}<i></span>
+									<span class="mtotal">Number of orders: <i>{{ $m['nor'] }}<i></span>
 									<span class="mtotal">Total sale of month: <i>{{ $m['value'] }}</i> (VND)</span>
 									</td>
 								</tr>
@@ -155,7 +155,7 @@
 											<tr>
 											<td style="background-color: #ffffcc;">
 												<b>{{ $d['day'].' / '.$m['month'].' / '.$year[$y]['year'] }}</b>
-												<span class="dtotal">Number of receipts: <b>{{ $d['nor'] }}</b></span>
+												<span class="dtotal">Number of orders: <b>{{ $d['nor'] }}</b></span>
 												<span class="dtotal">Sum up of day: <b>{{ $d['value'] }}</b> (VND)</span>
 											</td>
 											</tr>
@@ -199,7 +199,7 @@
 										@elseif($i == 12)
 										December
 										@endif
-										<span class="mtotal">Number of receipts: 0</span>
+										<span class="mtotal">Number of orders: 0</span>
 										<span class="mtotal">Total sale of month: 0 (VND)</span>
 									</td>
 								</tr>

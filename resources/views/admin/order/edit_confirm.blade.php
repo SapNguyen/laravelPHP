@@ -226,7 +226,7 @@
                       <a href="#" class="nav-link">
                       <i class="fa-solid fa-file-invoice-dollar nav-icon" style="color: #ffffff;"></i>
                       <p>
-                          orders
+                          Orders
                           <i class="right fas fa-angle-left"></i>
                       </p>
                       </a>
@@ -323,7 +323,7 @@
       
     <main>
       <div class="order_detail">
-      <h1 align=center>Detail biên lai</h1>
+      <h1 align=center>Chi tiết đơn hàng</h1>
       @include('module.error')
       <table class="table table-striped">
         <thead>
@@ -365,15 +365,15 @@
             <form action="/admin/edit/{{$product_order['order_id']}}" method="post">             
               @csrf
               <div class="btn-confirm">
-                <button type="submit" class="btn btn-primary"  onclick="return confirm('Bạn có chắc đã xác nhận rồi không?');">Xác nhận biên lai</button>
+                <button type="submit" class="btn btn-primary"  onclick="return confirm('Bạn có chắc đã xác nhận rồi không?');">Duyệt đơn hàng</button>
               </div>
             </form>
-            <form action="/admin/cancel_edit/{{$product_order['order_id']}}" method="post">
+            {{-- <form action="/admin/cancel_edit/{{$product_order['order_id']}}" method="post">
               @csrf
               <div class="btn-cancel">
                 <button type="submit" class="btn btn-primary btn-cancel-primary"  onclick="return confirm('Bạn có chắc hủy biên lai này không?');">Hủy biên lai</button>
               </div>
-            </form>
+            </form> --}}
           </div>
           
         </div>

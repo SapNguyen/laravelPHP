@@ -226,7 +226,7 @@
                       <a href="#" class="nav-link">
                       <i class="fa-solid fa-file-invoice-dollar nav-icon" style="color: #ffffff;"></i>
                       <p>
-                          orders
+                          Orders
                           <i class="right fas fa-angle-left"></i>
                       </p>
                       </a>
@@ -308,11 +308,11 @@
             <div class="container-fluid">
               <div class="row mb-2">
                 <div class="col-sm-6">
-                  <h1>Detail order</h1>
+                  <h1>Detail Order</h1>
                 </div>
                 <div class="col-sm-6">
                   <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item">orders</li>
+                    <li class="breadcrumb-item">Orders</li>
                     <li class="breadcrumb-item"><a href="{{ route('a.r.list.0') }}">List</a></li>
                     <li class="breadcrumb-item">Detail</li>
                   </ol>
@@ -323,7 +323,7 @@
       
     <main>
       <div class="order_detail">
-      <h1 align=center>Detail biên lai</h1>
+      <h1 align=center>Chi tiết Đơn hàng</h1>
       @include('module.error')
       <table class="table table-striped">
         <thead>

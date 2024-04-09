@@ -225,7 +225,7 @@ class HomeController extends Controller
             //$products = product::where('product_active','=','1')->with('discounts')->get();
             $products = product::where('product_active', '=', '1')->with(['details', 'discounts' => function ($query) {
                 $query->where('discount_active', 1);
-            }])->get();
+            }])->take(10)->get();
             return response()->json([
                 'status' => 'success',
                 'products' => $products,
@@ -295,11 +295,11 @@ class HomeController extends Controller
 
             if ($star == 0) {
                 $products = Product::with(['feedbacks' => function ($query) use ($star) {
-                    $query->with('member');
+                    $query->with('member')->paginate(10);
                 }])->find($product_id);
             } else {
                 $products = Product::with(['feedbacks' => function ($query) use ($star) {
-                    $query->where('star', $star)->with('member');
+                    $query->where('star', $star)->with('member')->paginate(10);
                 }])->find($product_id);
             }
 
@@ -368,28 +368,849 @@ class HomeController extends Controller
             $order->save();
 
             // // // Lấy id của đơn hàng vừa tạo
-            $orderId = $order->order_id;
+            //$orderId = $order->order_id;
 
             $products = $request->input('products');
             $array = json_decode($products, true);
             if (is_array($array) || is_object($array)) {
                 foreach ($array as $product) {
                     $orderProduct = new product_order();
-                    $orderProduct->order_id = $orderId;
+                    $orderProduct->order_id = order::max('order_id');
                     $orderProduct->product_id = $product['product_id'];
                     $orderProduct->size = $product['size'];
                     $orderProduct->color = $product['color'];
                     $orderProduct->quantity = $product['quantity'];
                     $orderProduct->sell_price = $product['price'];
+                    $orderProduct->img = $product['image'];
                     $orderProduct->save();
+
+                    DB::table('product_size_color')
+                        ->where('product_id', $product['product_id'])
+                        ->where('size', $product['size'])
+                        ->where('color', $product['color'])
+                        ->update(['quantity' => DB::raw('quantity - ' . $product['quantity'])]);
+
+                    DB::table('cart')
+                        ->where('cart_id', $product['cart_id'])
+                        ->update([
+                            'cart_active' => 0
+                        ]);
                 }
                 return response()->json(['message' => 'Đã thêm đơn hàng thành công'], 201);
             } else {
 
                 return response()->json(['status' => 'error', 'error' => 'Không phải mảng']);
             }
+
+            // Lưu thông tin chi tiết đơn hàng cho từng sản phẩm
+            // foreach ($array as $product) {
+            //     $orderProduct = new product_order();
+            //     $orderProduct->order_id = $orderId;
+            //     $orderProduct->product_id = $product['product_id'];
+            //     $orderProduct->size = $product['size'];
+            //     $orderProduct->color = $product['color'];
+            //     $orderProduct->quantity = $product['quantity'];
+            //     $orderProduct->sell_price = $product['price'];
+            //     $orderProduct->save();
+            // }
+            //$order = $request->input('products');
+            // $array = json_decode($order, true);
+
+
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
+        }
+    }
+
+    public function update_info_user_api(Request $request)
+    {
+        try {
+            $mem_id = $request->query('id');
+
+            $name = $request->query('name');
+            $address = $request->query('address');
+            $phone = intval($request->query('phone'));
+
+            member::where('mem_id', $mem_id)->update([
+                'name' => $name,
+                'address' => $address,
+                'phone' => $phone,
+            ]);
+            return response()->json(['message' => 'Sửa thông tin thành công'], 201);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
+        }
+    }
+
+    public function update_password_api(Request $request)
+    {
+        try {
+            $mem_id = $request->query('id');
+
+            $password = $request->query('password');
+
+            //$member = member::where('password' ,'=', $password);
+
+            $member = DB::select('select * from member where mem_id = :mem_id and password = :password', [
+                'mem_id' => $mem_id,
+                'password' => $password
+            ]);
+
+            if ($member) {
+
+                $passwordnew = $request->query('passwordnew');
+
+                member::where('mem_id', $mem_id)->update([
+                    'password' => $passwordnew
+                ]);
+                return response()->json(['message' => 'Sửa mật khẩu thành công'], 201);
+            } else {
+                return response()->json(['message' => 'Mật khẩu không chính xác'], 201);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
+        }
+    }
+
+    // public function product_brand_api(Request $request)
+    // {
+    //     try {
+    //         $brand_name = $request->input('brand_name');
+
+    //         //$data = DB::select("select * from brand where brand_active = 1 ");
+
+    //         // $data = Product::where('product_active', '!=', 1)
+    //         //   ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
+    //         //   ->where('brand.brand_name', '=', $brand_name)
+    //         //   ->paginate(7);
+    //         $products = Product::where('product_active', '=', '1')->join('brand', 'product.brand_id', '=', 'brand.brand_id')
+    //             ->where('brand.brand_name', '=', $brand_name)->with(['details', 'discounts' => function ($query) {
+    //                 $query->where('discount_active', 1);
+    //             }])->paginate(7);
+
+    //         // return response()->json($data);
+    //         return response()->json(['status' => 'success', 'products' => $products], 201);
+    //     } catch (\Exception $e) {
+    //         return response()->json(['status' => 'error', 'error' => $e->getMessage()], 500);
+    //     }
+    // }
+
+    public function product_brand_api(Request $request)
+    {
+        try {
+            $brand_name = $request->input('brand_name');
+            $sx = $request->input('sx');
+            $price = $request->input('price');
+            $array = json_decode($price, true);
+
+            if ($brand_name != "All") {
+                $sx = $request->input('sx');
+                if ($sx == "A-Z") {
+                    $products = Product::where('product_active', '=', '1')
+                        ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
+                        ->where('brand.brand_name', '=', $brand_name)
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])
+                        ->orderBy('product_name');
+
+                    $paginatedProducts = $products->paginate(7);
+                    return response()->json(['status' => 'success', 'products' => $paginatedProducts, 'sx' => $sx], 201);
+                } else if ($sx == "Z-A") {
+                    $products = Product::where('product_active', '=', '1')
+                        ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
+                        ->where('brand.brand_name', '=', $brand_name)
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])
+                        ->orderBy('product_name', 'desc');
+
+                    $paginatedProducts = $products->paginate(7);
+                    return response()->json(['status' => 'success', 'products' => $paginatedProducts, 'sx' => $sx], 201);
+                } else if ($sx == "Up") {
+                    $products = Product::where('product_active', '=', '1')
+                        ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
+                        ->where('brand.brand_name', '=', $brand_name)
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])
+                        ->orderBy('product_price', 'asc');
+
+                    $paginatedProducts = $products->paginate(7);
+                    return response()->json(['status' => 'success', 'products' => $paginatedProducts, 'sx' => $sx], 201);
+                } else if ($sx == "Down") {
+                    $products = Product::where('product_active', '=', '1')
+                        ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
+                        ->where('brand.brand_name', '=', $brand_name)
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])
+                        ->orderBy('product_price', 'desc');
+
+                    $paginatedProducts = $products->paginate(7);
+
+                    return response()->json(['status' => 'success', 'products' => $paginatedProducts, 'sx' => $sx], 201);
+                }
+                $products = Product::where('product_active', '=', '1')
+                    ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
+                    ->where('brand.brand_name', '=', $brand_name)
+                    ->where(function ($query) use ($array) {
+                        foreach ($array as $range) {
+                            [$minPrice, $maxPrice] = explode('-', $range);
+                            $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                        }
+                    })
+                    ->with(['details', 'discounts' => function ($query) {
+                        $query->where('discount_active', 1);
+                    }]);
+
+                $paginatedProducts = $products->paginate(7);
+
+                return response()->json(['status' => 'success', 'products' => $paginatedProducts, 'sx' => $sx], 201);
+            } else if ($brand_name == "All") {
+                $sx = $request->input('sx');
+                if ($sx == "A-Z") {
+                    $products = Product::where('product_active', '=', '1')
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_name');
+
+                    $paginatedProducts = $products->paginate(7);
+
+                    return response()->json(['status' => 'success', 'products' => $paginatedProducts, 'sx' => $sx], 201);
+                } else if ($sx == "Z-A") {
+                    $products = Product::where('product_active', '=', '1')
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_name', 'desc');
+
+                    $paginatedProducts = $products->paginate(7);
+
+                    return response()->json(['status' => 'success', 'products' => $paginatedProducts, 'sx' => $sx], 201);
+                } else if ($sx == "Up") {
+
+                    $products = Product::where('product_active', '=', '1')
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_price', 'asc');
+
+                    $paginatedProducts = $products->paginate(7);
+
+                    return response()->json(['status' => 'success', 'products' => $paginatedProducts, 'sx' => $sx], 201);
+                } else if ($sx == "Down") {
+
+                    $products = Product::where('product_active', '=', '1')
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_price', 'desc');
+
+                    $paginatedProducts = $products->paginate(7);
+
+                    return response()->json(['status' => 'success', 'products' => $paginatedProducts, 'sx' => $sx], 201);
+                }
+
+                $products = Product::where('product_active', '=', '1')
+                    ->where(function ($query) use ($array) {
+                        foreach ($array as $range) {
+                            [$minPrice, $maxPrice] = explode('-', $range);
+                            $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                        }
+                    })
+                    ->with(['details', 'discounts' => function ($query) {
+                        $query->where('discount_active', 1);
+                    }]);
+
+                $paginatedProducts = $products->paginate(7);
+
+                return response()->json(['status' => 'success', 'products' => $paginatedProducts, 'sx' => $sx], 201);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function product_genre_api(Request $request)
+    {
+        try {
+            $brand_name = $request->input('brand_name');
+            $sx = $request->input('sx');
+            $price = $request->input('price');
+            $array = json_decode($price, true);
+            $genre = $request->input('genre');
+
+            if ($brand_name != "All") {
+                if ($sx == "A-Z") {
+                    $products = Product::where('product_active', '=', '1')
+                        ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
+                        ->where('brand.brand_name', '=', $brand_name)
+                        ->where('product_genre', '=', $genre)
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_name')
+                        ->paginate(8);
+
+                    return response()->json(['status' => 'success', 'products' => $products], 201);
+                } else if ($sx == "Z-A") {
+
+                    $products = Product::where('product_active', '=', '1')
+                        ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
+                        ->where('brand.brand_name', '=', $brand_name)
+                        ->where('product_genre', '=', $genre)
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_name', 'desc')
+                        ->paginate(8);
+
+                    return response()->json(['status' => 'success', 'products' => $products], 201);
+                } else if ($sx == "Up") {
+
+                    $products = Product::where('product_active', '=', '1')
+                        ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
+                        ->where('brand.brand_name', '=', $brand_name)
+                        ->where('product_genre', '=', $genre)
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_price', 'asc')
+                        ->paginate(8);
+
+                    return response()->json(['status' => 'success', 'products' => $products], 201);
+                } else if ($sx == "Down") {
+                    $products = Product::where('product_active', '=', '1')
+                        ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
+                        ->where('brand.brand_name', '=', $brand_name)
+                        ->where('product_genre', '=', $genre)
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_price', 'desc')
+                        ->paginate(8);
+
+                    return response()->json(['status' => 'success', 'products' => $products], 201);
+                }
+                $products = Product::where('product_active', '=', '1')
+                    ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
+                    ->where('brand.brand_name', '=', $brand_name)
+                    ->where('product_genre', '=', $genre)
+                    ->where(function ($query) use ($array) {
+                        foreach ($array as $range) {
+                            [$minPrice, $maxPrice] = explode('-', $range);
+                            $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                        }
+                    })
+                    ->with(['details', 'discounts' => function ($query) {
+                        $query->where('discount_active', 1);
+                    }])
+                    ->paginate(8);
+
+                return response()->json(['status' => 'success', 'products' => $products], 201);
+            } else if ($brand_name == "All") {
+                if ($sx == "A-Z") {
+                    $products = Product::where('product_active', '=', '1')
+                        ->where('product_genre', '=', $genre)
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_name')
+                        ->paginate(8);
+
+                    return response()->json(['status' => 'success', 'products' => $products], 201);
+                } else if ($sx == "Z-A") {
+
+                    $products = Product::where('product_active', '=', '1')
+                        ->where('product_genre', '=', $genre)
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_name', 'desc')
+                        ->paginate(8);
+
+                    return response()->json(['status' => 'success', 'products' => $products], 201);
+                } else if ($sx == "Up") {
+
+                    $products = Product::where('product_active', '=', '1')
+                        ->where('product_genre', '=', $genre)
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_price', 'asc')
+                        ->paginate(8);
+
+                    return response()->json(['status' => 'success', 'products' => $products], 201);
+                } else if ($sx == "Down") {
+                    $products = Product::where('product_active', '=', '1')
+                        ->where('product_genre', '=', $genre)
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_price', 'desc')
+                        ->paginate(8);
+
+                    return response()->json(['status' => 'success', 'products' => $products], 201);
+                }
+                $products = Product::where('product_active', '=', '1')
+                    ->where('product_genre', '=', $genre)
+                    ->where(function ($query) use ($array) {
+                        foreach ($array as $range) {
+                            [$minPrice, $maxPrice] = explode('-', $range);
+                            $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                        }
+                    })
+                    ->with(['details', 'discounts' => function ($query) {
+                        $query->where('discount_active', 1);
+                    }])
+                    ->paginate(8);
+
+                return response()->json(['status' => 'success', 'products' => $products], 201);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function product_new_api(Request $request)
+    {
+        try {
+            $brand_name = $request->input('brand_name');
+            $sx = $request->input('sx');
+            $price = $request->input('price');
+            $array = json_decode($price, true);
+
+            if ($brand_name != "All") {
+                if ($sx == "A-Z") {
+                    $oneMonthAgo = Carbon::now()->subMonth();
+                    $products = Product::where('product_active', '=', '1')
+                        ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
+                        ->where('brand.brand_name', '=', $brand_name)
+                        ->where('product_updated_date', '>=', $oneMonthAgo)
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_name')
+                        ->paginate(8);
+                    return response()->json(['status' => 'success', 'products' => $products], 201);
+                } else if ($sx == "Z-A") {
+                    $oneMonthAgo = Carbon::now()->subMonth();
+                    $products = Product::where('product_active', '=', '1')
+                        ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
+                        ->where('brand.brand_name', '=', $brand_name)
+                        ->where('product_updated_date', '>=', $oneMonthAgo)
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_name', 'desc')
+                        ->paginate(8);
+                    return response()->json(['status' => 'success', 'products' => $products], 201);
+                } else if ($sx == "Up") {
+                    $oneMonthAgo = Carbon::now()->subMonth();
+                    $products = Product::where('product_active', '=', '1')
+                        ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
+                        ->where('brand.brand_name', '=', $brand_name)
+                        ->where('product_updated_date', '>=', $oneMonthAgo)
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_price', 'asc')
+                        ->paginate(8);
+                    return response()->json(['status' => 'success', 'products' => $products], 201);
+                } else if ($sx == "Down") {
+                    $oneMonthAgo = Carbon::now()->subMonth();
+                    $products = Product::where('product_active', '=', '1')
+                        ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
+                        ->where('brand.brand_name', '=', $brand_name)
+                        ->where('product_updated_date', '>=', $oneMonthAgo)
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_price', 'desc')
+                        ->paginate(8);
+                    return response()->json(['status' => 'success', 'products' => $products], 201);
+                }
+                $oneMonthAgo = Carbon::now()->subMonth();
+                $products = Product::where('product_active', '=', '1')
+                    ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
+                    ->where('brand.brand_name', '=', $brand_name)
+                    ->where('product_updated_date', '>=', $oneMonthAgo)
+                    ->where(function ($query) use ($array) {
+                        foreach ($array as $range) {
+                            [$minPrice, $maxPrice] = explode('-', $range);
+                            $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                        }
+                    })
+                    ->with(['details', 'discounts' => function ($query) {
+                        $query->where('discount_active', 1);
+                    }])
+                    ->paginate(8);
+                return response()->json(['status' => 'success', 'products' => $products], 201);
+            } else if ($brand_name == "All") {
+                if ($sx == "A-Z") {
+                    $oneMonthAgo = Carbon::now()->subMonth();
+                    $products = Product::where('product_active', '=', '1')
+                        ->where('product_updated_date', '>=', $oneMonthAgo)
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_name')
+                        ->paginate(8);
+                    return response()->json(['status' => 'success', 'products' => $products], 201);
+                } else if ($sx == "Z-A") {
+                    $oneMonthAgo = Carbon::now()->subMonth();
+                    $products = Product::where('product_active', '=', '1')
+                        ->where('product_updated_date', '>=', $oneMonthAgo)
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_name', 'desc')
+                        ->paginate(8);
+                    return response()->json(['status' => 'success', 'products' => $products], 201);
+                } else if ($sx == "Up") {
+                    $oneMonthAgo = Carbon::now()->subMonth();
+                    $products = Product::where('product_active', '=', '1')
+                        ->where('product_updated_date', '>=', $oneMonthAgo)
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_price', 'asc')
+                        ->paginate(8);
+                    return response()->json(['status' => 'success', 'products' => $products], 201);
+                } else if ($sx == "Down") {
+                    $oneMonthAgo = Carbon::now()->subMonth();
+                    $products = Product::where('product_active', '=', '1')
+                        ->where('product_updated_date', '>=', $oneMonthAgo)
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_price', 'desc')
+                        ->paginate(8);
+                    return response()->json(['status' => 'success', 'products' => $products], 201);
+                }
+                $oneMonthAgo = Carbon::now()->subMonth();
+                $products = Product::where('product_active', '=', '1')
+                    ->where('product_update_date', '>=', $oneMonthAgo)
+                    ->where(function ($query) use ($array) {
+                        foreach ($array as $range) {
+                            [$minPrice, $maxPrice] = explode('-', $range);
+                            $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                        }
+                    })
+                    ->with(['details', 'discounts' => function ($query) {
+                        $query->where('discount_active', 1);
+                    }])
+                    ->paginate(8);
+                return response()->json(['status' => 'success', 'products' => $products], 201);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function product_discount_api(Request $request)
+    {
+        try {
+            $brand_name = $request->input('brand_name');
+            $sx = $request->input('sx');
+            $price = $request->input('price');
+            $array = json_decode($price, true);
+
+            if ($brand_name != "All") {
+                if ($sx == "A-Z") {
+                    $products = Product::where('product_active', '=', '1')
+                        ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
+                        ->where('brand.brand_name', '=', $brand_name)
+                        ->whereNotNull('discount_id')
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_name')
+                        ->paginate(8);
+
+                    return response()->json(['status' => 'success', 'products' => $products], 201);
+                } else if ($sx == "Z-A") {
+
+                    $products = Product::where('product_active', '=', '1')
+                        ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
+                        ->where('brand.brand_name', '=', $brand_name)
+                        ->whereNotNull('discount_id')
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_name', 'desc')
+                        ->paginate(8);
+
+                    return response()->json(['status' => 'success', 'products' => $products], 201);
+                } else if ($sx == "Up") {
+
+                    $products = Product::where('product_active', '=', '1')
+                        ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
+                        ->where('brand.brand_name', '=', $brand_name)
+                        ->whereNotNull('discount_id')
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_price', 'asc')
+                        ->paginate(8);
+
+                    return response()->json(['status' => 'success', 'products' => $products], 201);
+                } else if ($sx == "Down") {
+                    $products = Product::where('product_active', '=', '1')
+                        ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
+                        ->where('brand.brand_name', '=', $brand_name)
+                        ->whereNotNull('discount_id')
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_price', 'desc')
+                        ->paginate(8);
+
+                    return response()->json(['status' => 'success', 'products' => $products], 201);
+                }
+                $products = Product::where('product_active', '=', '1')
+                    ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
+                    ->where('brand.brand_name', '=', $brand_name)
+                    ->whereNotNull('discount_id')
+                    ->where(function ($query) use ($array) {
+                        foreach ($array as $range) {
+                            [$minPrice, $maxPrice] = explode('-', $range);
+                            $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                        }
+                    })
+                    ->with(['details', 'discounts' => function ($query) {
+                        $query->where('discount_active', 1);
+                    }])
+                    ->paginate(8);
+
+                return response()->json(['status' => 'success', 'products' => $products], 201);
+            } else if ($brand_name == "All") {
+                if ($sx == "A-Z") {
+                    $products = Product::where('product_active', '=', '1')
+                        ->whereNotNull('discount_id')
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_name')
+                        ->paginate(8);
+
+                    return response()->json(['status' => 'success', 'products' => $products], 201);
+                } else if ($sx == "Z-A") {
+
+                    $products = Product::where('product_active', '=', '1')
+                        ->whereNotNull('discount_id')
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_name', 'desc')
+                        ->paginate(8);
+
+                    return response()->json(['status' => 'success', 'products' => $products], 201);
+                } else if ($sx == "Up") {
+
+                    $products = Product::where('product_active', '=', '1')
+                        ->whereNotNull('discount_id')
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_price', 'asc')
+                        ->paginate(8);
+
+                    return response()->json(['status' => 'success', 'products' => $products], 201);
+                } else if ($sx == "Down") {
+                    $products = Product::where('product_active', '=', '1')
+                        ->whereNotNull('discount_id')
+                        ->where(function ($query) use ($array) {
+                            foreach ($array as $range) {
+                                [$minPrice, $maxPrice] = explode('-', $range);
+                                $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                            }
+                        })
+                        ->with(['details', 'discounts' => function ($query) {
+                            $query->where('discount_active', 1);
+                        }])->orderBy('product_price', 'desc')
+                        ->paginate(8);
+
+                    return response()->json(['status' => 'success', 'products' => $products], 201);
+                }
+                $products = Product::where('product_active', '=', '1')
+                    ->whereNotNull('discount_id')
+                    ->where(function ($query) use ($array) {
+                        foreach ($array as $range) {
+                            [$minPrice, $maxPrice] = explode('-', $range);
+                            $query->orWhereBetween('product_price', [$minPrice, $maxPrice]);
+                        }
+                    })
+                    ->with(['details', 'discounts' => function ($query) {
+                        $query->where('discount_active', 1);
+                    }])
+                    ->paginate(8);
+
+                return response()->json(['status' => 'success', 'products' => $products], 201);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'error' => $e->getMessage()], 500);
         }
     }
 }
