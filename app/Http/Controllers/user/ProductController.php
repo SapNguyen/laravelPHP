@@ -130,7 +130,7 @@ class ProductController extends Controller
 
 
 
-    //API
+    ///API
 
     public function detail_api($id)
     {
@@ -226,22 +226,7 @@ class ProductController extends Controller
                     ->get();
                 $products_similar[$i]->image = explode(',', $img[0]->product_image)[0];
             }
-            // return view('user/product', [
-            //     'quantitys' => $quantitys,
-            //     'product_imgs' => $product_imgs,
-            //     'product' => $product[0],
-            //     'sizes' => $sizes,
-            //     'colors' => $colors,
-            //     'brands' => $brands->load(),
-            //     'feedback' => $feedback,
-            //     'total_feedback' => $total_feedback[0]->total,
-            //     'average' => $average,
-            //     'star_full' => $star_full,
-            //     'star_empty' => $star_empty,
-            //     'star_fill' => $star_fill,
-            //     'count_star' => $count_star,
-            //     'products_similar' => $products_similar
-            // ]);
+            
             return response()->json([
                 'status' => 'success',
                 'quantitys' => $quantitys,

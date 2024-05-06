@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\admin;
 
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use App\Http\Controllers\Controller;
 
 use App\Models\admin\brand;
@@ -12,204 +11,103 @@ use App\Models\admin\product;
 use Illuminate\Support\Facades\File;
 
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
 
 class BrandController extends Controller
 {
+    // [GET] /admin/brands (use)
     public function list()
     {
-        // $searchName = request('searchName');
-        // $apiUrl = 'http://127.0.0.1:8000/api/admin/brands';
-        // // Thực hiện yêu cầu GET đến API
-        // $response = Http::get($apiUrl);
-
-        // // Kiểm tra xem yêu cầu có thành công hay không (status code 2xx)
-        // if ($response->successful()) {
-        //     // Lấy dữ liệu từ phản hồi
-        //     $get = $response->json();
-
-        //     $count = brand::where('brand_active', '!=', -1)
-        //         ->where('brand_name', 'like', '%' . $searchName . '%')->count('brand_id');
-
-        //     // Xử lý dữ liệu theo nhu cầu của bạn
-        //     return view('admin.brand.admin_brand_page', ['brand' => $get, 'count' => $count, 'title' => 'Brands List']);
-
-        // } else {
-        //     // Xử lý trường hợp yêu cầu không thành công
-        //     return view('error-view');
-        // }
-
         $searchName = request('searchName');
-        $page = request('page', 1);
-
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/brands', ['searchName' => $searchName, 'page' => $page]);
-
-        // Kiểm tra nếu yêu cầu thành công (status code 200)
-        if ($response->successful()) {
-            // Lấy dữ liệu JSON từ phản hồi
-            $responseData = $response->json();
-
-            // Truy cập dữ liệu từ 'data' trong 'data'
-            // $data = $responseData['data']['data'];
-
-            $count = $responseData['count'];
-
-            // Lấy dữ liệu thương hiệu từ $data['data']
-            $brands = collect($responseData['data']['data']);
-
-            // Số lượng mục trên mỗi trang
-            $perPage = 7; // Hoặc bất kỳ giá trị nào bạn muốn
-
-            // Trang hiện tại
-            // $currentPage = $responseData['data']['current_page'];
-
-            // Tạo LengthAwarePaginator
-            $paginator = new LengthAwarePaginator(
-                $brands,
-                $responseData['count'],
-                $perPage,
-                $page,
-                ['path' => url()->current(), 'query' => request()->query()]
-            );
-
-            // Trả về view và truyền dữ liệu vào view
-            // return view('admin.brand.admin_brand_page', compact('data'));
-            // dd($data, $count);
-            return view('admin.brand.admin_brand_page', ['brand' => $paginator, 'count' => $count, 'title' => 'Brands List']);
+        if (isset($searchName)) {
+            $count = brand::where('brand_active', '!=', -1)
+                ->where('brand_name', 'like', '%' . $searchName . '%')->count('brand_id');
+            $get = brand::where('brand_active', '!=', -1)
+                ->where('brand_name', 'like', '%' . $searchName . '%')->paginate(8);
         } else {
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
+            $count = brand::where('brand_active', '!=', -1)
+                ->where('brand_name', 'like', '%' . $searchName . '%')
+                ->count('brand_id');
+            $get = brand::where('brand_active', '!=', -1)->paginate(8);
         }
+        return view('admin.brand.admin_brand_page', ['brand' => $get, 'count' => $count, 'title' => 'Brands List']);
     }
 
-
+    // [GET] /admin/brand/add (use)
     public function addred()
     {
-
-        // $get = brand::where('brand_active', '!=', -1)->get();
-
-        // return view('admin.brand.admin_brand_add', ['brand' => $get, 'title' => 'Add New Brand']);
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/brand/add');
-
-        if ($response->successful()) {
-            $responseData = $response->json();
-
-            $get = $responseData['data'];
-
-            return view('admin.brand.admin_brand_add', ['brand' => $get, 'title' => 'Add New Brand']);
-        } else {
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-        }
+        $get = brand::where('brand_active', '!=', -1)->get();
+        return view('admin.brand.admin_brand_add', ['brand' => $get, 'title' => 'Add New Brand']);
     }
+
+    // [POST] /admin/brand/add (use)
     public function add(Request $request)
     {
-        // $id = brand::max('brand_id');
-        // if (isset($id)) {
-        //     $id += 1;
-        // } else {
-        //     $id = 1;
-        // }
-        $totalPages = 1;
-        $currentPage = 1;
-        $maxBrandId = 0;
-        do {
-            $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/brands?page=' . $currentPage);
-
-            if ($response->successful()) {
-                $responseData = $response->json();
-
-
-                $id = collect($responseData['data']['data'])->max('brand_id') + 1;
-                if ($id > $maxBrandId) {
-                    $maxBrandId = $id;
-                }
-
-                $currentPage++;
-
-                $totalPages = $responseData['data']['last_page'];
-            } else {
-                $statusCode = $response->status();
-                $errorMessage = $response->body();
-                break;
-            }
-        } while ($currentPage <= $totalPages);
-        
-        $brandImagePath = "img/brand/{$id}";
-        if (!File::exists($brandImagePath)) {
-            File::makeDirectory($brandImagePath, 0755, true, true);
+        $id = brand::max('brand_id');
+        if (isset($id)) {
+            $id = $id + 1;
+        } else {
+            $id = 1;
         }
+        $temp1 = public_path('img/brand/temp1');
+        $temp2 = public_path('img/brand/temp2');
+        $temp3 = public_path('img/brand/temp3');
+        $path = "img/brand/{$id}";
+        if (!File::exists($path)) {
+            File::makeDirectory($path, 0755, true, true);
+        }
+        $files1 = File::allFiles($temp1);
+        $files2 = File::allFiles($temp2);
+        $files3 = File::allFiles($temp3);
+        foreach ($files1 as $f1) {
+            File::move($temp1 . '/' . $f1->getFilename(), $path . '/' . $f1->getFilename());
+        }
+        foreach ($files2 as $f2) {
+            File::move($temp2 . '/' . $f2->getFilename(), $path . '/' . $f2->getFilename());
+        }
+        foreach ($files3 as $f3) {
+            File::move($temp3 . '/' . $f3->getFilename(), $path . '/' . $f3->getFilename());
+        }
+
+        $b = new brand();
+        $b->brand_name = request('bName');
         if ($request->hasFile('bLogo')) {
-            // $logoImg = $request->file('bLogo')->storeAs("img/brand/{$id}", "{$id}logo.jpg", 'public');
-            $request->file('bLogo')->move($brandImagePath, 'logo.jpg');
+            $request->file('bLogo')->move($path, 'logo.jpg');
             $logoImg = 'logo.jpg';
-            // $imageUrl = Storage::url($request->file('bLogo')->move($brandImagePath, 'logo.jpg'));
         } else {
             $logoImg = NULL;
         }
-
-
+        $b->brand_logo = $logoImg;
         if ($request->hasFile('bHPimg')) {
-            $request->file('bHPimg')->move($brandImagePath, 'img.jpg');
+            $request->file('bHPimg')->move($path, 'img.jpg');
             $homeImg = 'img.jpg';
         } else {
             $homeImg = NULL;
         }
-
+        $b->brand_img = $homeImg;
         if ($request->hasFile('bBPimg')) {
-            $request->file('bBPimg')->move($brandImagePath, 'des.jpg');
+            $request->file('bBPimg')->move($path, 'des.jpg');
             $brandImg = 'des.jpg';
         } else {
             $brandImg = NULL;
         }
-
+        $b->brand_des_img = $brandImg;
         if ($request->hasFile('bBannerimg')) {
-            $request->file('bBannerimg')->move($brandImagePath, 'banner.jpg');
+            $request->file('bBannerimg')->move($path, 'banner.jpg');
             $bannerImg = 'banner.jpg';
         } else {
             $bannerImg = NULL;
         }
-
-        // $b = new brand();
-        // $b->brand_id = $id;
-        // $b->brand_name = request('bName');
-        // $b->brand_logo = $logoImg;
-        // $b->brand_img = $homeImg;
-        // $b->brand_des_img = $brandImg;
-        // $b->brand_banner = $bannerImg;
-        // $b->brand_des = request('bDes');
-        // if (!isset($b->brand_des)) {
-        //     $b->brand_des = "No data";
-        // }
-        // $b->save();
-
-        $postData = [
-            'brand_id' => $id,
-            'brand_name' => request('bName'),
-            'brand_logo' => $logoImg,
-            'brand_img' => $homeImg,
-            'brand_des_img' => $brandImg,
-            'brand_banner' => $bannerImg,
-            'brand_des' => request('bDes'),
-        ];
-
-        $response = Http::post('https://s25sneaker.000webhostapp.com/api/admin/brand/add', $postData);
-
-        // Kiểm tra nếu yêu cầu thành công (status code 2xx)
-        if ($response->successful()) {
-            // $responseData = $response->json();
-            // Xử lý dữ liệu phản hồi nếu cần
-            // return response()->json(['message' => 'Data posted successfully']);
-            return to_route('a.b.list');
-        } else {
-            // Xử lý lỗi nếu có
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-            return response()->json(['error' => 'Failed to post data'], $statusCode);
+        $b->brand_banner = $bannerImg;
+        $b->brand_des = request('bDes');
+        if (!isset($b->brand_des)) {
+            $b->brand_des = "No data";
         }
+
+        $b->save();
+        return to_route('a.b.list');
     }
 
+    // [POST] /upload1 (use)
     public function upload1(Request $request)
     {
         $data = $request->All();
@@ -219,6 +117,8 @@ class BrandController extends Controller
         $img_name = $data['img1']->getClientOriginalName();
         $data['img1']->move($path . '/', $img_name);
     }
+
+    // [POST] /upload2 (use)
     public function upload2(Request $request)
     {
         $data = $request->All();
@@ -228,6 +128,8 @@ class BrandController extends Controller
         $img_name = $data['img2']->getClientOriginalName();
         $data['img2']->move($path . '/', $img_name);
     }
+
+    // [POST] /upload3 (use)
     public function upload3(Request $request)
     {
         $data = $request->All();
@@ -237,24 +139,15 @@ class BrandController extends Controller
         $img_name = $data['img3']->getClientOriginalName();
         $data['img3']->move($path . '/', $img_name);
     }
+
+    //[GET] /admin/brand/edit (use)
     public function editred()
     {
-        $bid = request('bid');
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/brand/edit', ['bid' => $bid]);
-
-        if ($response->successful()) {
-            $responseData = $response->json();
-
-            $get = $responseData['data'];
-
-            return view('admin.brand.admin_brand_edit', ['brand' => $get, 'title' => 'Edit Brand']);
-        } else {
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-        }
-        // $get = brand::where('brand_id', request('bid'))->get();
-        // return view('admin.brand.admin_brand_edit', ['brand' => $get, 'title' => 'Edit Brand']);
+        $get = brand::where('brand_id', request('bid'))->get();
+        return view('admin.brand.admin_brand_edit', ['brand' => $get, 'title' => 'Edit Brand']);
     }
+
+    // [POST] /admin/brand/edit (use)
     public function edit(Request $request)
     {
         $id = request('bid');
@@ -263,7 +156,7 @@ class BrandController extends Controller
             if (File::exists("{$brandImagePath}/logo.jpg")) {
                 File::delete("{$brandImagePath}/logo.jpg");
             }
-            // $logoImg = $request->file('bLogo')->storeAs("img/brand/{$id}", "{$id}logo.jpg", 'public');
+
             $request->file('bLogo')->move($brandImagePath, 'logo.jpg');
             $logoImg = 'logo.jpg';
         } else {
@@ -321,150 +214,80 @@ class BrandController extends Controller
             $brand_des = "No data";
         }
 
-        // brand::where('brand_id', $id)->update([
-        //     'brand_name' => request('bName'),
-        //     'brand_logo' => $logoImg,
-        //     'brand_img' => $homeImg,
-        //     'brand_des_img' => $brandImg,
-        //     'brand_banner' => $bannerImg,
-        //     'brand_des' => $brand_des
-        // ]);
-
-        $postData = [
-            'brand_id' => $id,
+        brand::where('brand_id', $id)->update([
             'brand_name' => request('bName'),
             'brand_logo' => $logoImg,
             'brand_img' => $homeImg,
             'brand_des_img' => $brandImg,
             'brand_banner' => $bannerImg,
             'brand_des' => $brand_des
-        ];
+        ]);
 
-        $response = Http::post('https://s25sneaker.000webhostapp.com/api/admin/brand/edit', $postData);
-
-        if ($response->successful()) {
-            return to_route('a.b.list');
-        } else {
-            // Xử lý lỗi nếu có
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-            return response()->json(['error' => 'Failed to post data'], $statusCode);
-        }
+        return to_route('a.b.list');
     }
+
+    // [GET] /admin/brand/delete (use)
     public function delred()
     {
+
         $searchName = request('searchName');
-        // if (isset($searchName)) {
-        //     $count = brand::where('brand_active', '!=', -1)
-        //         ->where('brand_name', 'like', '%' . $searchName . '%')->count('brand_id');
-        //     $get = brand::where('brand_active', '!=', -1)
-        //         ->where('brand_name', 'like', '%' . $searchName . '%')->paginate(7);
-        // } else {
-        //     $count = brand::count('brand_id');
-        //     $get = brand::where('brand_active', '!=', -1)->paginate(7);
-        // }
-        // return view('admin.brand.admin_brand_delete', ['brand' => $get, 'count' => $count, 'title' => 'Delete Brands']);
-        $page = request('page', 1);
-
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/brand/delete', ['searchName' => $searchName, 'page' => $page]);
-
-        // Kiểm tra nếu yêu cầu thành công (status code 200)
-        if ($response->successful()) {
-            // Lấy dữ liệu JSON từ phản hồi
-            $responseData = $response->json();
-
-            $count = $responseData['count'];
-
-            $brands = collect($responseData['data']['data']);
-
-            $perPage = 7; // Hoặc bất kỳ giá trị nào bạn muốn
-
-            // $currentPage = $responseData['data']['current_page'];
-
-            $paginator = new LengthAwarePaginator(
-                $brands,
-                $responseData['count'],
-                $perPage,
-                $page,
-                ['path' => url()->current(), 'query' => request()->query()]
-            );
-
-            // return view('admin.brand.admin_brand_page', ['brand' => $paginator, 'count' => $count, 'title' => 'Brands List']);
-            return view('admin.brand.admin_brand_delete', ['brand' => $paginator, 'count' => $count, 'title' => 'Delete Brands']);
+        if (isset($searchName)) {
+            $count = brand::where('brand_active', '!=', -1)
+                ->where('brand_name', 'like', '%' . $searchName . '%')->count('brand_id');
+            $get = brand::where('brand_active', '!=', -1)
+                ->where('brand_name', 'like', '%' . $searchName . '%')->paginate(8);
         } else {
-            dd($response);
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
+            $count = brand::where('brand_active', '!=', -1)->count('brand_id');
+            $get = brand::where('brand_active', '!=', -1)->paginate(8);
         }
+        return view('admin.brand.admin_brand_delete', ['brand' => $get, 'count' => $count, 'title' => 'Delete Brands']);
     }
+
+    // [POST] /deleteBrand (use)
     public function del(Request $request)
     {
-        // $id = request('bid');
-        // $postData = [
-        //     'brand_id' => $id
-        // ];
         $get = $request->all();
-        $response = Http::post('https://s25sneaker.000webhostapp.com/api/admin/deleteBrand', $get);
-        if ($response->successful()) {
-            // return to_route('a.b.list');
-        } else {
-            // Xử lý lỗi nếu có
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-            return response()->json(['error' => 'Failed to post data'], $statusCode);
-        }
-        // $get = $request->all();
-        // brand::where('brand_id', $get['bid'])->update([
-        //     'brand_name' => $get['bid'] . 'deleted',
-        //     'brand_active' => -1,
-        // ]);
-        // product::where('brand_id', $get['bid'])->update([
-        //     'product_active' => 0
-        // ]);
+        brand::where('brand_id', $get['bid'])->update([
+            'brand_name' => $get['bid'] . 'deleted',
+            'brand_logo' => NULL,
+            'brand_img' => NULL,
+            'brand_des_img' => NULL,
+            'brand_des' => NULL,
+            'brand_active' => -1
+        ]);
+        product::where('brand_id', $get['bid'])->update([
+            'product_active' => 0
+        ]);
     }
+
+    //[POST] /activateBrand (use)
     public function activate(Request $request)
     {
-        // $get = $request->all();
-        // brand::where('brand_id', $get['bid'])->update([
-        //     'brand_active' => 1
-        // ]);
-        // product::where('product_id', $get['bid'])->update([
-        //     'product_active' => 1
-        // ]);
         $get = $request->all();
-        $response = Http::post('https://s25sneaker.000webhostapp.com/api/admin/activateBrand', $get);
-        if ($response->successful()) {
-            // return to_route('a.b.list');
-        } else {
-            // Xử lý lỗi nếu có
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-            return response()->json(['error' => 'Failed to post data'], $statusCode);
-        }
+        brand::where('brand_id', $get['bid'])->update([
+            'brand_active' => 1
+        ]);
+        product::where('product_id', $get['bid'])->update([
+            'product_active' => 1
+        ]);
     }
+
+    //[POST] /deactivateBrand (use)
     public function deactivate(Request $request)
     {
-        // $get = $request->all();
-        // brand::where('Brand_id', $get['bid'])->update([
-        //     'brand_active' => 0
-        // ]);
-        // product::where('product_id', $get['bid'])->update([
-        //     'product_active' => 0
-        // ]);
         $get = $request->all();
-        $response = Http::post('https://s25sneaker.000webhostapp.com/api/admin/deactivateBrand', $get);
-        if ($response->successful()) {
-            // return to_route('a.b.list');
-        } else {
-            // Xử lý lỗi nếu có
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-            return response()->json(['error' => 'Failed to post data'], $statusCode);
-        }
+        brand::where('Brand_id', $get['bid'])->update([
+            'brand_active' => 0
+        ]);
+        product::where('product_id', $get['bid'])->update([
+            'product_active' => 0
+        ]);
     }
 
 
 
+
+    
 
     // API
 
@@ -476,18 +299,17 @@ class BrandController extends Controller
                 $count = brand::where('brand_active', '!=', -1)
                     ->where('brand_name', 'like', '%' . $searchName . '%')->count('brand_id');
                 $get = brand::where('brand_active', '!=', -1)
-                    ->where('brand_name', 'like', '%' . $searchName . '%')->paginate(7);
+                    ->where('brand_name', 'like', '%' . $searchName . '%')->simplePaginate(8);
             } else {
                 $count = brand::where('brand_active', '!=', -1)
                     ->where('brand_name', 'like', '%' . $searchName . '%')
                     ->count('brand_id');
-                $get = brand::where('brand_active', '!=', -1)->paginate(7);
+                $get = brand::where('brand_active', '!=', -1)->simplePaginate(8);
             }
             return response()->json(['status' => 'success', 'count' => $count, 'data' => $get]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
         }
-        // return view('admin.brand.admin_brand_page', ['brand'=>$get, 'count'=>$count, 'title'=>'Brands List']);
     }
     public function addred_api()
     {
@@ -567,29 +389,6 @@ class BrandController extends Controller
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Thêm brand thất bại', 'error' => $e->getMessage()], 500);
         }
-
-
-
-        // $b = new brand();
-        // $b->brand_name = request('bName');
-        // $b->brand_logo = request('bLogo');
-        // if (!isset($b->brand_logo)) {
-        //     $b->brand_logo = "No_image_2.png";
-        // }
-        // $b->brand_img = request('bHPimg');
-        // if (!isset($b->brand_img)) {
-        //     $b->brand_img = "No_image_2.png";
-        // }
-        // $b->brand_des_img = request('bBPimg');
-        // if (!isset($b->brand_des_img)) {
-        //     $b->brand_des_img = "No_image_2.png";
-        // }
-        // $b->brand_des = request('bDes');
-        // if (!isset($b->brand_des)) {
-        //     $b->brand_des = "No data";
-        // }
-        // $b->save();
-        // return to_route('a.b.list');
     }
 
     public function editred_api()
@@ -597,7 +396,6 @@ class BrandController extends Controller
         try {
             $get = brand::where('brand_id', request('bid'))->get();
             return response()->json(['status' => 'success', 'data' => $get], 201);
-            // return view('admin.brand.admin_brand_edit', ['brand' => $get, 'title' => 'Edit Brand']);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'error' => $e->getMessage()], 500);
         }
@@ -606,8 +404,8 @@ class BrandController extends Controller
     {
 
         try {
-            $idb= $request->input('brand_id');
-            
+            $idb = $request->input('brand_id');
+
             $request->validate([
                 'brand_name' => 'required|string',
             ]);
@@ -677,13 +475,11 @@ class BrandController extends Controller
         $searchName = request('searchName');
         try {
             if (isset($searchName)) {
-                $count = brand::where('brand_active', '!=', -1)
-                    ->where('brand_name', 'like', '%' . $searchName . '%')->count('brand_id');
-                $get = brand::where('brand_active', '!=', -1)
-                    ->where('brand_name', 'like', '%' . $searchName . '%')->paginate(7);
+                $count = brand::where('brand_name', 'like', '%' . $searchName . '%')->count('brand_id');
+                $get = brand::where('brand_name', 'like', '%' . $searchName . '%')->paginate(8);
             } else {
                 $count = brand::count('brand_id');
-                $get = brand::where('brand_active', '!=', -1)->paginate(7);
+                $get = brand::paginate(8);
             }
             return response()->json(['status' => 'success', 'count' => $count, 'data' => $get], 201);
         } catch (\Exception $e) {

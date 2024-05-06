@@ -4,9 +4,12 @@ namespace App\Http\Controllers\user;
 
 use Illuminate\Routing\Controller;
 use App\Http\Resources\UserCollection;
+use App\Models\admin\member;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AccountController extends Controller
 {
@@ -338,15 +341,12 @@ class AccountController extends Controller
 
 
 
+
     // API
+
     public function loadPage_api()
     {
         try {
-            // session(['prePage' => '/account/profile']);
-            // if (session('login') != 'true') {
-            //     return redirect('/login');
-            // } 
-            // else {
             $uid = session('user');
             $user = DB::select('select * from member where mem_id= :uid', [
                 'uid' => $uid,
@@ -355,12 +355,6 @@ class AccountController extends Controller
                 $user[0]->phone = null;
             }
             $brands = new HeaderController();
-            // return view('user/profile',[
-            //     'user' => $user[0],
-            //     'brands' => $brands->load()
-            // ]);
-            // return new UserCollection($user[0],$brands);
-
             return response()->json(['status' => 'success', 'brands' => $brands, 'user' => $user[0]]);
             // }
         } catch (\Exception $e) {
@@ -370,10 +364,6 @@ class AccountController extends Controller
     public function goLink_api($link, Request $request)
     {
         try {
-            // session(['prePage' => '/account/' . $link]);
-            // if (session('login') != 'true') {
-            //     return redirect('/login');
-            // } else {
             $uid = session('user');
             $user = DB::select('select * from member where mem_id= :uid', [
                 'uid' => $uid,
@@ -403,10 +393,6 @@ class AccountController extends Controller
                     'product_orders' => $product_orders
                 ]);
             }
-            // return view('user/' . $link, [
-            //     'user' => $user[0],
-            //     'brands' => $brands->load()
-            // ]);
             return response()->json([
                 'status' => 'success',
                 'user' => $user[0],
@@ -445,12 +431,6 @@ class AccountController extends Controller
                 'uid' => $uid
             ]);
 
-            // return view('user/order', [
-            //     'user' => $user[0],
-            //     'brands' => $brands->load(),
-            //     'orders' => $orders,
-            //     'product_orders' => $product_orders
-            // ]);
             return response()->json([
                 'status' => 'success',
                 'user' => $user[0],
@@ -481,10 +461,6 @@ class AccountController extends Controller
                     $count = DB::select('select count(*) as TongDonHang from order where order_status= 0 and mem_id= :uid', [
                         'uid' => $request->uid
                     ]);
-                    // return response()->json([
-                    //     'drop' => 'success',
-                    //     'count' => $count[0]->TongDonHang
-                    // ]);
                     return response()->json(['status' => 'success', 'message' => 'Xóa đơn hàng thành công!', 'count' => $count[0]->TongDonHang], 201);
                 } else {
                     return response()->json(['drop' => 'fail']);
@@ -496,6 +472,8 @@ class AccountController extends Controller
             return response()->json(['status' => 'error', 'drop' => 'fail', 'error' => $e->getMessage()], 500);
         }
     }
+
+
     public function confirmorder_api(Request $request)
     {
         try {
@@ -515,10 +493,6 @@ class AccountController extends Controller
                     $count = DB::select('select count(*) as TongDonHang from order where order_status= 1 and mem_id= :uid', [
                         'uid' => $request->uid
                     ]);
-                    // return response()->json([
-                    //     'confirm' => 'success',
-                    //     'count' => $count[0]->TongDonHang
-                    // ]);
                     return response()->json(['status' => 'success', 'message' => 'Xác nhận thành công!', 'count' => $count[0]->TongDonHang], 201);
                 } else {
                     return response()->json(['status' => 'error', 'message' => 'Xác nhận thất bại'], 500);
@@ -562,11 +536,6 @@ class AccountController extends Controller
                 group by product_order.product_id', [
                     'rid' => $request->rid
                 ]);
-                // return response()->json([
-                //     'write' => 'true',
-                //     'products' => $products,
-                //     'pid' => $pid
-                // ]);
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Viết đánh giá thành công!',
@@ -609,11 +578,6 @@ class AccountController extends Controller
                 foreach ($products as $product) {
                     $product->product_image = explode(',', $product->product_image)[0];
                 }
-                // return response()->json([
-                //     'read' => 'true',
-                //     'products' => $products,
-                //     'feedbacks' => $feedbacks
-                // ]);
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Xem đánh giá thành công!',
@@ -621,7 +585,7 @@ class AccountController extends Controller
                     'feedbacks' => $feedbacks
                 ], 201);
             } else {
-                // return response()->json(['read' => 'fail']);
+
                 return response()->json(['status' => 'error', 'message' => 'Xem đánh giá thất bại'], 500);
             }
         } catch (\Exception $e) {
@@ -661,13 +625,12 @@ class AccountController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Thêm đánh giá thất bại', 'error' => $e->getMessage()], 500);
         }
     }
+
+
+
     public function changePass_api(Request $request)
     {
         try {
-            // session(['prePage' => '/account/profile']);
-            // if (session('login') != 'true') {
-            //     return response()->json(['redirect', '/login']);
-            // } else {
             $request->validate([
                 'old_pass' => 'required',
                 'new_pass' => 'required',
@@ -694,7 +657,7 @@ class AccountController extends Controller
                 'uid' => $uid,
                 'pass' => $request->new_pass
             ]);
-            // return response()->json(['success' => 'true']);
+            
             return response()->json(['status' => 'success', 'message' => 'Thay đổi mật khẩu thành công!'], 201);
             // }
         } catch (\Exception $e) {
@@ -706,10 +669,6 @@ class AccountController extends Controller
     public function changeProfile_api(Request $request)
     {
         try {
-            // session(['prePage' => '/account']);
-            // if (session('login') != 'true') {
-            //     return response()->json(['redirect', '/login']);
-            // } else {
             $request->validate([
                 'name' => 'required',
                 'phone' => 'required|digits:10|max:10|min:10',
@@ -722,11 +681,116 @@ class AccountController extends Controller
                 'uid' => session('user')
             ]);
 
-            // return response()->json(['name' => $request->name]);
+
             return response()->json(['status' => 'success', 'message' => 'Thay đổi thông tin thành công!', 'name' => $request->name], 201);
-            // }
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Thay đổi thông tin thất bại', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+
+
+    //USE
+
+    //JWT
+
+    //[POST] /login_JWT 
+    public function loginJWT(Request $request)
+    {
+        $credentials = $request->only('username', 'password');
+
+        $member = member::where('username', $credentials['username'])->where('password', $credentials['password'])->where('role', NULL)->first();
+
+        if (!$member) {
+            return response()->json(['error' => 'Mật khẩu không chính xác'], 401);
+        }
+
+        try {
+            $token = JWTAuth::fromUser($member);
+        } catch (JWTException $e) {
+            return response()->json(['error' => 'Không thể tạo token'], 500);
+        }
+
+        return response()->json(['token' => $token]);
+    }
+
+    //[POST] /register_JWT
+
+    public function registerJWT(Request $request)
+    {
+        $user = DB::select('select * from member where username= :uname', [
+            'uname' => $request->input('username')
+        ]);
+        if ($user) {
+            return response()->json(['error' => 'Email đã tồn tại']);
+        }
+        DB::table("member")->insert([
+            'username' => $request->input('username'),
+            'password' => $request->input('password'),
+            'name' => $request->input('name'),
+            'address' => '',
+            'phone' => 0
+        ]);
+
+        $member = member::where('username', $request->input('username'))->first();
+
+        try {
+            $token = JWTAuth::fromUser($member);
+            return response()->json(['token' => $token]);
+        } catch (JWTException $e) {
+            return response()->json(['error' => 'Không thể tạo token'], 500);
+        }
+    }
+
+    //[POST] /forget_JWT (use)
+
+    public function forgetJWT(Request $request)
+    {
+        try {
+            $user = DB::select('select * from member where username= :uname and phone= :phone', [
+                'uname' => $request->input('username'),
+                'phone' => $request->input('phone'),
+            ]);
+            if ($user) {
+                DB::table("member")->where('username', $request->input('username'))
+                    ->where('phone', $request->input('phone'))
+                    ->update([
+                        'password' => $request->input('password')
+                    ]);
+
+                $member = member::where('username', $request->input('username'))->first();
+
+                try {
+                    $token = JWTAuth::fromUser($member);
+                } catch (JWTException $e) {
+                    return response()->json(['error' => 'Không thể tạo token'], 500);
+                }
+                return response()->json(['token' => $token]);
+            } else {
+                return response()->json(['status' => 'error', 'error' => 'Email và số điện thoại không trùng khớp']);
+            }
+
+            // }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
+        }
+    }
+
+    //[GET] /profile_JWT
+    public function profileJWT(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user) {
+            $member = member::find($user->mem_id);
+
+            if ($member) {
+                return response()->json($member);
+            } else {
+                return response()->json(['error' => 'Member not found'], 404);
+            }
+        } else {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
     }
 }

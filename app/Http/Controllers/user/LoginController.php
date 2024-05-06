@@ -12,76 +12,37 @@ class LoginController extends Controller
 {
     public function login(Request $request)
     {
-        // $request->validate([
-        //     'email' => 'required',
-        //     'pswd' => 'required'
-        // ]);
-        // $user = DB::select('select * from member where username = :uname and password= :pswd', [
-        //     'uname' => $request->email,
-        //     'pswd' => $request->pswd
-        // ]);
-        // if (!$user) {
-        //     return response()->json([
-        //         'error' => 'Sai mật khẩu hoặc email'
-        //     ]);
-        // } else {
-        //     session(['login' => 'true']);
-        //     session(['user' => $user[0]->mem_id]);
-        //     if ($user[0]->role == 'admin') {
-        //         session(['admin' => 'true']);
-        //         $dir = '/admin_page';
-        //     } else if ($user[0]->role == 'staff') {
-        //         session(['staff' => 'true']);
-        //         $dir = '/admin_page';
-        //     } else {
-        //         if (session('prePage')) {
-        //             $dir = session('prePage');
-        //         } else {
-        //             $dir = '/';
-        //         }
-        //     }
-        //     return response()->json(['dir' => $dir]);
-        // }
-        $postData = [
-            'username' => $request->email,
-            'password' => $request->pswd
-        ];
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/login', $postData);
-
-        if ($response->successful()) {
-            $responseData = $response->json();
-
-            $user = $responseData['user'];
-
-            if (!$user) {
-                return response()->json([
-                    'error' => 'Sai mật khẩu hoặc email'
-                    // 'error' => $request->email
-
-                ]);
-            } else {
-                session(['login' => 'true']);
-                session(['user' => $user[0]['mem_id']]);
-                if ($user[0]['role'] == 'admin') {
-                    session(['admin' => 'true']);
-                    $dir = '/admin_page';
-                } else if ($user[0]['role'] == 'staff') {
-                    session(['staff' => 'true']);
-                    $dir = '/admin_page';
-                } else {
-                    if (session('prePage')) {
-                        $dir = session('prePage');
-                    } else {
-                        $dir = '/';
-                    }
-                }
-                return response()->json(['dir' => $dir]);
-            }
+        $request->validate([
+            'email' => 'required',
+            'pswd' => 'required'
+        ]);
+        $user = DB::select('select * from member where username = :uname and password= :pswd', [
+            'uname' => $request->email,
+            'pswd' => $request->pswd
+        ]);
+        if (!$user) {
+            return response()->json([
+                'error' => 'Sai mật khẩu hoặc email'
+            ]);
         } else {
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-            return response()->json(['error' => 'Failed to post data'], $statusCode);
+            session(['login' => 'true']);
+            session(['user' => $user[0]->mem_id]);
+            if ($user[0]->role == 'admin') {
+                session(['admin' => 'true']);
+                $dir = '/admin_page';
+            } else if ($user[0]->role == 'staff') {
+                session(['staff' => 'true']);
+                $dir = '/admin_page';
+            } else {
+                if (session('prePage')) {
+                    $dir = session('prePage');
+                } else {
+                    $dir = '/';
+                }
+            }
+            return response()->json(['dir' => $dir]);
         }
+        
     }
     public function register(Request $request)
     {
@@ -134,7 +95,6 @@ class LoginController extends Controller
 
 
     // API
-    // API
     public function login_api(Request $request)
     {
         try {
@@ -163,7 +123,7 @@ class LoginController extends Controller
                 'username' => $request->input('username'),
                 'password' => $request->input('password'),
                 'name' => $request->input('name'),
-                'address' => 0,
+                'address' => 'Việt Nam',
                 'phone' => 0
             ]);
 

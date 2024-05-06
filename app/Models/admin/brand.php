@@ -10,4 +10,5 @@ class brand extends Model
     use HasFactory;
     public $timestamps = false;
     protected $table = "Brand";
+    public $primaryKey = "brand_id";
 }

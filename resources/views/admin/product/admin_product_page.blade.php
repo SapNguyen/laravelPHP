@@ -104,6 +104,7 @@
                                             <th>#</th>
                                             <th>Name</th>
                                             <th>Brand</th>
+                                            <th>Genre</th>
                                             <th>Price</th>
                                             <th>Total</th>
                                             <th>Last updated on</th>
@@ -113,9 +114,16 @@
                                     <tbody>
                                         @foreach($product as $p)
                                         <tr data-widget="expandable-table" aria-expanded="false">
-                                            <td>{{ $p['product_id'] }}</td>
+                                            <td>{{ ($product->currentPage() - 1) * $product->perPage() + $loop->iteration }}.</td>
                                             <td>{{ $p['product_name'] }}</td>
                                             <td>{{ $p['brand_name'] }}</td>
+                                            @if( $p['product_genre'] == 1)
+                                                <td>Nam</td>
+                                                @elseif( $p['product_genre'] ==0)
+                                                <td>Nữ</td>
+                                                @else
+                                                <td>Unisex</td>
+                                                @endif
                                             <td>{{ number_format($p['product_price']) }}</td>
                                             <td>
                                                 @foreach($quan as $q)

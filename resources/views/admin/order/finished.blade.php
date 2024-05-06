@@ -99,9 +99,11 @@
                               <div class="row"><div class="col-sm-12 col-md-6"></div>
                               <div class="col-sm-12 col-md-6"></div></div><div class="row">
                                   <div class="col-sm-12"> 
-    <table class="table table-bordered table-hover">
+                                    
+                                    <table class="table table-bordered table-hover">
           <thead>
             <tr>
+              <th>#</th>
               <th>Mã đơn hàng</th>
               <th>Ngày tạo</th>
               <th>Ngày xác thực</th>
@@ -118,19 +120,20 @@
           <tbody>
               @foreach($orders as $order)
                   <tr>
-                      <td valign="middle">{{$order['order_id']}}</td>
-                      <td valign="middle">{{$order['created_date']}}</td>
-                      <td valign="middle">{{$order['validated_date']}}</td>
-                      <td valign="middle">{{$order['canceled_date']}}</td>
-                      <td valign="middle">{{$order['completion_date']}}</td>
-                      <td valign="middle">{{number_format($order['order_value'])}}</td>
-                      @if($order['order_status'] == 2)
+                      <td>{{ ($orders->currentPage() - 1) * $orders->perPage() + $loop->iteration }}.</td>
+                      <td valign="middle">{{$order->order_id}}</td>
+                      <td valign="middle">{{$order->created_date}}</td>
+                      <td valign="middle">{{$order->validated_date}}</td>
+                      <td valign="middle">{{$order->canceled_date}}</td>
+                      <td valign="middle">{{$order->completion_date}}</td>
+                      <td valign="middle">{{number_format($order->order_value)}}</td>
+                      @if($order->order_status == 2)
                       <td valign="middle"><b style="color: green;">Đã hoàn thành</b></td>
                        
                                             @endif
                       
-                      <td valign="middle">{{$order['mem_id']}}</td>
-                      <td valign="middle"><a class="btn btn-primary mr-2" href="/admin/detail/{{$order['order_id']}}"><i class="fa fa-edit"></i></a></td>
+                      <td valign="middle">{{$order->mem_id}}</td>
+                      <td valign="middle"><a class="btn btn-primary mr-2" href="/admin/detail/{{$order->order_id}}"><i class="fa fa-edit"></i></a></td>
                       
                   </tr>
                   

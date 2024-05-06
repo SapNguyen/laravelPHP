@@ -18,187 +18,176 @@ use Illuminate\Support\Facades\Http;
 
 class ProductController extends Controller
 {
+    //[GET] /admin/products (use)
     public function list()
     {
-        // $pq = product_size_color::groupBy('product_id')
-        //     ->get([
-        //         'product_id',
-        //         product_size_color::raw('SUM(quantity) as quan')
-        //     ]);
+        $pq = product_size_color::groupBy('product_id')
+            ->get([
+                'product_id',
+                product_size_color::raw('SUM(quantity) as quan')
+            ]);
         $search = request('searchName');
-        // if (isset($search)) {
-        //     $count = product::where('product_active', '!=', -1)
-        //         ->where('product_name', 'like', '%' . $search . '%')
-        //         ->count('product_id');
-        //     $get = product::join('brand', 'product.brand_id', '=', 'brand.brand_id')
-        //         ->where('product_active', '!=', -1)
-        //         ->where('product_name', 'like', '%' . $search . '%')
-        //         ->paginate(1);
-        // } else {
-        //     $count = product::where('product_active', '!=', -1)->count('product_id');
-        //     $get = product::join('brand', 'product.brand_id', '=', 'brand.brand_id')
-        //         ->where('product_active', '!=', -1)->paginate(1);
-        // }
-        // return view('admin.product.admin_product_page', ['product' => $get, 'count' => $count, 'quan' => $pq, 'title' => 'Products List']);
-
-        $page = request('page', 1);
-
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/products', ['searchName' => $search, 'page' => $page,]);
-
-        // Kiểm tra nếu yêu cầu thành công (status code 200)
-        if ($response->successful()) {
-            // Lấy dữ liệu JSON từ phản hồi
-            $responseData = $response->json();
-
-            $count = $responseData['count'];
-
-            $quan = $responseData['quan'];
-
-            // Lấy dữ liệu thương hiệu từ $data['data']
-            $product = collect($responseData['product']['data']);
-
-            // $product = $responseData['product']['data'];
-
-            // Số lượng mục trên mỗi trang
-            $perPage = 7; // Hoặc bất kỳ giá trị nào bạn muốn
-
-            // Trang hiện tại
-            // $currentPage = $responseData['product']['current_page'];
-
-            // $currentPage = Paginator::resolveCurrentPage() ?: 1; // Trang hiện tại, mặc định là 1 nếu không có trang nào được chỉ định
-            // $paginator = new Paginator($product, $perPage, $currentPage);
-
-            // Tạo LengthAwarePaginator
-            $paginator = new LengthAwarePaginator(
-                $product,
-                $responseData['count'],
-                $perPage,
-                $page,
-                ['path' => url()->current(), 'query' => request()->query()]
-            );
-
-            return view('admin.product.admin_product_page', ['product' => $paginator, 'count' => $count, 'quan' => $quan, 'title' => 'Products List']);
+        if (isset($search)) {
+            $count = product::where('product_active', '!=', -1)
+                ->where('product_name', 'like', '%' . $search . '%')
+                ->count('product_id');
+            $get = product::join('brand', 'product.brand_id', '=', 'brand.brand_id')
+                ->where('product_active', '!=', -1)
+                ->where('product_name', 'like', '%' . $search . '%')
+                ->paginate(8);
         } else {
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
+            $count = product::where('product_active', '!=', -1)->count('product_id');
+            $get = product::join('brand', 'product.brand_id', '=', 'brand.brand_id')
+                ->where('product_active', '!=', -1)->paginate(8);
         }
+        return view('admin.product.admin_product_page', ['product' => $get, 'count' => $count, 'quan' => $pq, 'title' => 'Products List']);
     }
+
+    // public function list_inventory()
+    // {
+    //     $pq = product_size_color::groupBy('product_id')
+    //         ->get([
+    //             'product_id',
+    //             product_size_color::raw('SUM(quantity) as quan')
+    //         ]);
+    //     $search = request('searchName');
+    //     if (isset($search)) {
+    //         $count = product::where('product_active', '!=', -1)
+    //             ->where('product_name', 'like', '%' . $search . '%')
+    //             ->count('product_id');
+    //         $get = product::join('brand', 'product.brand_id', '=', 'brand.brand_id')
+    //             ->where('product_active', '!=', -1)
+    //             ->where('product_name', 'like', '%' . $search . '%')
+    //             ->paginate(8);
+    //     } else {
+    //         $count = product::where('product_active', '!=', -1)->count('product_id');
+    //         $get = product::join('brand', 'product.brand_id', '=', 'brand.brand_id')
+    //             ->where('product_active', '!=', -1)->paginate(8);
+    //     }
+
+    //     return view('admin.product.admin_product_page_inventory', ['product' => $get, 'count' => $count, 'quan' => $pq, 'title' => 'Products List']);
+    // }
+
+    public function list_inventory()
+    {
+        $search = request('searchName');
+
+        $pq = product_size_color::groupBy('product_id')
+            ->get([
+                'product_id',
+                product_size_color::raw('SUM(quantity) as quan')
+            ]);
+
+        if (isset($search)) {
+
+            $query = product::join('brand', 'product.brand_id', '=', 'brand.brand_id')
+                ->leftJoin('product_size_color', 'product.product_id', '=', 'product_size_color.product_id')
+                ->select('product.*', 'brand.brand_name', DB::raw('SUM(product_size_color.quantity) as quan'))
+                ->where('product_active', '!=', -1)
+                ->where('product_name', 'like', '%' . $search . '%')
+                ->groupBy('product.product_id', 'product.product_name', 'product.product_material', 'product.product_des', 'product.product_price', 'product.product_genre', 'product.product_updated_date', 'product.product_active', 'product.brand_id', 'product.discount_id', 'brand.brand_name');
+
+            $query->havingRaw('quan > 0 AND quan < 10');
+    
+            $get = $query->paginate(8);
+        } else {
+            $query = product::join('brand', 'product.brand_id', '=', 'brand.brand_id')
+                ->leftJoin('product_size_color', 'product.product_id', '=', 'product_size_color.product_id')
+                ->select('product.*', 'brand.brand_name', DB::raw('SUM(product_size_color.quantity) as quan'))
+                ->where('product_active', '!=', -1)
+                ->groupBy('product.product_id', 'product.product_name', 'product.product_material', 'product.product_des', 'product.product_price', 'product.product_genre', 'product.product_updated_date', 'product.product_active', 'product.brand_id', 'product.discount_id', 'brand.brand_name');
+
+            $query->havingRaw('quan > 0 AND quan < 10');
+    
+            $get = $query->paginate(8);
+        }
+
+        return view('admin.product.admin_product_page_inventory', ['product' => $get, 'quan' => $pq, 'title' => 'Products List']);
+    }
+
+    public function list_bulk()
+    {
+        $search = request('searchName');
+
+        $pq = product_size_color::groupBy('product_id')
+            ->get([
+                'product_id',
+                product_size_color::raw('SUM(quantity) as quan')
+            ]);
+
+        $query = product::join('brand', 'product.brand_id', '=', 'brand.brand_id')
+            ->leftJoin('product_size_color', 'product.product_id', '=', 'product_size_color.product_id')
+            ->select('product.*', 'brand.brand_name', DB::raw('SUM(product_size_color.quantity) as quan'))
+            ->where('product_active', '!=', -1)
+            ->groupBy('product.product_id', 'product.product_name', 'product.product_material', 'product.product_des', 'product.product_price', 'product.product_genre', 'product.product_updated_date', 'product.product_active', 'product.brand_id', 'product.discount_id', 'brand.brand_name');
+
+        if (isset($search)) {
+            $query->where('product_name', 'like', '%' . $search . '%');
+        }
+        $query->havingRaw('quan > 20');
+
+        // $count = $query->count('product.product_id');
+        $get = $query->paginate(8);
+
+        return view('admin.product.admin_product_page_bulk', ['product' => $get, 'quan' => $pq, 'title' => 'Products List']);
+    }
+
+    //[GET] /admin/product/view
     public function viewred()
     {
-        // $get = product::where('product_id', request('pid'))
-        //     ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
-        //     ->where('product_active', '!=', -1)->paginate(7);
-        // $get2 = product_size_color::where('product_id', request('pid'))
-        //     ->groupBy('product_id')
-        //     ->groupBy('color')
-        //     ->groupBy('product_image')
-        //     ->get([
-        //         'product_id', 'color',
-        //         product_size_color::raw('COUNT(size) as row'),
-        //         'product_image'
-        //     ]);
-        // $get3 = product_size_color::where('product_id', request('pid'))->get();
-
-        // return view('admin.product.admin_product_view', [
-        //     'product' => $get, 'psc1' => $get2, 'psc2' => $get3, 'title' => 'View Product'
-        // ]);
-        $pid = request('pid');
-        $page = request('page', 1);
-
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/product/view', ['pid' => $pid, 'page' => $page]);
-
-        // Kiểm tra nếu yêu cầu thành công (status code 200)
-        if ($response->successful()) {
-            // Lấy dữ liệu JSON từ phản hồi
-            $responseData = $response->json();
-
-            $psc1 = $responseData['psc1'];
-
-            $psc2 = $responseData['psc2'];
-
-            $product = collect($responseData['product']['data']);
-
-            $perPage = 7;
-
-            // Trang hiện tại
-            // $currentPage = $responseData['product']['current_page'];
-
-            // Tạo LengthAwarePaginator
-            $paginator = new LengthAwarePaginator(
-                $product,
-                $perPage,
-                $page,
-                ['path' => url()->current(), 'query' => request()->query()]
-            );
-
-            return view('admin.product.admin_product_view', [
-                'product' => $paginator, 'psc1' => $psc1, 'psc2' => $psc2, 'title' => 'View Product'
+        $get = product::where('product_id', request('pid'))
+            ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
+            ->where('product_active', '!=', -1)->paginate(7);
+        $get2 = product_size_color::where('product_id', request('pid'))
+            ->groupBy('product_id')
+            ->groupBy('color')
+            ->groupBy('product_image')
+            ->get([
+                'product_id', 'color',
+                product_size_color::raw('COUNT(size) as row'),
+                'product_image'
             ]);
-        } else {
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-        }
+        $get3 = product_size_color::where('product_id', request('pid'))->get();
+
+        return view('admin.product.admin_product_view', [
+            'product' => $get, 'psc1' => $get2, 'psc2' => $get3, 'title' => 'View Product'
+        ]);
     }
+
+    //[GET] /admin/product/add (use)
     public function addred()
     {
-        // $brand = brand::where('brand_active', '!=', -1)
-        //     ->orderBy('brand_name', 'asc')->get();
-        // return view('admin.product.admin_product_add', ['brand' => $brand, 'title' => 'Add New Product']);
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/product/add');
-
-
-        if ($response->successful()) {
-            $responseData = $response->json();
-            $get = $responseData['brand'];
-
-
-            // return view('admin.brand.admin_brand_add', ['brand' => $get, 'title' => 'Add New Brand']);
-            return view('admin.product.admin_product_add', ['brand' => $get, 'title' => 'Add New Product']);
-        } else {
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-        }
+        $brand = brand::where('brand_active', '!=', -1)
+            ->orderBy('brand_name', 'asc')->get();
+        return view('admin.product.admin_product_add', ['brand' => $brand, 'title' => 'Add New Product']);
     }
+
+    //[POST] /addProduct (use)
     public function add(Request $request)
     {
         $get = $request->all();
 
-        // $product = new product();
-        // $product->product_name = $get['name'];
-        // $product->product_material = $get['material'];
-        // $product->product_des = $get['des'];
-        // $product->product_price = $get['price'];
-        // $product->brand_id = $get['brand'];
-        // $product->save();
+        if ($get['genre'] == "Unisex") {
+            $genre = 2;
+        } else if ($get['genre'] == "Nam") {
+            $genre = 1;
+        } else if ($get['genre'] == "Nữ") {
+            $genre = 0;
+        }
 
-        // $id = product::max('product_id') + 2;
-        // if (!isset($id)) {
-        //     $id = 1;
-        // }
-        $totalPages = 1;
-        $currentPage = 1;
-        $maxProductId = 0;
-        do {
-            $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/products?page=' . $currentPage);
+        $product = new product();
+        $product->product_name = $get['name'];
+        $product->product_material = $get['material'];
+        $product->product_genre = $genre;
+        $product->product_des = $get['des'];
+        $product->product_price = $get['price'];
+        $product->brand_id = $get['brand'];
+        $product->save();
 
-            if ($response->successful()) {
-                $responseData = $response->json();
-
-
-                $id = collect($responseData['product']['data'])->max('product_id') + 1;
-                if ($id > $maxProductId) {
-                    $maxProductId = $id;
-                }
-
-                $currentPage++;
-
-                $totalPages = $responseData['product']['last_page'];
-            } else {
-                $statusCode = $response->status();
-                $errorMessage = $response->body();
-                break;
-            }
-        } while ($currentPage <= $totalPages);
+        $id = product::max('product_id');
+        if (!isset($id)) {
+            $id = 1;
+        }
 
         $filepath = public_path('/img/product/' . $id);
         $temppath = public_path('/img/product/temp');
@@ -215,23 +204,53 @@ class ProductController extends Controller
             File::move($temppath . '/' . $imgs[$i]->getFilename(), $filepath . '/' . $imgs[$i]->getFileName());
         }
 
-        // $pcsq = $get['pcsq'];
-        // $pcs = array();
-        // for ($i = 0; $i < count($pcsq); $i++) {
-        //     $ex = explode('|', $pcsq[$i]);
-        //     $pcs[$i] = new product_size_color();
-        //     $pcs[$i]->product_id = $id;
-        //     $pcs[$i]->color = $ex[0];
-        //     $pcs[$i]->size = $ex[1];
-        //     $pcs[$i]->quantity = $ex[2];
-        //     $pcs[$i]->product_image = $ex[3];
-        //     $pcs[$i]->save();
-        // }
+        $pcsq = $get['pcsq'];
+        $pcs = array();
+        for ($i = 0; $i < count($pcsq); $i++) {
+            $ex = explode('|', $pcsq[$i]);
+            $pcs[$i] = new product_size_color();
+            $pcs[$i]->product_id = $id;
+            $pcs[$i]->color = $ex[0];
+            $pcs[$i]->size = $ex[1];
+            $pcs[$i]->quantity = $ex[2];
+            $pcs[$i]->product_image = $ex[3];
+            $pcs[$i]->save();
+        }
 
-        // return response()->json([
-        //     'message' => 'Product added successfully.'
-        // ]);
+        return response()->json([
+            'message' => 'Product added successfully.'
+        ]);
+    }
 
+    //[GET] /admin/product/edit (use)
+    public function editred()
+    {
+        $pid = request('pid');
+        $brand = brand::where('brand_active', '!=', -1)
+            ->orderBy('brand_name', 'asc')->get();
+        $get = product::where('product_id', request('pid'))
+            ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
+            ->get();
+        $get2 = product_size_color::where('product_id', request('pid'))
+            ->groupBy('product_id')
+            ->groupBy('color')
+            ->groupBy('product_image')
+            ->get([
+                'product_id', 'color',
+                product_size_color::raw('COUNT(size) as row'),
+                'product_image'
+            ]);
+        $get3 = product_size_color::where('product_id', request('pid'))->get();
+        return view('admin.product.admin_product_edit', [
+            'product' => $get, 'psc1' => $get2, 'psc2' => $get3,
+            'brand' => $brand, 'title' => 'Edit Product'
+        ]);
+    }
+
+    //[POST] /updateProduct (use)
+    public function update(Request $request)
+    {
+        $get = $request->all();
         if ($get['genre'] == "Unisex") {
             $genre = 2;
         } else if ($get['genre'] == "Nam") {
@@ -240,90 +259,15 @@ class ProductController extends Controller
             $genre = 0;
         }
 
-        $postData = [
-            'product_id' => $id,
+        product::where('product_id', $get['id'])->update([
             'product_name' => $get['name'],
             'product_material' => $get['material'],
             'product_genre' => $genre,
             'product_des' => $get['des'],
             'product_price' => $get['price'],
             'brand_id' => $get['brand'],
-            'product_updated_date' => Carbon::now()->toDateString(),
-            'pcsq' => $get['pcsq']
-        ];
-
-        $response = Http::post('https://s25sneaker.000webhostapp.com/api/addProduct', $postData);
-
-        // Kiểm tra nếu yêu cầu thành công (status code 2xx)
-        if ($response->successful()) {
-            // $responseData = $response->json();
-            // Xử lý dữ liệu phản hồi nếu cần
-            // return response()->json(['message' => 'Data posted successfully']);
-            return to_route('a.b.list');
-        } else {
-            // Xử lý lỗi nếu có
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-            return response()->json(['error' => 'Failed to post data'], $statusCode);
-        }
-    }
-    public function editred()
-    {
-        $pid = request('pid');
-        // $brand = brand::where('brand_active', '!=', -1)
-        //     ->orderBy('brand_name', 'asc')->get();
-        // $get = product::where('product_id', request('pid'))
-        //     ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
-        //     ->get();
-        // $get2 = product_size_color::where('product_id', request('pid'))
-        //     ->groupBy('product_id')
-        //     ->groupBy('color')
-        //     ->groupBy('product_image')
-        //     ->get([
-        //         'product_id', 'color',
-        //         product_size_color::raw('COUNT(size) as row'),
-        //         'product_image'
-        //     ]);
-        // $get3 = product_size_color::where('product_id', request('pid'))->get();
-        // return view('admin.product.admin_product_edit', [
-        //     'product' => $get, 'psc1' => $get2, 'psc2' => $get3,
-        //     'brand' => $brand, 'title' => 'Edit Product'
-        // ]);
-
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/product/edit', ['pid' => $pid]);
-
-        if ($response->successful()) {
-            $responseData = $response->json();
-
-            $get = $responseData['product'];
-
-            $psc1 = $responseData['psc1'];
-
-            $psc2 = $responseData['psc2'];
-
-            $brand = $responseData['brand'];
-
-            return view('admin.product.admin_product_edit', [
-                'product' => $get, 'psc1' => $psc1, 'psc2' => $psc2,
-                'brand' => $brand, 'title' => 'Edit Product'
-            ]);
-        } else {
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-        }
-    }
-    public function update(Request $request)
-    {
-        $get = $request->all();
-
-        // product::where('product_id', $get['id'])->update([
-        //     'product_name' => $get['name'],
-        //     'product_material' => $get['material'],
-        //     'product_des' => $get['des'],
-        //     'product_price' => $get['price'],
-        //     'brand_id' => $get['brand'],
-        //     'product_updated_date' => Carbon::now()->toDateString()
-        // ]);
+            'product_updated_date' => Carbon::now()->toDateString()
+        ]);
 
         $id = $get['id'];
 
@@ -344,163 +288,81 @@ class ProductController extends Controller
         }
 
 
-        // product_size_color::where('product_id', $get['id'])->delete();
-        // $pcsq = $get['pcsq'];
-        // $pcs = array();
-        // for ($i = 0; $i < count($pcsq); $i++) {
-        //     $ex = explode('|', $pcsq[$i]);
-        //     $pcs[$i] = new product_size_color();
-        //     $pcs[$i]->product_id = $id;
-        //     $pcs[$i]->color = $ex[0];
-        //     $pcs[$i]->size = $ex[1];
-        //     $pcs[$i]->quantity = $ex[2];
-        //     $pcs[$i]->product_image = $ex[3];
-        //     $pcs[$i]->save();
-        // }
-
-        if ($get['genre'] == "Unisex") {
-            $genre = 2;
-        } else if ($get['genre'] == "Nam") {
-            $genre = 1;
-        } else if ($get['genre'] == "Nữ") {
-            $genre = 0;
+        product_size_color::where('product_id', $get['id'])->delete();
+        $pcsq = $get['pcsq'];
+        $pcs = array();
+        for ($i = 0; $i < count($pcsq); $i++) {
+            $ex = explode('|', $pcsq[$i]);
+            $pcs[$i] = new product_size_color();
+            $pcs[$i]->product_id = $id;
+            $pcs[$i]->color = $ex[0];
+            $pcs[$i]->size = $ex[1];
+            $pcs[$i]->quantity = $ex[2];
+            $pcs[$i]->product_image = $ex[3];
+            $pcs[$i]->save();
         }
 
-        $postData = [
-            'product_id' => $id,
-            'product_name' => $get['name'],
-            'product_material' => $get['material'],
-            'product_genre' => $genre,
-            'product_des' => $get['des'],
-            'product_price' => $get['price'],
-            'brand_id' => $get['brand'],
-            'product_updated_date' => Carbon::now()->toDateString(),
-            'pcsq' => $get['pcsq']
-        ];
-        $response = Http::post('https://s25sneaker.000webhostapp.com/api/updateProduct', $postData);
 
-        if ($response->successful()) {
-            return response()->json([
-                'message' => 'Product updated successfully.'
-            ]);
-        } else {
-            // Xử lý lỗi nếu có
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-            return response()->json(['error' => 'Failed to post data'], $statusCode);
-        }
-
-        // return response()->json([
-        //     'message' => 'Product updated successfully.'
-        // ]);
+        return response()->json([
+            'message' => 'Product updated successfully.'
+        ]);
     }
+
+    //[GET] /admin/product/delete (use)
     public function delred()
     {
-        // $pq = product_size_color::groupBy('product_id')
-        //     ->get([
-        //         'product_id',
-        //         product_size_color::raw('SUM(quantity) as quan')
-        //     ]);
-        $search = request('searchName');
-        // if (isset($search)) {
-        //     $count = product::where('product_active', '!=', -1)
-        //         ->where('product_name', 'like', '%' . $search . '%')
-        //         ->count('product_id');
-        //     $get = product::join('brand', 'product.brand_id', '=', 'brand.brand_id')
-        //         ->where('product_active', '!=', -1)
-        //         ->where('product_name', 'like', '%' . $search . '%')
-        //         ->paginate(7);
-        // } else {
-        //     $count = product::where('product_active', '!=', -1)->count('product_id');
-        //     $get = product::join('brand', 'product.brand_id', '=', 'brand.brand_id')
-        //         ->where('product_active', '!=', -1)->paginate(7);
-        // }
-        // return view('admin.product.admin_product_delete', [
-        //     'product' => $get, 'count' => $count, 'quan' => $pq, 'title' => 'Products List'
-        // ]);
-        $page = request('page', 1);
-
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/product/delete', ['searchName' => $search, 'page' => $page]);
-
-        if ($response->successful()) {
-            $responseData = $response->json();
-
-            $count = $responseData['count'];
-
-            $quan = $responseData['quan'];
-
-            $product = collect($responseData['product']['data']);
-
-            $perPage = 7;
-
-            // $currentPage = $responseData['product']['current_page'];
-
-            $paginator = new LengthAwarePaginator(
-                $product,
-                $responseData['count'],
-                $perPage,
-                $page,
-                ['path' => url()->current(), 'query' => request()->query()]
-            );
-
-
-            return view('admin.product.admin_product_delete', [
-                'product' => $paginator,
-                'count' => $count,
-                'quan' => $quan, 'title' => 'Products List'
+        $pq = product_size_color::groupBy('product_id')
+            ->get([
+                'product_id',
+                product_size_color::raw('SUM(quantity) as quan')
             ]);
+        $search = request('searchName');
+        if (isset($search)) {
+            $count = product::where('product_active', '!=', -1)
+                ->where('product_name', 'like', '%' . $search . '%')
+                ->count('product_id');
+            $get = product::join('brand', 'product.brand_id', '=', 'brand.brand_id')
+                ->where('product_active', '!=', -1)
+                ->where('product_name', 'like', '%' . $search . '%')
+                ->paginate(8);
         } else {
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
+            $count = product::where('product_active', '!=', -1)->count('product_id');
+            $get = product::join('brand', 'product.brand_id', '=', 'brand.brand_id')
+                ->where('product_active', '!=', -1)->paginate(8);
         }
+        return view('admin.product.admin_product_delete', [
+            'product' => $get, 'count' => $count, 'quan' => $pq, 'title' => 'Products List'
+        ]);
     }
+
+    //[POST] /deleteProduct
     public function delete(Request $request)
     {
         $get = $request->all();
-        // product::where('product_id', $get['pid'])->update([
-        //     'product_active' => -1
-        // ]);
-
-        $response = Http::post('https://s25sneaker.000webhostapp.com/api/deleteProduct', $get);
-        if ($response->successful()) {
-        } else {
-            // Xử lý lỗi nếu có
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-            return response()->json(['error' => 'Failed to post data'], $statusCode);
-        }
+        product::where('product_id', $get['pid'])->update([
+            'product_active' => -1
+        ]);
     }
+
+    //[POST] /activateProduct
     public function activate(Request $request)
     {
         $get = $request->all();
-        // product::where('product_id', $get['pid'])->update([
-        //     'product_active' => 1
-        // ]);
-        $response = Http::post('https://s25sneaker.000webhostapp.com/api/activateProduct', $get);
-        if ($response->successful()) {
-        } else {
-            // Xử lý lỗi nếu có
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-            return response()->json(['error' => 'Failed to post data'], $statusCode);
-        }
+        product::where('product_id', $get['pid'])->update([
+            'product_active' => 1
+        ]);
     }
+
+    //[POST] /deactivateProduct (use)
     public function deactivate(Request $request)
     {
         $get = $request->all();
-        // product::where('product_id', $get['pid'])->update([
-        //     'product_active' => 0
-        // ]);
-        $response = Http::post('https://s25sneaker.000webhostapp.com/api/deactivateProduct', $get);
-        if ($response->successful()) {
-            // return to_route('a.b.list');
-        } else {
-            // Xử lý lỗi nếu có
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-            return response()->json(['error' => 'Failed to post data'], $statusCode);
-        }
+        product::where('product_id', $get['pid'])->update([
+            'product_active' => 0
+        ]);
     }
+
+    //[POST] addPimg (use)
     public function addimg(Request $request)
     {
         $get = $request->all();
@@ -524,15 +386,9 @@ class ProductController extends Controller
             'message' => 'Add images to folder ' . $path . ' successfully.',
             'name' => $name, 'imgs' => $imgs
         ]);
-        // $response = Http::post('https://s25sneaker.000webhostapp.com/api/addPimg', $get);
-        // if ($response->successful()) {
-        // } else {
-        //     // Xử lý lỗi nếu có
-        //     $statusCode = $response->status();
-        //     $errorMessage = $response->body();
-        //     return response()->json(['error' => 'Failed to post data'], $statusCode);
-        // }
     }
+
+    //[POST] /removePcolor (use)
     public function removecolor(Request $request)
     {
         $get = $request->all();
@@ -543,20 +399,9 @@ class ProductController extends Controller
                 File::delete($path . '/' . $n);
             }
         }
-        // return response()->json([
-        //     'message' => 'Remove imgs of color successfully.'
-        // ]);
-        $response = Http::post('https://s25sneaker.000webhostapp.com/api/removePcolor', $get);
-        if ($response->successful()) {
-            return response()->json([
-                'message' => 'Remove imgs of color successfully.'
-            ]);
-        } else {
-            // Xử lý lỗi nếu có
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-            return response()->json(['error' => 'Failed to post data'], $statusCode);
-        }
+        return response()->json([
+            'message' => 'Remove imgs of color successfully.'
+        ]);
     }
 
 
@@ -565,6 +410,7 @@ class ProductController extends Controller
 
 
     // API
+
 
     public function list_api()
     {
@@ -582,11 +428,11 @@ class ProductController extends Controller
                 $get = product::join('brand', 'product.brand_id', '=', 'brand.brand_id')
                     ->where('product_active', '!=', -1)
                     ->where('product_name', 'like', '%' . $search . '%')
-                    ->paginate(7);
+                    ->simplePaginate(8);
             } else {
                 $count = product::where('product_active', '!=', -1)->count('product_id');
                 $get = product::join('brand', 'product.brand_id', '=', 'brand.brand_id')
-                    ->where('product_active', '!=', -1)->paginate(7);
+                    ->where('product_active', '!=', -1)->simplePaginate(8);
             }
             return response()->json(['status' => 'success', 'product' => $get, 'count' => $count, 'quan' => $pq]);
         } catch (\Exception $e) {
@@ -598,7 +444,7 @@ class ProductController extends Controller
         try {
             $get = product::where('product_id', request('pid'))
                 ->join('brand', 'product.brand_id', '=', 'brand.brand_id')
-                ->where('product_active', '!=', -1)->paginate(7);
+                ->where('product_active', '!=', -1)->simplePaginate(8);
             $get2 = product_size_color::where('product_id', request('pid'))
                 ->groupBy('product_id')
                 ->groupBy('color')
@@ -799,11 +645,11 @@ class ProductController extends Controller
                 $get = product::join('brand', 'product.brand_id', '=', 'brand.brand_id')
                     ->where('product_active', '!=', -1)
                     ->where('product_name', 'like', '%' . $search . '%')
-                    ->paginate(7);
+                    ->simplePaginate(8);
             } else {
                 $count = product::where('product_active', '!=', -1)->count('product_id');
                 $get = product::join('brand', 'product.brand_id', '=', 'brand.brand_id')
-                    ->where('product_active', '!=', -1)->paginate(7);
+                    ->where('product_active', '!=', -1)->simplePaginate(8);
             }
             // return view('admin.product.admin_product_delete', [
             //     'product' => $get, 'count' => $count, 'quan' => $pq, 'title' => 'Products List'

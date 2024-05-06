@@ -159,18 +159,55 @@
                     <p>Completed</p>
                     </a>
                   </li>
-              
                 </ul>
             </li>
 
             <!-- Revenue -->
-            <li class="nav-item">
+            {{-- <li class="nav-item">
                 <a href="{{ route('a.revenue') }}" class="nav-link {{ request()->is('admin/revenue') ? 'active' : '' }}">
                     <i class="fa-sharp fa-solid fa-chart-simple nav-icon" style="color: #ffffff;"></i>
                     <p>
                         Revenue
                     </p>
                 </a>
+            </li> --}}
+
+            <li class="nav-item {{ request()->is('admin/revenue*') ? 'menu-open' : '' }}">
+                <a href="#" class="nav-link" {{ request()->is('admin/revenue*') ? 'active' : '' }}>
+                    <i class="fa-sharp fa-solid fa-chart-simple nav-icon" style="color: #ffffff;"></i>
+                    <p>
+                        Statistical
+                        <i class="right fas fa-angle-left"></i>
+                    </p>
+                    </a>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                        <a href="{{ route('a.revenue') }}" class="nav-link {{ request()->is('admin/revenue') ? 'active' : '' }}">
+                            <i class="far fa-circle nav-icon" style="color: #ffffff;"></i>
+                            <p>
+                                Revenue
+                            </p>
+                        </a>
+                    </li>
+                <li class="nav-item">
+                    <a href="{{ route('a.revenue.list.0') }}" class="nav-link {{ request()->is('admin/revenue/inventory_products') ? 'active' : '' }}">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Inventory product statistics</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('a.revenue.list.1') }}" class="nav-link {{ request()->is('admin/revenue/bulk_products') ? 'active' : '' }}">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Bulk product statistics</p>
+                    </a>
+                </li>
+                {{-- <li class="nav-item">
+                    <a href="{{ route('a.revenue.list.2') }}" class="nav-link {{ request()->is('admin/revenue/StatisticsOrder') ? 'active' : '' }}">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Order Statistics</p>
+                    </a>
+                </li> --}}
+                </ul>
             </li>
 
             <!-- Account -->

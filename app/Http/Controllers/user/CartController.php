@@ -443,15 +443,10 @@ class CartController extends Controller
 
 
     // API
+
     public function payment_api(Request $request, $pid)
     {
         try {
-            // session(['prePage' => '/cart/' . $pid]);
-            // if (session('login') == 'false') {
-            //     session(['cart' => $request->size . ',' . $request->color . ',' . $request->amount]);
-            //     return redirect('/login');
-            // } else {
-            //     if (session('cart') == null) {
             $request->validate([
                 'size' => 'required',
                 'color' => 'required',
@@ -460,20 +455,11 @@ class CartController extends Controller
             $size = $request->size;
             $color = $request->color;
             $amount = $request->amount;
-            // } else {
-            //     $arr = explode(',', session('cart'));
-            //     $size = $arr[0];
-            //     $color = $arr[1];
-            //     $amount = $arr[2];
-            // }
             $product_size = DB::select('select * from product_size_color where product_id= :pid and size= :size and color= :color', [
                 'pid' => $pid,
                 'size' => $size,
                 'color' => $color
             ]);
-            // if ($product_size[0]->quantity == 0) {
-            //     return redirect('/products/' . $pid);
-            // } else {
             $products = DB::select('select cart.*,discount.*,product_size_color.*,product.* from cart 
                         inner join product on cart.product_id = product.product_id
                         inner join product_size_color on product_size_color.size = cart.size 
@@ -562,7 +548,7 @@ class CartController extends Controller
                         where product.product_active < 1 and mem_id= :uid', [
                 'uid' => session('user')
             ]);
-            // dd( count($deleted_products));
+
             if ($deleted_products) {
                 for ($i = 0; $i < count($deleted_products); $i++) {
                     DB::select('delete from cart where mem_id = :uid and size = :size and color = :color and product_id = :pid', [
@@ -573,16 +559,7 @@ class CartController extends Controller
                     ]);
                 }
             }
-            // return view('user/cart', [
-            //     'pscs' => $pscs,
-            //     'products' => $products,
-            //     'pid' => $pid,
-            //     'sizes' => $sizes,
-            //     'colors' => $colors,
-            //     'pri_product' => $pri_product[0],
-            //     'brands' => $brands->load(),
-            //     'count_deleted' => count($deleted_products)
-            // ]);
+
             return response()->json([
                 'status' => 'success',
                 'pscs' => $pscs,
@@ -601,10 +578,7 @@ class CartController extends Controller
     public function loadCart_api()
     {
         try {
-            // session(['prePage' => '/cart']);
-            // if (session('login') != 'true') {
-            //     return redirect('/login');
-            // } else {
+
             $products = DB::select('select cart.*,discount.*,product_size_color.*,product.* from cart 
                     inner join product on cart.product_id = product.product_id 
                     inner join product_size_color on cart.size = product_size_color.size 
@@ -630,7 +604,7 @@ class CartController extends Controller
                     where product.product_active < 1 and mem_id= :uid', [
                 'uid' => session('user')
             ]);
-            // dd( count($deleted_products));
+
             if ($deleted_products) {
                 for ($i = 0; $i < count($deleted_products); $i++) {
                     DB::select('delete from cart where mem_id = :uid and size = :size and color = :color and product_id = :pid', [
@@ -641,14 +615,7 @@ class CartController extends Controller
                     ]);
                 }
             }
-            // return view('user/cart', [
-            //     'pscs' => $pscs,
-            //     'products' => $products,
-            //     'sizes' => $sizes,
-            //     'colors' => $colors,
-            //     'brands' => $brands->load(),
-            //     'count_deleted' => count($deleted_products)
-            // ]);
+
             return response()->json([
                 'status' => 'success',
                 'pscs' => $pscs,
@@ -658,7 +625,6 @@ class CartController extends Controller
                 'brands' => $brands->load(),
                 'count_deleted' => count($deleted_products)
             ], 201);
-            // }
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'error' => $e->getMessage()], 500);
         }
@@ -667,10 +633,7 @@ class CartController extends Controller
     public function updateQuantity_api(Request $request)
     {
         try {
-            // session(['prePage' => '/cart']);
-            // if (session('login') != 'true') {
-            //     return response()->json(['redirect', '/login']);
-            // } else {
+
             $request->validate([
                 'id' => 'required',
                 'size' => 'required',
@@ -732,12 +695,7 @@ class CartController extends Controller
                 'color' => $request->color
             ]);
 
-            // return response()->json([
-            //     'quantity' => $amount,
-            //     's_price' => $amount * $p_price,
-            //     'diff_price' => $amount * $p_price - $old_price,
-            //     'diff_amount' => $amount - $old_amount
-            // ]);
+
             return response()->json([
                 'status' => 'success',
                 'quantity' => $amount,
@@ -754,10 +712,7 @@ class CartController extends Controller
     public function removeProduct_api(Request $request)
     {
         try {
-            // session(['prePage' => '/cart']);
-            // if (session('login') != 'true') {
-            //     return response()->json(['redirect', '/login']);
-            // } else {
+
             $request->validate([
                 'id' => 'required',
                 'size' => 'required',
@@ -787,10 +742,7 @@ class CartController extends Controller
     public function updateSize_api(Request $request)
     {
         try {
-            // session(['prePage' => '/cart']);
-            // if (session('login') != 'true') {
-            //     return response()->json(['redirect', '/login']);
-            // } else {
+
             $request->validate([
                 'pid' => 'required',
                 'size' => 'required',
@@ -829,10 +781,7 @@ class CartController extends Controller
                             where cart_id= :cid', [
                         'cid' => $request->cid
                     ]);
-                    // return response()->json([
-                    //     'quantity' => $product[0]->quantity,
-                    //     'img' => explode(',', $product[0]->product_image)[0]
-                    // ]);
+
                     return response()->json([
                         'status' => 'success',
                         'quantity' => $product[0]->quantity,
@@ -856,10 +805,7 @@ class CartController extends Controller
     public function selectProduct_api(Request $request)
     {
         try {
-            // session(['prePage' => '/cart']);
-            // if (session('login') != 'true') {
-            //     return response()->json(['redirect', '/login']);
-            // } else {
+
             $request->validate([
                 'pid' => 'required'
             ]);
@@ -910,10 +856,6 @@ class CartController extends Controller
                     $s_price = $cart[0]->amount * $cart[0]->product_price;
                 }
 
-                // return response()->json([
-                //     's_amount' => $s_amount,
-                //     's_price' => $s_price
-                // ]);
                 return response()->json([
                     'status' => 'success',
                     's_amount' => $s_amount,
@@ -925,6 +867,11 @@ class CartController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Chọn sản phẩm thất bại', 'error' => $e->getMessage()], 500);
         }
     }
+
+
+    //USE
+
+    //[POST] /cart/add_product 
 
     public function cart_api(Request $request)
     {
@@ -959,6 +906,8 @@ class CartController extends Controller
         }
     }
 
+    //[GET] /cart/user
+
     public function user_cart_api(Request $request)
     {
         try {
@@ -968,7 +917,7 @@ class CartController extends Controller
                     $query->with(['details', 'discounts' => function ($query) {
                         $query->where('discount_active', 1);
                     }]);
-                }])
+                }])->orderBy('cart_id', 'desc')
                 ->get();
             return response()->json([
                 'status' => 'success',
@@ -978,6 +927,8 @@ class CartController extends Controller
             return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
         }
     }
+
+    //[POST] /cart/update
 
     public function update_cart_api(Request $request)
     {
@@ -1001,16 +952,17 @@ class CartController extends Controller
         }
     }
 
+    //[POST] /cart/remove
+
     public function remove_cart_api(Request $request)
     {
         try {
             $cartId = $request->input('cart_id');
 
-            //DB::table('cart')->where('cart_id', $cartId)->delete();
             DB::table('cart')
                 ->where('cart_id', $cartId)
                 ->update([
-                    'cart_active' => 0,
+                    'cart_active' => -1,
                 ]);
             return response()->json([
                 'status' => 'success',
@@ -1020,6 +972,8 @@ class CartController extends Controller
             return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
         }
     }
+
+    //[GET] /order/user
 
     public function order_user_api(Request $request)
     {
@@ -1040,8 +994,8 @@ class CartController extends Controller
                             ]);
                         }
 
-                    ])
-                    ->get();
+                    ])->orderBy('order_id', 'desc')
+                    ->paginate(5);
                 return response()->json([
                     'status' => 'success',
                     'products' => $orders,
@@ -1060,8 +1014,8 @@ class CartController extends Controller
                             ]);
                         }
 
-                    ])
-                    ->get();
+                    ])->orderBy('order_id', 'desc')
+                    ->paginate(5);
                 return response()->json([
                     'status' => 'success',
                     'products' => $orders,
@@ -1071,6 +1025,8 @@ class CartController extends Controller
             return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
         }
     }
+
+    //[POST] /feedback/product
 
     public function feedback_api(Request $request)
     {
@@ -1091,12 +1047,51 @@ class CartController extends Controller
         }
     }
 
+    //[POST] /order/canceled
+
+    // public function update_canceled_api(Request $request)
+    // {
+    //     try {
+    //         $details = $request->input('details');
+    //         $array = json_decode($details, true);
+    //         if (is_array($array) || is_object($array)) {
+    //             $order_id = intval($request->input('order_id'));
+
+    //             DB::table('order')
+    //                 ->where('order_id', $order_id)
+    //                 ->update([
+    //                     'order_status' => -1,
+    //                     'canceled_date' => DB::raw('CURRENT_TIMESTAMP()')
+    //                 ]);
+
+    //             foreach ($array as $product) {
+
+    //                 DB::table('product_size_color')
+    //                     ->where('product_id', $product['product_id'])
+    //                     ->where('size', $product['size'])
+    //                     ->where('color', $product['color'])
+    //                     ->update(['quantity' => DB::raw('quantity + ' . $product['quantity'])]);
+    //             }
+    //             return response()->json([
+    //                 'status' => 'success',
+    //                 'update' => 'Hủy đơn hàng thành công',
+    //             ]);
+    //         } else {
+    //             return response()->json(['status' => 'error']);
+    //         }
+    //     } catch (\Exception $e) {
+    //         return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
+    //     }
+    // }
+
     public function update_canceled_api(Request $request)
     {
-        try {
+        DB::beginTransaction();
 
+        try {
             $details = $request->input('details');
             $array = json_decode($details, true);
+
             if (is_array($array) || is_object($array)) {
                 $order_id = intval($request->input('order_id'));
 
@@ -1108,13 +1103,15 @@ class CartController extends Controller
                     ]);
 
                 foreach ($array as $product) {
-
                     DB::table('product_size_color')
                         ->where('product_id', $product['product_id'])
                         ->where('size', $product['size'])
                         ->where('color', $product['color'])
                         ->update(['quantity' => DB::raw('quantity + ' . $product['quantity'])]);
                 }
+
+                DB::commit();
+
                 return response()->json([
                     'status' => 'success',
                     'update' => 'Hủy đơn hàng thành công',
@@ -1123,9 +1120,13 @@ class CartController extends Controller
                 return response()->json(['status' => 'error']);
             }
         } catch (\Exception $e) {
+            DB::rollBack();
+
             return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
         }
     }
+
+    // [POST] /order/completion
 
     public function update_completion_api(Request $request)
     {

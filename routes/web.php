@@ -118,16 +118,16 @@ Route::post('/feedback/readRequest', [
     AccountController::class, 'readRequest'
 ]);
 
-Route::get('/loadHeader', function () {
-    if (session('login') == 'true') {
-        $user = DB::select('select * from member where mem_id= :uid', [
-            'uid' => session('user')
-        ]);
-        $name_user = $user[0]->name;
-        return response()->json(['name' => $name_user]);
-    }
-    return response()->json([]);
-});
+// Route::get('/loadHeader', function () {
+//     if (session('login') == 'true') {
+//         $user = DB::select('select * from member where mem_id= :uid', [
+//             'uid' => session('user')
+//         ]);
+//         $name_user = $user[0]->name;
+//         return response()->json(['name' => $name_user]);
+//     }
+//     return response()->json([]);
+// });
 
 Route::post('/cart/quantity', [
     CartController::class, 'updateQuantity'
@@ -202,6 +202,12 @@ Route::middleware([AdminStaffValidate::class])->group(function () {
     Route::post('/admin/cancel_edit/{order}', [OrderController::class, 'canceledit']);
 
     Route::get('/admin/revenue', 'App\Http\Controllers\admin\RevenueController@show')->name('a.revenue');
+    Route::get('/admin/revenue/inventory_products', 'App\Http\Controllers\admin\ProductController@list_inventory')->name('a.revenue.list.0');
+    Route::get('/admin/revenue/bulk_products', 'App\Http\Controllers\admin\ProductController@list_bulk')->name('a.revenue.list.1');
+    Route::get('/admin/revenue/StatisticsOrder', [
+        OrderController::class, 'revenue_finished'
+    ])->name('a.revenue.list.2');
+
     Route::middleware([AdminValidate::class])->group(function () {
         Route::get('/admin/brand/add', 'App\Http\Controllers\admin\BrandController@addred')->name('a.b.add.red');
         Route::post('/admin/brand/add', 'App\Http\Controllers\admin\BrandController@add')->name('a.b.add');

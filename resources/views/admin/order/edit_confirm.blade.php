@@ -340,14 +340,14 @@
         <tbody>
             @foreach($product_orders as $rp)
                 <tr>
-                    <td valign="middle" ><img src="/img/product/{{$rp['product_id']}}/{{explode(',',$rp['product_image'])[0]}}" class="img"></td>
+                    <td valign="middle" ><img src="/img/product/{{$rp->product_id}}/{{explode(',',$rp->product_image)[0]}}" class="img"></td>
                     {{-- <td valign="middle"><img src="/img/18/img-01.jpg"></td> --}}
-                    <td valign="middle" style="vertical-align: middle;">{{$rp['product_name']}}</td>
-                    <td valign="middle" style="vertical-align: middle;">{{number_format($rp['sell_price'])}}</td>
-                    <td valign="middle" style="vertical-align: middle;text-align:center">{{$rp['quantity']}}</td>
-                    <td valign="middle" style="vertical-align: middle;text-align:center">{{$rp['color']}}</td>
-                    <td valign="middle" style="vertical-align: middle;text-align:center">{{$rp['size']}}</td>
-                    <td valign="middle" style="vertical-align: middle;">{{number_format($rp['sell_price'] * $rp['quantity'])}}</td>
+                    <td valign="middle" style="vertical-align: middle;">{{$rp->product_name}}</td>
+                    <td valign="middle" style="vertical-align: middle;">{{number_format($rp->sell_price / $rp->quantity)}}</td>
+                    <td valign="middle" style="vertical-align: middle;text-align:center">{{$rp->quantity}}</td>
+                    <td valign="middle" style="vertical-align: middle;text-align:center">{{$rp->color}}</td>
+                    <td valign="middle" style="vertical-align: middle;text-align:center">{{$rp->size}}</td>
+                    <td valign="middle" style="vertical-align: middle;">{{number_format($rp->sell_price)}}</td>
                     {{-- <td valign="middle">{{$product_order->order_value}}</td> --}}
                     
                     {{-- <td>
@@ -360,20 +360,20 @@
             <tr></tr>
         </tbody>
         </table>
-        <h3 align=right class="order_total">Tổng cộng: {{number_format($product_order['order_value'])}}</h3>
+        <h3 align=right class="order_total">Tổng cộng: {{number_format($product_order->order_value)}}</h3>
             <div class="btn-confirm-cancel">
-            <form action="/admin/edit/{{$product_order['order_id']}}" method="post">             
+            <form action="/admin/edit/{{$product_order->order_id}}" method="post">             
               @csrf
               <div class="btn-confirm">
                 <button type="submit" class="btn btn-primary"  onclick="return confirm('Bạn có chắc đã xác nhận rồi không?');">Duyệt đơn hàng</button>
               </div>
             </form>
-            {{-- <form action="/admin/cancel_edit/{{$product_order['order_id']}}" method="post">
+            <form action="/admin/cancel_edit/{{$product_order->order_id}}" method="post">
               @csrf
               <div class="btn-cancel">
                 <button type="submit" class="btn btn-primary btn-cancel-primary"  onclick="return confirm('Bạn có chắc hủy biên lai này không?');">Hủy biên lai</button>
               </div>
-            </form> --}}
+            </form>
           </div>
           
         </div>
@@ -384,19 +384,19 @@
           <div class="member_detail">
             <div class="member-name">
               <div class="member-name-name">Tên: </div>
-              <p>{{$product_order['receiver_name']}}</p>
+              <p>{{$product_order->receiver_name}}</p>
             </div>
             <div class="member-email">
               <div class="member-email-email">Email: </div>
-              <p>{{$product_order['username']}}</p>
+              <p>{{$product_order->username}}</p>
             </div>
             <div class="member-sdt">
               <div class="member-sdt-sdt">Số điện thoại: </div>
-              <p>{{$product_order['receiver_phone']}}</p>
+              <p>{{$product_order->receiver_phone}}</p>
             </div>
             <div class="member-address">
               <div class="member-address-address">Địa chỉ: </div>
-              <p>{{$product_order['receiver_address']}}</p>
+              <p>{{$product_order->receiver_address}}</p>
             </div>
           </div>
         </div>

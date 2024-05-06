@@ -340,3 +340,9 @@ Route::get('/updateImg/{id}', [
     ProductController::class,
     'updateImg'
 ]);
+
+//JWT
+Route::post('login_JWT', [AccountController::class, 'loginJWT']);
+Route::get('profile_JWT', [AccountController::class, 'profileJWT']);
+Route::post('register_JWT', [AccountController::class, 'registerJWT']);
+Route::post('forget_JWT', [AccountController::class, 'forgetJWT']);

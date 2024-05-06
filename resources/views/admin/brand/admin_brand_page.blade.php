@@ -126,7 +126,7 @@
                                     <tbody>
                                         @foreach($brand as $b)
                                         <tr data-widget="expandable-table" aria-expanded="false">
-                                            <td>{{ $b['brand_id'] }}.</td>
+                                            <td>{{ ($brand->currentPage() - 1) * $brand->perPage() + $loop->iteration }}.</td>
                                             <td class="bName">{{ $b['brand_name'] }}</td>
                                             <td>
                                                 @if($b['brand_logo'] === NULL)

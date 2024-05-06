@@ -114,21 +114,7 @@
                       <p>Contact:&nbsp;&nbsp;&nbsp;{{ $m['phone'] }}</p>
                       <p>Address:&nbsp;&nbsp;&nbsp;{{ $m['address'] }}</p>
                       <p>Number of orders:&nbsp;&nbsp;&nbsp;
-                        <?php $i = 0; ?>
-                        @if(count($nor) == 0)
-                          {{ $i }}
-                        @else
-                          @foreach($nor as $n)
-                            @if($n['mem_id'] == $m['mem_id'])
-                              {{ $n['nor'] }}
-                              <?php $i += 1; ?>
-                              @break
-                            @endif
-                          @endforeach
-                          @if($i == 0)
-                            {{ $i }}
-                          @endif
-                        @endif
+                        {{ $m['orders_count'] }}
                       </p>
                       <div>
                         @if($m['mem_active'] == 1)

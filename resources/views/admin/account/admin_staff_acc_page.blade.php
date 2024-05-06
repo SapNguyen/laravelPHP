@@ -218,12 +218,12 @@ $.ajaxSetup({
 $('.savebtn').click(function(){
     var tr = $(this).closest('tr')[0].childNodes;
 
-    for(var i = 0; i < accs.length; i++){
-		if(accs[i].username == tr[3].childNodes[1].value || tr[3].childNodes[1].value == ""){
-			alert('Username is invalid or taken!');
-			return;
-		}
-	}
+    // for(var i = 0; i < accs.length; i++){
+	// 	if(accs[i].username == tr[3].childNodes[1].value || tr[3].childNodes[1].value == ""){
+	// 		alert('Username is invalid or taken!');
+	// 		return;
+	// 	}
+	// }
 
     var formData = new FormData();
     formData.append('sId', tr[1].value);

@@ -126,7 +126,7 @@
                                     <tbody>
                                         @foreach($brand as $b)
                                         <tr data-widget="expandable-table" aria-expanded="false">
-                                            <td>{{ $b['brand_id'] }}.</td>
+                                            <td>{{ ($brand->currentPage() - 1) * $brand->perPage() + $loop->iteration }}.</td>
                                             <td class="bName">{{ $b['brand_name'] }}</td>
                                             <td>
                                                 @if($b['brand_logo'] === NULL)
@@ -325,7 +325,7 @@ function deleteBrand(button){
         $.ajax({
             type: "POST",
             url: "/deleteBrand",
-            // url: "https://s25sneaker.000webhostapp.com/api/admin/deleteBrand",
+            // url: "http://127.0.0.1:8000/api/admin/deleteBrand",
             data: formData,
             success: function (response) {
                 alert('Brand no.' + bid + ' has been deleted.');

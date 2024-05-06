@@ -110,7 +110,7 @@
   <table class="table table-bordered table-hover">
     <thead>
       <tr>
-        <th>Mã khuyến mãi</th>
+        <th>#</th>
         <th>Tên khuyến mãi</th>
         <th>Ngày bắt đầu</th>
         <th>Ngày kết thúc</th>
@@ -121,8 +121,7 @@
     <tbody>
         @foreach($discounts as $discount)
         <tr data-widget="expandable-table" aria-expanded="false">
-            
-                <td valign="middle">{{$discount['discount_id']}}</td>
+                <td>{{ ($discounts->currentPage() - 1) * $discounts->perPage() + $loop->iteration }}.</td>
                 <td valign="middle">{{$discount['discount_name']}}</td>
                 <td valign="middle">{{$discount['discount_start']}}</td>
                 <td valign="middle">{{$discount['discount_end']}}</td>

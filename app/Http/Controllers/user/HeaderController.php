@@ -24,20 +24,9 @@ class HeaderController extends Controller
         // return view('login', [
         //     'brands' => $brands->load()
         // ]);
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/load');
 
-        if ($response->successful()) {
-            $responseData = $response->json();
 
-            $brands = $responseData['brands'];
-
-            return view('login', [
-                'brands' => $brands
-            ]);
-        } else {
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-        }
+        return view('login');
         // }
     }
 
@@ -48,7 +37,7 @@ class HeaderController extends Controller
         //     'brands' => $brands->load()
         // ]);
 
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/load');
+        $response = Http::get('http://127.0.0.1:8000/api/load');
 
         if ($response->successful()) {
             $responseData = $response->json();
@@ -82,9 +71,6 @@ class HeaderController extends Controller
     {
         try {
             $brands = new HeaderController();
-            // return view('user/product', [
-            //     'brands' => $brands->load()
-            // ]);
             return response()->json(['status' => 'success', 'brands' => $brands->load()], 201);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error'], 500);
@@ -95,9 +81,6 @@ class HeaderController extends Controller
     {
         try {
             $brands = new HeaderController();
-            // return view('register', [
-            //     'brands' => $brands->load()
-            // ]);
             return response()->json(['status' => 'success', 'brands' => $brands->load()]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'error' => $e->getMessage()]);
@@ -107,13 +90,7 @@ class HeaderController extends Controller
     public function get_login_api()
     {
         try {
-            // if (session('login') == 'true') {
-            //     return redirect(session('prePage'));
-            // } else {
             $brands = new HeaderController();
-            // return view('login', [
-            //     'brands' => $brands->load()
-            // ]);
             return response()->json(['status' => 'success', 'brands' => $brands->load()]);
             // }
         } catch (\Exception $e) {

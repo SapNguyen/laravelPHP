@@ -13,7 +13,7 @@ $('.changebtn').click(function(){
     btn[9].style.display = 'block';
 
     var tr = $(this).closest('tr')[0].childNodes;
-    tr[3].childNodes[1].disabled = false;
+    // tr[3].childNodes[1].disabled = false;
     tr[5].childNodes[1].disabled = false;
     tr[7].childNodes[1].disabled = false;
     tr[9].childNodes[1].disabled = false;

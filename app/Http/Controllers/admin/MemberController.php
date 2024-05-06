@@ -7,285 +7,122 @@ use Illuminate\Http\Request;
 use App\Models\admin\member;
 use App\Models\admin\order;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
 class MemberController extends Controller
 {
-
+    //[GET] /admin/accounts/admin (use)
     public function adminshow()
     {
-        // $get = member::where('role', '!=', 'admin')
-        //     ->orWhere('role', '=', null)
-        //     ->get();
-        // $get2 = member::where('role', 'admin')->get();
-        // return view('admin.account.admin_admin_acc_page', ['accs' => $get, 'admin' => $get2, 'title' => 'Admin Account']);
-
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/accounts/admin');
-
-        if ($response->successful()) {
-            // Lấy dữ liệu JSON từ phản hồi
-            $responseData = $response->json();
-
-            $accs = $responseData['accs'];
-
-            $admin = $responseData['admin'];
-
-            return view('admin.account.admin_admin_acc_page', ['accs' => $accs, 'admin' => $admin, 'title' => 'Admin Account']);
-        } else {
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-        }
+        $get = member::where('role', '!=', 'admin')
+            ->orWhere('role', '=', null)
+            ->get();
+        $get2 = member::where('role', 'admin')->get();
+        return view('admin.account.admin_admin_acc_page', ['accs' => $get, 'admin' => $get2, 'title' => 'Admin Account']);
     }
-    public function update_admin()
+
+    //[POST] /admin/accounts/admin (use)
+    public function update_admin(Request $request)
     {
-        $aId = request('aId');
+        try {
+            $mem_id = $request->input('aId');
+            $username = $request->input('aName');
+            $password = $request->input('aPass');
 
-        $postData = [
-            'mem_id' => $aId,
-            'username' => request('aName'),
-            'password' => request('aPass')
-        ];
-
-        $response = Http::post('https://s25sneaker.000webhostapp.com/api/admin/accounts/admin', $postData);
-
-        if ($response->successful()) {
+            DB::update('update `member` set `username` = ?, `password` = ? where `mem_id` = ?', [$username, $password, $mem_id]);
             return to_route('a.a.list');
-        } else {
-            // Xử lý lỗi nếu có
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-            return response()->json(['error' => 'Failed to post data'], $statusCode);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'error' => $e->getMessage()], 500);
         }
-
-        // member::where('mem_id', request('aId'))->update([
-        //     'username' => request('aName'),
-        //     'password' => request('aPass')
-        // ]);
-        // return to_route('a.a.list');
     }
+
+    //[GET] /admin/accounts/staff (use)
     public function staffshow()
     {
         $search = request('table_search');
-        // if (isset($search)) {
-        //     $get = member::all();
-        //     $get2 = member::where('role', 'staff')
-        //         ->where('mem_active', '!=', -1)
-        //         ->where('username', 'like', '%' . $search . '%')
-        //         ->get();
-        // } else {
-        //     $get = member::all();
-        //     $get2 = member::where('role', 'staff')
-        //         ->where('mem_active', '!=', -1)
-        //         ->get();
-        // }
-        // return view('admin.account.admin_staff_acc_page', ['accs' => $get, 'staff' => $get2, 'title' => 'Admin Account']);
-
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/accounts/staff', ['table_search' => $search]);
-
-        if ($response->successful()) {
-            $responseData = $response->json();
-
-            $accs = $responseData['accs'];
-
-            $staff = $responseData['staff'];
-
-            return view('admin.account.admin_staff_acc_page', ['accs' => $accs, 'staff' => $staff, 'title' => 'Admin Account']);
+        if (isset($search)) {
+            $get = member::all();
+            $get2 = member::where('role', 'staff')
+                ->where('mem_active', '!=', -1)
+                ->where('username', 'like', '%' . $search . '%')
+                ->get();
         } else {
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
+            $get = member::all();
+            $get2 = member::where('role', 'staff')
+                ->where('mem_active', '!=', -1)
+                ->get();
         }
+        return view('admin.account.admin_staff_acc_page', ['accs' => $get, 'staff' => $get2, 'title' => 'Admin Account']);
     }
+
+    //[POST] /updatestaff (use)
     public function update_staff(Request $request)
     {
-        // $get = $request->all();
-        // member::where('mem_id', $get['sId'])->update([
-        //     'username' => $get['sUser'],
-        //     'password' => $get['sPass'],
-        //     'name' => $get['sName'],
-        //     'phone' => $get['sPhone'],
-        //     'mem_active' => $get['sStas']
-        // ]);
-
         $get = $request->all();
-
-        $sId = $get['sId'];
-
-        $postData = [
-            'mem_id' => $sId,
-            'username' => $get['sUser'],
-            'password' => $get['sPass'],
-            'name' => $get['sName'],
-            'address' => 'Hà Nội',
-            'phone' => $get['sPhone'],
-            'mem_active' => $get['sStas']
-        ];
-
-
-        $response = Http::post('https://s25sneaker.000webhostapp.com/api/updatestaff', $postData);
-
-        if ($response->successful()) {
-            // return to_route('a.a.list');
-        } else {
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-            return response()->json(['error' => 'Failed to post data'], $statusCode);
-        }
+        DB::update('update `member` set `username` = ?, `password` = ?, `name` = ?, `phone` = ?, `mem_active` = ? where `mem_id` = ?', [$get['sUser'], $get['sPass'], $get['sName'], $get['sPhone'], $get['sStas'], $get['sId']]);
     }
+    //[POST] /deletestaff(use)
     public function delete_staff(Request $request)
     {
-        // $get = $request->all();
-        // member::where('mem_id', $get['sId'])->update([
-        //     'username' => $get['sId'] . 'deleted',
-        //     'password' => $get['sId'] . 'deleted',
-        //     'name' => null,
-        //     'mem_active' => -1
-        // ]);
-        // return response()->json([
-        //     'message' => 'Account has been deleted successfully.',
-        // ]);
-
         $get = $request->all();
-        $response = Http::post('https://s25sneaker.000webhostapp.com/api/deletestaff', $get);
-        if ($response->successful()) {
-            // return to_route('a.b.list');
-        } else {
-            // Xử lý lỗi nếu có
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-            return response()->json(['error' => 'Failed to post data'], $statusCode);
-        }
+        DB::update('update `member` set  `mem_active` = -1 where `mem_id` = ?', [$get['sId']]);
+
+        return response()->json([
+            'message' => 'Account has been deleted successfully.',
+        ]);
     }
+
+    //[GET] /admin/accounts/staff/add (use)
     public function addstaffred()
     {
-        // $get = member::all();
-        // return view('admin.account.admin_staff_acc_add', ['accs' => $get, 'title' => 'Add New Staff Account']);
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/accounts/staff/add');
-
-        if ($response->successful()) {
-            $responseData = $response->json();
-
-            $accs = $responseData['accs'];
-
-            return view('admin.account.admin_staff_acc_add', ['accs' => $accs, 'title' => 'Add New Staff Account']);
-        } else {
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-        }
+        $get = member::all();
+        return view('admin.account.admin_staff_acc_add', ['accs' => $get, 'title' => 'Add New Staff Account']);
     }
+
+    //[POST] /admin/accounts/staff/add (use)
     public function addstaff()
     {
-        // $staff = new member();
-        // $staff->username = request('nsUser');
-        // $staff->password = request('nsPass');
-        // $staff->name = request('nsName');
-        // $staff->phone = request('nsPhone');
-        // $staff->address = '0';
-        // $staff->role = 'staff';
-        // $staff->save();
+        $username = request('nsUser');
+        $password = request('nsPass');
+        $name = request('nsName');
+        $phone = request('nsPhone');
 
-        // return to_route('a.s.list');
+        DB::insert('insert into `member` (`username`, `password`, `name`, `phone`, `address`, `role`) values (?, ?, ?, ?, ?, ?)', [$username, $password, $name, $phone, '0', 'staff']);
 
-        $postData = [
-            'username' => request('nsUser'),
-            'password' => request('nsPass'),
-            'name' => request('nsName'),
-            'phone' => request('nsPhone'),
-            'address' => '0',
-            'role' => 'staff',
-        ];
-
-        $response = Http::post('https://s25sneaker.000webhostapp.com/api/admin/accounts/staff/add', $postData);
-
-        if ($response->successful()) {
-            return to_route('a.s.list');
-        } else {
-            // Xử lý lỗi nếu có
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-            return response()->json(['error' => 'Failed to post data'], $statusCode);
-        }
+        return to_route('a.s.list');
     }
+    //[GET] /admin/accounts/member
     public function membershow()
     {
-        // $get = member::where('role', null)
-        //     ->where('mem_active', '!=', -1)
-        //     ->paginate(10);
-        // $count = member::where('role', null)
-        //     ->where('mem_active', '!=', -1)
-        //     ->count('mem_id');
-        // $nor = order::where('order_status', 1)
-        //     ->groupBy('mem_id')
-        //     ->get(['mem_id', order::raw('COUNT(order_id) as nor')]);
-        // return view('admin.account.admin_member_acc_page', ['member' => $get, 'nor' => $nor, 'count' => $count, 'title' => 'Member Accounts']);
-        $page = request('page', 1);
-
-        $response = Http::get('https://s25sneaker.000webhostapp.com/api/admin/accounts/member', ['page' => $page]);
-
-        if ($response->successful()) {
-            $responseData = $response->json();
-
-            $count = $responseData['count'];
-
-            $nor = $responseData['nor'];
-
-            $members = collect($responseData['member']['data']);
-
-            $perPage = 10;
-
-            // $currentPage = $responseData['member']['current_page'];
-
-            $paginator = new LengthAwarePaginator(
-                $members,
-                $responseData['count'],
-                $perPage,
-                $page,
-                ['path' => url()->current(), 'query' => request()->query()]
-            );
-
-            return view('admin.account.admin_member_acc_page', ['member' => $paginator, 'nor' => $nor, 'count' => $count, 'title' => 'Member Accounts']);
-        } else {
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-        }
+        $get = Member::where('role', null)
+            ->where('mem_active', '!=', -1)
+            ->withCount('orders')
+            ->paginate(10);
+        $count = member::where('role', null)
+            ->where('mem_active', '!=', -1)
+            ->count('mem_id');
+        return view('admin.account.admin_member_acc_page', ['member' => $get, 'count' => $count, 'title' => 'Member Accounts']);
     }
+    //[POST] /unbanmember (use)
     public function unban(Request $request)
     {
-        // $get = $request->all();
-        // member::where('mem_id', $get['mid'])->update([
-        //     'mem_active' => 1
-        // ]);
         $get = $request->all();
-        $response = Http::post('https://s25sneaker.000webhostapp.com/api/unbanmember', $get);
-        if ($response->successful()) {
-        } else {
-            // Xử lý lỗi nếu có
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-            return response()->json(['error' => 'Failed to post data'], $statusCode);
-        }
+        DB::update('update `member` set  `mem_active` = 1 where `mem_id` = ?', [$get['mid']]);
     }
+    //[POST] /banmember (use)
     public function ban(Request $request)
     {
-        // $get = $request->all();
-        // member::where('mem_id', $get['mid'])->update([
-        //     'mem_active' => 0
-        // ]);
         $get = $request->all();
-        $response = Http::post('https://s25sneaker.000webhostapp.com/api/banmember', $get);
-        if ($response->successful()) {
-        } else {
-            // Xử lý lỗi nếu có
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-            return response()->json(['error' => 'Failed to post data'], $statusCode);
-        }
+        DB::update('update `member` set  `mem_active` = -1 where `mem_id` = ?', [$get['mid']]);
     }
 
 
 
 
 
-    //  API
+
+
     //  API
 
     public function adminshow_api()

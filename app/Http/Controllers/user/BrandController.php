@@ -284,16 +284,6 @@ class BrandController extends Controller
                 GROUP by product_id,product_size_color.product_image'
             );
             $brands = new HeaderController();
-            // return view('user/brand', [
-            //     'product_imgs' => $product_imgs,
-            //     'brands' => $brands->load(),
-            //     'products' => $products,
-            //     'name' => $name,
-            //     'sort_type' => $sort_type,
-            //     'amount' => $amount,
-            //     'checked_box' => $checked_box,
-            //     'cur_page' => $request->page
-            // ]);
             return response()->json([
                 'status' => 'success',
                 'product_imgs' => $product_imgs,
@@ -375,15 +365,6 @@ class BrandController extends Controller
                 GROUP by product_id,product_size_color.product_image'
             );
             $brands = new HeaderController();
-            // return view('user/brand', [
-            //     'product_imgs' => $product_imgs,
-            //     'brands' => $brands->load(),
-            //     'products' => $products,
-            //     'sort_type' => $sort_type,
-            //     'amount' => $amount,
-            //     'checked_box' => $checked_box,
-            //     'cur_page' => $request->page
-            // ]);
             return response()->json([
                 'status' => 'success',
                 'product_imgs' => $product_imgs,
@@ -428,15 +409,6 @@ class BrandController extends Controller
                 GROUP by product_id,product_size_color.product_image'
             );
             $brands = new HeaderController();
-            // return view('user/brand', [
-            //     'product_imgs' => $product_imgs,
-            //     'brands' => $brands->load(),
-            //     'products' => $products,
-            //     'sort_type' => $sort_type,
-            //     'amount' => $amount,
-            //     'checked_box' => $checked_box,
-            //     'cur_page' => $request->page
-            // ]);
             return response()->json([
                 'status' => 'success',
                 'product_imgs' => $product_imgs,
@@ -452,81 +424,78 @@ class BrandController extends Controller
         }
     }
 
+
+    //USE
+
+    //[GET] /user/banner
     public function banner_api()
     {
         try {
-            $data = DB::select("SELECT brand.*, COUNT(product.product_id) as product_count FROM brand INNER JOIN product ON brand.brand_id = product.brand_id WHERE brand.brand_banner != '' GROUP BY brand.brand_id,brand.brand_name,brand.brand_des,brand.brand_img,brand.brand_banner,brand.brand_des_img,brand.brand_logo,brand.brand_active LIMIT 5");
-            // return response()->json($data);
+            $data = DB::select("SELECT brand.*, COUNT(product.product_id) as product_count FROM brand INNER JOIN product ON brand.brand_id = product.brand_id WHERE brand.brand_banner != '' AND brand.brand_active = 1 GROUP BY brand.brand_id,brand.brand_name,brand.brand_des,brand.brand_img,brand.brand_banner,brand.brand_des_img,brand.brand_logo,brand.brand_active LIMIT 5");
+
             return response()->json(['status' => 'success', 'data' => $data], 201);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'error' => $e->getMessage()], 500);
         }
     }
+
+    //[GET] /user/home 
     public function home_api()
     {
         try {
-            // $data = DB::select('select * from brands where homeimg != ""  ');
-            $data = DB::select("SELECT brand.*, COUNT(product.product_id) as product_count FROM brand INNER JOIN product ON brand.brand_id = product.brand_id WHERE brand.brand_img != '' GROUP BY brand.brand_id,brand.brand_name,brand.brand_des,brand.brand_img,brand.brand_banner,brand.brand_des_img,brand.brand_logo,brand.brand_active LIMIT 5");
 
-            // return response()->json($data);
+            $data = DB::select("SELECT brand.*, COUNT(product.product_id) as product_count FROM brand INNER JOIN product ON brand.brand_id = product.brand_id WHERE brand.brand_img != '' AND brand.brand_active = 1 GROUP BY brand.brand_id,brand.brand_name,brand.brand_des,brand.brand_img,brand.brand_banner,brand.brand_des_img,brand.brand_logo,brand.brand_active LIMIT 5");
+
             return response()->json(['status' => 'success', 'data' => $data], 201);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'error' => $e->getMessage()], 500);
         }
     }
 
+    //[GET] /user/logo
     public function logo_api()
     {
         try {
-            // $data = DB::select('select * from brands where homeimg != ""  ');
-            $data = DB::select("select * from brand where brand_logo != '' ");
 
-            // return response()->json($data);
+            $data = DB::select("select * from brand where brand_logo != '' and brand_active=1 ");
+
             return response()->json(['status' => 'success', 'data' => $data], 201);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'error' => $e->getMessage()], 500);
         }
     }
 
+    //[GET] /brands
     public function brand_api()
     {
         try {
-            $data = DB::select("select * from brand where brand_active = 1 ");
+            $data = DB::select("select * from brand where brand_active = 1 LIMIT 8");
 
-            // return response()->json($data);
             return response()->json(['status' => 'success', 'data' => $data], 201);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'error' => $e->getMessage()], 500);
         }
     }
 
-    // public function product_brand_api(Request $request)
-    // {
-    //     try {
-    //         $brand_name = $request->input('brand_name');
-
-    //         //$data = DB::select("select * from brand where brand_active = 1 ");
-
-    //         $data = brand::where('brand_active', '!=', 1)
-    //                 ->where('brand_name', '=',$brand_name)->paginate(7)->get();
-
-    //         // return response()->json($data);
-    //         return response()->json(['status' => 'success', 'data' => $data], 201);
-    //     } catch (\Exception $e) {
-    //         return response()->json(['status' => 'error', 'error' => $e->getMessage()], 500);
-    //     }
-    // }
+    //[GET] /detail/brand
 
     public function detail_brand_api(Request $request)
     {
         try {
             $brand_name = $request->input('brand_name');
+            if ($brand_name != "All") {
+                $data = brand::where('brand_active', '=', 1)
+                    ->where('brand_name', '=', $brand_name)->get();
 
-            $data = brand::where('brand_active', '=', 1)
-                ->where('brand_name', '=', $brand_name)->get();
+                // return response()->json($data);
+                return response()->json(['status' => 'success', 'data' => $data], 201);
+            } else {
+                $data = brand::where('brand_active', '=', 1)
+                    ->where('brand_id', '=', 8)->get();
 
-            // return response()->json($data);
-            return response()->json(['status' => 'success', 'data' => $data], 201);
+                // return response()->json($data);
+                return response()->json(['status' => 'success', 'data' => $data], 201);
+            }
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'error' => $e->getMessage()], 500);
         }
